@@ -1,0 +1,24 @@
+set(ELECTRODECHARGE_REFERENCE_LIBRARY_NAME ElectrodeChargePluginReference)
+set(SHARED_TARGET ${ELECTRODECHARGE_REFERENCE_LIBRARY_NAME})
+
+set(API_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+set(API_INCLUDE_FILES)
+foreach(dir ${API_INCLUDE_DIRS})
+    file(GLOB fullpaths ${dir}/*.h)
+    set(API_INCLUDE_FILES ${API_INCLUDE_FILES} ${fullpaths})
+    include_directories(BEFORE ${dir})
+endforeach()
+
+file(GLOB SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+file(GLOB SOURCE_INCLUDE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+include_directories(BEFORE ${CMAKE_SOURCE_DIR}/openmmapi/include)
+include_directories(BEFORE ${CMAKE_SOURCE_DIR}/openmmapi/include/internal)
+
+add_library(${SHARED_TARGET} SHARED ${SOURCE_FILES} ${SOURCE_INCLUDE_FILES} ${API_INCLUDE_FILES})
+
+target_link_libraries(${SHARED_TARGET} OpenMM ${SHARED_PLUGIN_TARGET})
+set_target_properties(${SHARED_TARGET} PROPERTIES
+    COMPILE_FLAGS "-DOPENMM_BUILDING_SHARED_LIBRARY ${EXTRA_COMPILE_FLAGS}"
+    LINK_FLAGS "${EXTRA_COMPILE_FLAGS}")
+
+install(TARGETS ${SHARED_TARGET} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/plugins)

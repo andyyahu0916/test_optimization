@@ -1,0 +1,127 @@
+Warning: importing 'simtk.openmm' is deprecated.  Import 'openmm' instead.
+Traceback (most recent call last):
+  File "/home/andy/test_optimization/BMIM_BF4_HOH/test_stability.py", line 77, in <module>
+    MMsys.simmd.step(freq_charge_update_fs)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andy/miniforge3/envs/cuda/lib/python3.13/site-packages/openmm/app/simulation.py", line 150, in step
+    self._simulate(endStep=self.currentStep+steps)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andy/miniforge3/envs/cuda/lib/python3.13/site-packages/openmm/app/simulation.py", line 229, in _simulate
+    self.integrator.step(10) # Only take 10 steps at a time, to give Python more chances to respond to a control-c.
+    ~~~~~~~~~~~~~~~~~~~~^^^^
+  File "/home/andy/miniforge3/envs/cuda/lib/python3.13/site-packages/openmm/openmm.py", line 13820, in step
+    return _openmm.DrudeLangevinIntegrator_step(self, steps)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+openmm.OpenMMException: Particle coordinate is NaN.  For more information, see https://github.com/openmm/openmm/wiki/Frequently-Asked-Questions#nan
+✅ Cython module loaded successfully!
+======================================================================
+🧪 測試數值穩定性修復
+======================================================================
+目標: 跑到 400 iterations (超過之前 332 iteration 爆炸點)
+======================================================================
+
+初始化系統...
+  PDB: for_openmm.pdb
+  Voltage: 2.0 V
+🔥 Using Cython-accelerated Poisson solver
+✓ 系統初始化完成
+  總原子數: 29427
+  電極原子數: 800 (cathode) + 800 (anode)
+
+開始模擬...
+  每 10 ps 做 50 次 Poisson solver
+Q_numeric , Q_analytic charges on  cathode -3.057776433707577 0.3835571999862076
+Q_numeric , Q_analytic charges on  anode -0.3955571999861504 -0.3955571999861512
+Q_numeric , Q_analytic charges on  cathode -0.34150984536170054 -0.34150984536170553
+Q_numeric , Q_analytic charges on  anode -75.3940501902303 0.3295098453617335
+Q_numeric , Q_analytic charges on  cathode -223.6611712242655 18.83644591035617
+Q_numeric , Q_analytic charges on  anode -18.848445910356112 -18.84844591035617
+Q_numeric , Q_analytic charges on  cathode -35.962944731361524 -35.9629447313614
+Q_numeric , Q_analytic charges on  anode -227.31301917038869 35.95094473136145
+Q_numeric , Q_analytic charges on  cathode -227.845017645877 25.718673296711223
+Q_numeric , Q_analytic charges on  anode -25.730673296711107 -25.730673296711224
+Q_numeric , Q_analytic charges on  cathode -33.36322966382427 -33.36322966382405
+Q_numeric , Q_analytic charges on  anode -227.74315838203694 33.35122966382408
+Q_numeric , Q_analytic charges on  cathode -227.68253545415692 28.389181800843097
+Q_numeric , Q_analytic charges on  anode -28.40118180084317 -28.401181800843126
+Q_numeric , Q_analytic charges on  cathode -31.2082225627782 -31.208222562778268
+Q_numeric , Q_analytic charges on  anode -227.91006516354375 31.196222562778324
+Q_numeric , Q_analytic charges on  cathode -227.54784751034163 30.099499356203047
+Q_numeric , Q_analytic charges on  anode -30.11149935620249 -30.111499356202962
+
+❌ 測試失敗: Particle coordinate is NaN.  For more information, see https://github.com/openmm/openmm/wiki/Frequently-Asked-Questions#nan
+Final charge range: [-0.1502, 0.1510]
+Final charge range: [-0.1510, 0.1502]
+Final charge range: [-0.2255, 0.2263]
+Final charge range: [-0.1749, 0.1744]
+Final charge range: [-0.2631, 0.2639]
+Final charge range: [-0.1529, 0.1525]
+Final charge range: [-0.2820, 0.2827]
+Final charge range: [-0.1518, 0.1514]
+Final charge range: [-0.2914, 0.2921]
+Final charge range: [-0.1517, 0.1513]
+Final charge range: [-0.1555, 0.1558]
+Final charge range: [-0.2266, 0.2260]
+Final charge range: [-0.1507, 0.1511]
+Final charge range: [-0.2640, 0.2634]
+Final charge range: [-0.1507, 0.1511]
+Final charge range: [-0.2828, 0.2821]
+Final charge range: [-0.1507, -0.1501]
+Final charge range: [-0.2921, 0.2915]
+Final charge range: [-0.2258, 0.0757]
+Final charge range: [-0.2968, 0.2961]
+Final charge range: [-0.2633, -0.1125]
+Final charge range: [-0.1896, 0.1879]
+Final charge range: [-0.2820, -0.2067]
+Final charge range: [-0.1649, 0.1631]
+Final charge range: [0.0097, 0.0474]
+Final charge range: [-0.1627, -0.1389]
+Final charge range: [-0.1455, 0.1745]
+Final charge range: [-0.2321, -0.2202]
+Final charge range: [-0.2091, 0.2212]
+Final charge range: [-0.2668, -0.2609]
+Final charge range: [-0.1801, 0.1811]
+Final charge range: [-0.2842, -0.2812]
+Final charge range: [-0.1742, -0.1265]
+Final charge range: [-0.2928, 0.0098]
+Final charge range: [-0.2375, -0.2136]
+Final charge range: [-0.2689, 0.1538]
+Final charge range: [-0.2691, -0.2572]
+Final charge range: [-0.1833, 0.1690]
+Final charge range: [-0.2850, -0.2790]
+Final charge range: [-0.1690, 0.1672]
+Final charge range: [-0.2929, 0.0113]
+Final charge range: [-0.1672, -0.1345]
+Final charge range: [-1.0129, 0.1839]
+!!! BAD INPUT to update_openmm: charges[427]=-1.0129
+!!! BAD INPUT to update_openmm: charges[428]=-1.0129
+!!! BAD INPUT to update_openmm: charges[551]=-1.0125
+Final charge range: [-0.2343, -0.2180]
+Final charge range: [-0.3843, 0.1932]
+Final charge range: [-0.2679, -0.2598]
+Final charge range: [-0.2012, 0.1761]
+Final charge range: [-0.2847, -0.2806]
+Final charge range: [-0.1753, -0.1286]
+Final charge range: [-0.2931, 0.0101]
+Final charge range: [-0.2381, -0.2147]
+Final charge range: [-0.3104, 0.1549]
+Final charge range: [-0.2694, -0.2577]
+Final charge range: [-0.1948, 0.1723]
+Final charge range: [-0.2851, -0.2793]
+Final charge range: [-0.1721, 0.1693]
+Final charge range: [-0.2930, 0.0111]
+Final charge range: [-0.1691, -0.1327]
+Final charge range: [-0.7952, 0.1701]
+Final charge range: [-0.2353, -0.2171]
+Final charge range: [-0.2979, 0.1823]
+Final charge range: [-0.2684, -0.2593]
+Final charge range: [-0.1878, 0.1737]
+Final charge range: [-0.2850, -0.2804]
+Final charge range: [-0.1726, -0.1299]
+Final charge range: [-0.2932, 0.0102]
+Final charge range: [-0.2367, -0.2154]
+Final charge range: [-0.3466, 0.1572]
+Final charge range: [-0.2687, -0.2581]
+Final charge range: [-0.2100, 0.1773]
+Final charge range: [-0.2848, -0.2794]
+Final charge range: [-0.1761, 0.1718]

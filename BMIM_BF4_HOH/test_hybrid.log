@@ -1,0 +1,56 @@
+Warning: importing 'simtk.openmm' is deprecated.  Import 'openmm' instead.
+Traceback (most recent call last):
+  File "/home/andy/test_optimization/BMIM_BF4_HOH/test_stability.py", line 77, in <module>
+    MMsys.simmd.step(freq_charge_update_fs)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andy/miniforge3/envs/cuda/lib/python3.13/site-packages/openmm/app/simulation.py", line 150, in step
+    self._simulate(endStep=self.currentStep+steps)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andy/miniforge3/envs/cuda/lib/python3.13/site-packages/openmm/app/simulation.py", line 229, in _simulate
+    self.integrator.step(10) # Only take 10 steps at a time, to give Python more chances to respond to a control-c.
+    ~~~~~~~~~~~~~~~~~~~~^^^^
+  File "/home/andy/miniforge3/envs/cuda/lib/python3.13/site-packages/openmm/openmm.py", line 13820, in step
+    return _openmm.DrudeLangevinIntegrator_step(self, steps)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+openmm.OpenMMException: Particle coordinate is NaN.  For more information, see https://github.com/openmm/openmm/wiki/Frequently-Asked-Questions#nan
+✅ Cython module loaded successfully!
+======================================================================
+🧪 測試數值穩定性修復
+======================================================================
+目標: 跑到 400 iterations (超過之前 332 iteration 爆炸點)
+======================================================================
+
+初始化系統...
+  PDB: for_openmm.pdb
+  Voltage: 2.0 V
+🔥 Using Cython-accelerated Poisson solver
+✓ 系統初始化完成
+  總原子數: 29427
+  電極原子數: 800 (cathode) + 800 (anode)
+
+開始模擬...
+  每 10 ps 做 50 次 Poisson solver
+Q_numeric , Q_analytic charges on  cathode -3.057776433707577 0.3835571999862076
+Q_numeric , Q_analytic charges on  anode -0.3955571999861504 -0.3955571999861512
+Q_numeric , Q_analytic charges on  cathode -0.34422684690579286 -0.34422684690579003
+Q_numeric , Q_analytic charges on  anode -80.21252832250937 0.3322268469058464
+Q_numeric , Q_analytic charges on  cathode -221.92970045807283 19.883103041575602
+Q_numeric , Q_analytic charges on  anode -19.895103041575528 -19.895103041575545
+Q_numeric , Q_analytic charges on  cathode -35.25374781088856 -35.253747810888676
+Q_numeric , Q_analytic charges on  anode -227.3784352410916 35.241747810888704
+Q_numeric , Q_analytic charges on  cathode -227.80069283834922 25.96735941776769
+Q_numeric , Q_analytic charges on  anode -25.979359417767753 -25.979359417767718
+Q_numeric , Q_analytic charges on  cathode -33.37405250230024 -33.374052502300025
+Q_numeric , Q_analytic charges on  anode -227.75870126460308 33.36205250230008
+Q_numeric , Q_analytic charges on  cathode -227.68321188156028 27.639613830610422
+Q_numeric , Q_analytic charges on  anode -27.651613830610486 -27.651613830610366
+Q_numeric , Q_analytic charges on  cathode -32.57289713645487 -32.572897136454934
+Q_numeric , Q_analytic charges on  anode -227.86321716540505 32.56089713645496
+Q_numeric , Q_analytic charges on  cathode -227.6331396711975 29.35451628225517
+Q_numeric , Q_analytic charges on  anode -29.366516282255155 -29.366516282255084
+Q_numeric , Q_analytic charges on  cathode -31.313349150778592 -31.3133491507784
+Q_numeric , Q_analytic charges on  anode -227.9703985686342 31.3013491507784
+Q_numeric , Q_analytic charges on  cathode -38.29739596870972 nan
+Q_numeric , Q_analytic charges on  anode -127.45005998624184 nan
+
+❌ 測試失敗: Particle coordinate is NaN.  For more information, see https://github.com/openmm/openmm/wiki/Frequently-Asked-Questions#nan
