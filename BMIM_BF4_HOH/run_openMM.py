@@ -57,10 +57,10 @@ openmm_platform = sim_config.get('platform')
 Voltage = sim_config.getfloat('voltage')
 
 # MM version
-mm_version = sim_config.get('mm_version', 'original').lower()
+mm_version = sim_config.get('mm_version', 'optimized').lower()
 
 # Warm Start
-enable_warmstart = sim_config.getboolean('enable_warmstart', fallback=True)
+enable_warmstart = sim_config.getboolean('enable_warmstart', fallback=False)
 verify_interval = sim_config.getint('verify_interval', fallback=100)
 warmstart_after_ns = sim_config.getfloat('warmstart_after_ns', fallback=0.0)
 warmstart_after_frames = sim_config.getint('warmstart_after_frames', fallback=0)
@@ -232,14 +232,11 @@ if logging_mode == 'legacy_print':
             steps_in_this_chunk = int(freq_traj_output_ps * 1000 / freq_charge_update_fs )
             
             for j in range( steps_in_this_chunk ):
-                if mm_version == 'cython':
-                    MMsys.Poisson_solver_fixed_voltage( 
-                        Niterations=4,
-                        enable_warmstart=use_warmstart_now,
-                        verify_interval=verify_interval
-                    )
-                else:
-                    MMsys.Poisson_solver_fixed_voltage( Niterations=4 )
+                MMsys.Poisson_solver_fixed_voltage(
+                    Niterations=4,
+                    enable_warmstart=use_warmstart_now,
+                    verify_interval=verify_interval
+                )
                 MMsys.simmd.step( freq_charge_update_fs )
             
             if write_charges : # Legacy 模式也支援寫入 charge (雖然頻率不同)
@@ -323,15 +320,11 @@ elif logging_mode == 'efficient':
                     use_warmstart_now = False
 
             # 執行一次電荷更新 + MD 步驟
-            if mm_version == 'cython':
-                MMsys.Poisson_solver_fixed_voltage( 
-                    Niterations=4,
-                    enable_warmstart=use_warmstart_now,
-                    verify_interval=verify_interval
-                )
-            else:
-                MMsys.Poisson_solver_fixed_voltage( Niterations=4 )
-            
+            MMsys.Poisson_solver_fixed_voltage(
+                Niterations=4,
+                enable_warmstart=use_warmstart_now,
+                verify_interval=verify_interval
+            )
             MMsys.simmd.step( steps_per_charge_update )
             
             # 根據設定的頻率寫入電荷
