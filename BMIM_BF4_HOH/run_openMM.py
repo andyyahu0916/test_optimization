@@ -2,9 +2,9 @@ from __future__ import print_function
 import sys
 sys.path.append('./lib/')
 #********** OpenMM Drivers
-from simtk.openmm.app import *
-from simtk.openmm import *
-from simtk.unit import *
+from openmm.app import *
+from openmm import *
+from openmm.unit import *
 
 # ⚠️ MM_classes import will be determined by config.ini (see below)
 # from MM_classes import *
@@ -49,7 +49,7 @@ config.read(config_path)
 
 # [Simulation] 區塊
 sim_config = config['Simulation']
-simulation_time_ns = sim_config.getint('simulation_time_ns')
+simulation_time_ns = sim_config.getfloat('simulation_time_ns')
 freq_charge_update_fs = sim_config.getint('freq_charge_update_fs')
 freq_traj_output_ps = sim_config.getint('freq_traj_output_ps')
 simulation_type = sim_config.get('simulation_type')
@@ -73,28 +73,11 @@ write_components = sim_config.getboolean('write_components', fallback=False)
 
 # Import appropriate MM_classes based on version
 if mm_version == 'cython':
-    print("🔥 Loading Cython-optimized MM classes (2-5x speedup expected)")
-    if enable_warmstart:
-        if warmstart_after_ns > 0:
-            print(f"🚀 Warm Start will be enabled after {warmstart_after_ns} ns (equilibration period)")
-        elif warmstart_after_frames > 0:
-            print(f"🚀 Warm Start will be enabled after {warmstart_after_frames} frames")
-        else:
-            print(f"🚀 Warm Start enabled immediately (verify every {verify_interval} calls, ~1.3-1.5x additional speedup)")
-    else:
-        print("⚠️  Warm Start disabled (using cold start every time)")
-    from MM_classes_CYTHON import *
-    from Fixed_Voltage_routines_CYTHON import *
-elif mm_version == 'optimized':
-    print("⚡ Loading NumPy-optimized MM classes (1.5-2x speedup expected)")
-    if enable_warmstart: print("⚠️  Warning: Warm Start only supported in 'cython' version, ignoring parameter")
-    enable_warmstart = False
-    from MM_classes_OPTIMIZED import *
-    from Fixed_Voltage_routines_OPTIMIZED import *
-else: # 'original'
-    print("📦 Loading original MM classes (baseline performance)")
-    if enable_warmstart: print("⚠️  Warning: Warm Start only supported in 'cython' version, ignoring parameter")
-    enable_warmstart = False
+    print("🔥 Loading Cython-accelerated MM classes.")
+    from MM_classes_CYTHON import MM_CYTHON as MM
+    from Fixed_Voltage_routines import *
+else: # 'original' or 'optimized' (which are now the same)
+    print("📦 Loading unified NumPy MM classes.")
     from MM_classes import *
     from Fixed_Voltage_routines import *
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from simtk.openmm.app import *
-from simtk.openmm import *
-from simtk.unit import *
+from openmm.app import *
+from openmm import *
+from openmm.unit import *
 from sys import stdout
 from time import gmtime, strftime
 from datetime import datetime
@@ -312,10 +312,13 @@ class Electrode_Virtual(Conductor_Virtual):
     #
     #  input:
     #       MMsys :  MMsystem object
-    #       positions : full position list returned directly from OpenMM
-    #               includes all atoms, contains quantities ( value , unit)  in nanometers
+    #       z_positions_array : NumPy array of z-coordinates for all atoms
+    #       Conductor_list : list of conductor objects
+    #       z_opposite : z-position of the opposing electrode
+    #
+    # 🚀 OPTIMIZED: Use cached charges from MMsys to avoid 6,000-18,000 OpenMM API calls!
     #**************************
-    def compute_Electrode_charge_analytic( self, MMsys , positions, Conductor_list, z_opposite ):
+    def compute_Electrode_charge_analytic( self, MMsys , z_positions_array, Conductor_list, z_opposite ):
         # positive sign for cathode, negative for anode
         sign=1.0
         if self.electrode_type == 'anode':
@@ -324,24 +327,20 @@ class Electrode_Virtual(Conductor_Virtual):
         #********** Geometrical contribution:  Note use the Sheet Area rather than area_atom since we want total charge...
         self.Q_analytic = sign / ( 4.0 * numpy.pi ) * self.sheet_area * (self.Voltage / MMsys.Lgap + self.Voltage / MMsys.Lcell) * conversion_KjmolNm_Au
 
+        # 🚀 OPTIMIZATION: Use cached charges and vectorized operations
+        z_opp_value = z_opposite._value if hasattr(z_opposite, '_value') else float(z_opposite)
+
         #********** Image charge contribution:  sum over electrolyte atoms and Drude oscillators ...
-        for index in MMsys.electrolyte_atom_indices:
-            (q_i, sig, eps) = MMsys.nbondedForce.getParticleParameters(index)
-            z_atom = positions[index][2]._value # in nm
-            z_distance = abs(z_atom - z_opposite)
-            # add image charge contribution
-            self.Q_analytic += (z_distance / MMsys.Lcell) * (- q_i._value)
+        if getattr(MMsys, '_electrolyte_indices_array', None) is not None and MMsys._electrolyte_indices_array.size:
+            z_atoms = numpy.take(z_positions_array, MMsys._electrolyte_indices_array)
+            z_distances = numpy.abs(z_atoms - z_opp_value)
+            self.Q_analytic += numpy.sum(z_distances / MMsys.Lcell * (-MMsys._electrolyte_charges))
 
         #*********  Conductors are effectively in electrolyte as far as flat electrodes are concerned, sum over these atoms ...
-        if Conductor_list:
-            for Conductor in Conductor_list:
-                for atom in Conductor.electrode_atoms:
-                    index = atom.atom_index
-                    (q_i, sig, eps) = MMsys.nbondedForce.getParticleParameters(index)
-                    z_atom = positions[index][2]._value # in nm
-                    z_distance = abs(z_atom - z_opposite)
-                    # add image charge contribution
-                    self.Q_analytic += (z_distance / MMsys.Lcell) * (- q_i._value)
+        if Conductor_list and hasattr(MMsys, '_conductor_charges') and MMsys._conductor_charges is not None:
+            z_atoms_cond = numpy.take(z_positions_array, MMsys._conductor_indices)
+            z_distances_cond = numpy.abs(z_atoms_cond - z_opp_value)
+            self.Q_analytic += numpy.sum(z_distances_cond / MMsys.Lcell * (-MMsys._conductor_charges))
 
         
 
@@ -586,4 +585,3 @@ class Nanotube_Virtual(Conductor_Virtual):
             sumQ += atom.charge
 
         return sumQ
-
