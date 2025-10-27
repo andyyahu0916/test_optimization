@@ -29,6 +29,64 @@ import configparser
 # for electrode sheets, need to up recursion limit for residue atom matching...
 sys.setrecursionlimit(2000)
 
+# ============================================================
+# 🔥 Linus 重構: 統一 warm-start 激活邏輯
+# ============================================================
+def should_use_warmstart(
+    i_frame: int, 
+    current_time_ns: float, 
+    warmstart_activated: bool,
+    config_enable_warmstart: bool,
+    config_warmstart_after_ns: float,
+    config_warmstart_after_frames: int
+) -> tuple:
+    """
+    一個函數，統一處理所有 warm-start 激活邏輯。
+    
+    返回: (use_warmstart_now, new_warmstart_activated_status)
+    
+    這個函數是為了消除 run_openMM.py 中 'legacy_print' 和 'efficient' 
+    兩個模式下重複的 15 行 if/else 垃圾代碼。
+    
+    不要重複你自己 (Don't Repeat Yourself) 是軟體工程的基本原則。
+    違反這個原則的代碼是垃圾。
+    """
+    
+    # 如果全局禁用，直接返回
+    if not config_enable_warmstart:
+        return False, False
+    
+    # 如果已經激活，就保持激活
+    if warmstart_activated:
+        return True, True
+
+    # 尚未激活，檢查是否達到激活條件
+    
+    # 方式 A: 按時間 (ns)
+    if config_warmstart_after_ns > 0:
+        if current_time_ns >= config_warmstart_after_ns:
+            print(f"\n{'='*80}")
+            print(f"🚀 WARM START ACTIVATED at {current_time_ns:.2f} ns (frame {i_frame})")
+            print(f"{'='*80}\n")
+            return True, True  # 激活
+        else:
+            return False, False  # 保持 cold start
+    
+    # 方式 B: 按幀數 (僅在時間控制被禁用的情況下生效)
+    elif config_warmstart_after_frames > 0:
+        if i_frame >= config_warmstart_after_frames:
+            print(f"\n{'='*80}")
+            print(f"🚀 WARM START ACTIVATED at frame {i_frame} ({current_time_ns:.2f} ns)")
+            print(f"{'='*80}\n")
+            return True, True  # 激活
+        else:
+            return False, False  # 保持 cold start
+            
+    # 方式 C: 立即激活 (時間=0, 幀數=0)
+    else:
+        return True, True
+# ============================================================
+
 # --- 開始：讀取設定檔 ---
 
 # 1. 設定命令列參數解析
@@ -200,9 +258,7 @@ if logging_mode == 'legacy_print':
     # --- 這是您原始的、低效能的「列印到終端機」迴圈 ---
     print("--- WARNING: Running in 'legacy_print' mode. This will be VERY SLOW. ---")
     
-    # 🔥 NEW: Track simulation progress for delayed warm start activation
-    # (這是從您上傳的 run_openMM.py 複製過來的邏輯)
-    current_frame = 0
+    # 🔥 Linus 重構: 初始化 warm-start 狀態追蹤
     warmstart_activated = False
 
     for i in range( int(simulation_time_ns * 1000 / freq_traj_output_ps ) ):
@@ -217,25 +273,16 @@ if logging_mode == 'legacy_print':
             f = MMsys.system.getForce(j)
             print(f'  {type(f)}: ' + str(MMsys.simmd.context.getState(getEnergy=True, groups=2**j).getPotentialEnergy()))
 
-        # 2. 檢查 Warm Start (這是從您上傳的 run_openMM.py 複製過來的邏輯)
+        # 2. 🔥 Linus 重構: 使用統一的 warm-start 判斷函數
         current_time_ns = i * freq_traj_output_ps / 1000.0
-        use_warmstart_now = enable_warmstart
-        
-        if enable_warmstart and not warmstart_activated:
-            if warmstart_after_ns > 0:
-                if current_time_ns >= warmstart_after_ns:
-                    warmstart_activated = True
-                    print(f"🚀 WARM START ACTIVATED at {current_time_ns:.2f} ns (frame {i})")
-                else:
-                    use_warmstart_now = False
-            elif warmstart_after_frames > 0:
-                if i >= warmstart_after_frames:
-                    warmstart_activated = True
-                    print(f"🚀 WARM START ACTIVATED at frame {i} ({current_time_ns:.2f} ns)")
-                else:
-                    use_warmstart_now = False
-            else:
-                warmstart_activated = True
+        use_warmstart_now, warmstart_activated = should_use_warmstart(
+            i,                      # 當前幀號
+            current_time_ns,        # 當前模擬時間
+            warmstart_activated,    # 當前激活狀態
+            enable_warmstart,       # 來自 config.ini
+            warmstart_after_ns,     # 來自 config.ini
+            warmstart_after_frames  # 來自 config.ini
+        )
 
         # 3. 執行 "一個區塊" (chunk) 的模擬
         #********** Monte Carlo Simulation ********
@@ -252,7 +299,7 @@ if logging_mode == 'legacy_print':
                 if mm_version == 'cython':
                     MMsys.Poisson_solver_fixed_voltage( 
                         Niterations=4,
-                        enable_warmstart=use_warmstart_now,
+                        use_warmstart_this_step=use_warmstart_now,  # 🔥 Linus 重構: 新參數名
                         verify_interval=verify_interval
                     )
                 else:
@@ -265,8 +312,6 @@ if logging_mode == 'legacy_print':
         else:
             print('simulation type not recognized ...')
             sys.exit()
-        
-        current_frame = i
     
 elif logging_mode == 'efficient':
 
@@ -309,41 +354,28 @@ elif logging_mode == 'efficient':
         if write_components and componentsFile:
             print(f" Writing energy components to {strdir}components.log every {components_write_interval} updates (Warning: Performance heavy).")
 
-        # --- 整合 Warm Start 邏輯 ---
+        # 🔥 Linus 重構: 初始化 warm-start 狀態追蹤
         warmstart_activated = False
-        warmstart_activation_step = 0
-        if enable_warmstart and mm_version == 'cython':
-            if warmstart_after_ns > 0:
-                steps_per_ns = (1000 * 1000) / freq_charge_update_fs
-                warmstart_activation_step = int(warmstart_after_ns * steps_per_ns)
-                print(f"🚀 Warm Start will be enabled after {warmstart_activation_step} charge update steps (approx {warmstart_after_ns} ns).")
-            elif warmstart_after_frames > 0:
-                # 這裡的 frame 是指 'charge update' 步驟
-                warmstart_activation_step = warmstart_after_frames
-                print(f"🚀 Warm Start will be enabled after {warmstart_activation_step} charge update steps.")
-            else:
-                print("🚀 Warm Start enabled immediately.")
-                warmstart_activated = True
         
         # 這是新的主迴圈
         for i in range(n_total_updates):
             
-            use_warmstart_now = enable_warmstart
-            if enable_warmstart and not warmstart_activated:
-                if i >= warmstart_activation_step:
-                    warmstart_activated = True
-                    current_time_ns = (i * freq_charge_update_fs) / (1000.0 * 1000.0)
-                    print(f"\n{'='*80}")
-                    print(f"🚀 WARM START ACTIVATED at step {i} (approx {current_time_ns:.2f} ns)")
-                    print(f"{'='*80}\n")
-                else:
-                    use_warmstart_now = False
+            # 🔥 Linus 重構: 使用統一的 warm-start 判斷函數
+            current_time_ns = (i * freq_charge_update_fs) / (1000.0 * 1000.0)
+            use_warmstart_now, warmstart_activated = should_use_warmstart(
+                i,                      # 當前步驟號
+                current_time_ns,        # 當前模擬時間
+                warmstart_activated,    # 當前激活狀態
+                enable_warmstart,       # 來自 config.ini
+                warmstart_after_ns,     # 來自 config.ini
+                warmstart_after_frames  # 來自 config.ini
+            )
 
             # 執行一次電荷更新 + MD 步驟
             if mm_version == 'cython':
                 MMsys.Poisson_solver_fixed_voltage( 
                     Niterations=4,
-                    enable_warmstart=use_warmstart_now,
+                    use_warmstart_this_step=use_warmstart_now,  # 🔥 Linus 重構: 新參數名
                     verify_interval=verify_interval
                 )
             else:

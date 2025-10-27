@@ -77,7 +77,7 @@ class MM(MM_OPTIMIZED):
     # 🔥 CYTHON OPTIMIZED: Fixed-Voltage Poisson Solver
     # 完全遵循 OPTIMIZED 版本的算法，只在關鍵循環使用 Cython
     #************************************************
-    def Poisson_solver_fixed_voltage(self, Niterations=3, enable_warmstart=True, 
+    def Poisson_solver_fixed_voltage(self, Niterations=3, use_warmstart_this_step=False, 
                                       verify_interval=100):
         """
         🔥 Cython 優化版本的 Poisson solver (with Adaptive Warm Start)
@@ -109,8 +109,10 @@ class MM(MM_OPTIMIZED):
         ----------
         Niterations : int
             Number of Poisson solver iterations (default: 3)
-        enable_warmstart : bool
-            Whether to use warm start (default: True)
+        use_warmstart_this_step : bool
+            Whether to use warm start for THIS specific call (default: False)
+            Caller (run_openMM.py) is responsible for determining this based on
+            equilibration time, frame number, etc.
         verify_interval : int
             Force cold start every N calls for verification (default: 100)
             Set to 0 to disable periodic verification
@@ -121,15 +123,17 @@ class MM(MM_OPTIMIZED):
             platform=self.simmd.context.getPlatform()
             platform.setPropertyValue( self.simmd.context , 'ReferenceVextGrid' , "false" )
 
-        # 🔥 NEW: Adaptive Warm Start with periodic verification
+        # 🔥 Linus 重構: 簡化 warm-start 決策邏輯
         # Initialize counter on first call
         if not hasattr(self, '_warmstart_call_counter'):
             self._warmstart_call_counter = 0
         
         self._warmstart_call_counter += 1
         
-        # Decide whether to use warm start
-        use_warmstart = (enable_warmstart and 
+        # 🔥 CRITICAL: 只聽調用者的指令，不自作聰明
+        # run_openMM.py 負責判斷是否啟用 warm-start (基於時間、幀數等)
+        # 這個函數只檢查「調用者要求 warm-start 且上次保存的數據存在」
+        use_warmstart = (use_warmstart_this_step and 
                         hasattr(self, '_warm_start_cathode_charges') and
                         hasattr(self, '_warm_start_anode_charges'))
         
@@ -319,9 +323,10 @@ class MM(MM_OPTIMIZED):
         #     If print overhead is a concern, comment out the next line
         self.Scale_charges_analytic_general( print_flag = True )
 
-        # 🔥 NEW: Save converged charges for warm start in next call
-        # This is a standard continuation method - uses converged solution as initial guess
-        if enable_warmstart:  # Only save if warm start is enabled
+        # 🔥 Linus 重構: 只在調用者要求時才保存 (不再自作聰明)
+        # 保存收斂的電荷，供下次 warm-start 使用
+        # 這是標準的 continuation method - 使用收斂解作為下次的初始猜測
+        if use_warmstart_this_step:  # 只有當調用者要求使用時，才費力保存
             self._warm_start_cathode_charges = numpy.array([atom.charge for atom in self.Cathode.electrode_atoms])
             self._warm_start_anode_charges = numpy.array([atom.charge for atom in self.Anode.electrode_atoms])
             
