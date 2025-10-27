@@ -17,6 +17,8 @@ class MM_CYTHON(MM):
     def _calculate_new_charges(self, forces_z, indices, q_old, prefactor, voltage_term, sign):
         """
         Overrides the base method to use the faster Cython implementation.
+        If the Cython module is not available, it gracefully falls back to the
+        parent's NumPy implementation.
         """
         if CYTHON_AVAILABLE:
             return ec_cython.calculate_new_charges_cython(
@@ -29,7 +31,4 @@ class MM_CYTHON(MM):
                 sign
             )
         else:
-            # If Cython module fails to import, we can still run using the parent's
-            # NumPy implementation, ensuring the code never fails.
             return super()._calculate_new_charges(forces_z, indices, q_old, prefactor, voltage_term, sign)
-
