@@ -94,7 +94,7 @@ dependencies:
   - cuda-tools=12.9.1=ha770c72_0
   - cuda-version=12.9=h4f385c5_3
   - cuda-visual-tools=12.9.1=ha770c72_0
-  - cudnn=9.13.1.26=hbcb9cd8_0
+  - cudnn
   - cupy=13.6.0=py313h586c94b_2
   - cupy-core=13.6.0=py313h28b6081_2
   - cxx-compiler=1.11.0=hfcd1e18_0
@@ -193,8 +193,8 @@ dependencies:
   - libclang13=21.1.3=default_h746c552_0
   - libcublas=12.9.1.4=h9ab20c4_0
   - libcublas-dev=12.9.1.4=h9ab20c4_0
-  - libcudnn=9.13.1.26=hf7e9902_0
-  - libcudnn-dev=9.13.1.26=h58dd1b1_0
+  - libcudnn
+  - libcudnn-dev
   - libcudss=0.6.0.5=h58dd1b1_0
   - libcufft=11.4.1.4=h5888daf_0
   - libcufft-dev=11.4.1.4=h5888daf_0
