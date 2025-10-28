@@ -26,6 +26,7 @@ private:
     const ElectrodeChargeForce& owner;
     OpenMM::Kernel kernel;
     OpenMM::NonbondedForce* nonbondedForce = nullptr;
+    int nonbondedGroup = 0;  // Linus patch: store NonbondedForce group to avoid double-counting
     std::vector<double> cathodeSigmas;
     std::vector<double> cathodeEpsilons;
     std::vector<double> anodeSigmas;

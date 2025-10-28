@@ -60,8 +60,11 @@ double ReferenceCalcElectrodeChargeKernel::execute(ContextImpl& context,
     double cathodeArea = sheetArea / static_cast<double>(parameters.cathodeIndices.size());
     double anodeArea = sheetArea / static_cast<double>(parameters.anodeIndices.size());
 
-    double cathodeVoltageKj = parameters.cathodeVoltage * conversionEvKjmol;
-    double anodeVoltageKj = parameters.anodeVoltage * conversionEvKjmol;
+    // CRITICAL FIX: Use absolute values for voltage magnitude
+    // Sign is determined by the formula coefficients, not the voltage value
+    // This matches Python implementation where Cathode.Voltage == Anode.Voltage (same magnitude)
+    double cathodeVoltageKj = std::fabs(parameters.cathodeVoltage) * conversionEvKjmol;
+    double anodeVoltageKj = std::fabs(parameters.anodeVoltage) * conversionEvKjmol;
 
     cathodeTarget = oneOverFourPi * sheetArea * ((cathodeVoltageKj / parameters.lGap) + (cathodeVoltageKj / parameters.lCell)) * conversionKjmolNmAu;
     anodeTarget = -oneOverFourPi * sheetArea * ((anodeVoltageKj / parameters.lGap) + (anodeVoltageKj / parameters.lCell)) * conversionKjmolNmAu;
@@ -83,9 +86,10 @@ double ReferenceCalcElectrodeChargeKernel::execute(ContextImpl& context,
         double ezExternal = 0.0;
         if (std::fabs(charge) > 0.9 * parameters.smallThreshold)
             ezExternal = forces[index][2] / charge;
+        // Cathode: positive coefficient (matches Python)
         double newCharge = twoOverFourPi * cathodeArea * ((cathodeVoltageKj / parameters.lGap) + ezExternal) * conversionKjmolNmAu;
         if (std::fabs(newCharge) < parameters.smallThreshold)
-            newCharge = parameters.smallThreshold;
+            newCharge = parameters.smallThreshold;  // Cathode: positive threshold
         cathodeCharges[i] = newCharge;
     }
 
@@ -95,9 +99,10 @@ double ReferenceCalcElectrodeChargeKernel::execute(ContextImpl& context,
         double ezExternal = 0.0;
         if (std::fabs(charge) > 0.9 * parameters.smallThreshold)
             ezExternal = forces[index][2] / charge;
+        // Anode: negative coefficient (matches Python)
         double newCharge = -twoOverFourPi * anodeArea * ((anodeVoltageKj / parameters.lGap) + ezExternal) * conversionKjmolNmAu;
         if (std::fabs(newCharge) < parameters.smallThreshold)
-            newCharge = -parameters.smallThreshold;
+            newCharge = -parameters.smallThreshold;  // Anode: negative threshold
         anodeCharges[i] = newCharge;
     }
 

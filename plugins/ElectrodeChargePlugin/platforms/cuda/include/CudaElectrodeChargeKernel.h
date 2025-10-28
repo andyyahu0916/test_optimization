@@ -38,7 +38,7 @@ private:
     OpenMM::CudaContext* cu;
     int numParticles;
     
-    // Device arrays
+    // Device arrays (persistent)
     OpenMM::CudaArray* cathodeChargesDevice;
     OpenMM::CudaArray* anodeChargesDevice;
     OpenMM::CudaArray* cathodeIndicesDevice;
@@ -47,6 +47,12 @@ private:
     OpenMM::CudaArray* cathodeTargetDevice;
     OpenMM::CudaArray* anodeTargetDevice;
     OpenMM::CudaArray* chargeSum;
+    
+    // Persistent buffers for forces and positions (avoid repeated allocation)
+    OpenMM::CudaArray* forcesDevicePersistent;
+    OpenMM::CudaArray* posqDevicePersistent;
+    OpenMM::CudaArray* cathodeScaleDevice;
+    OpenMM::CudaArray* anodeScaleDevice;
 };
 
 } // namespace ElectrodeChargePlugin

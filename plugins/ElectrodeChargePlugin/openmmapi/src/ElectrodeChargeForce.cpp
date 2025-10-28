@@ -5,7 +5,11 @@
 using namespace ElectrodeChargePlugin;
 using namespace OpenMM;
 
-ElectrodeChargeForce::ElectrodeChargeForce() = default;
+ElectrodeChargeForce::ElectrodeChargeForce() {
+    // CRITICAL: Put in different group than NonbondedForce (which is in group 0)
+    // This prevents double-calculation when getState() calls all forces
+    setForceGroup(1);
+}
 
 void ElectrodeChargeForce::setCathode(const std::vector<int>& indices, double voltage) {
     cathode.atomIndices = indices;

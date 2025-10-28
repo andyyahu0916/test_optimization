@@ -19,10 +19,14 @@ _CUDA_LIB = os.path.abspath(
     os.path.join(os.path.dirname(__file__), os.pardir, "build", "platforms", "cuda", "libElectrodeChargePluginCUDA.so")
 )
 _RTLD_GLOBAL = getattr(ctypes, "RTLD_GLOBAL", 0)
+
+# Load in correct order: platform libraries first, then main plugin
 ctypes.CDLL(_REFERENCE_LIB, mode=_RTLD_GLOBAL)
 if os.path.exists(_CUDA_LIB):
     ctypes.CDLL(_CUDA_LIB, mode=_RTLD_GLOBAL)
-ctypes.CDLL(_PLUGIN_LIB, mode=_RTLD_GLOBAL)
+plugin_lib = ctypes.CDLL(_PLUGIN_LIB, mode=_RTLD_GLOBAL)
+# Manually register kernel factories
+plugin_lib.registerElectrodeChargePlugin()
 
 import electrodecharge
 
@@ -103,7 +107,8 @@ class ElectrodeChargeReferenceTest(unittest.TestCase):
         charges = []
         for index in range(nonbonded.getNumParticles()):
             charge, sigma, epsilon = nonbonded.getParticleParameters(index)
-            charges.append(float(charge))
+            # charge is a Quantity, need to strip units
+            charges.append(charge.value_in_unit(unit.elementary_charge) if hasattr(charge, 'value_in_unit') else float(charge))
         return charges
 
     def _compute_sheet_area(self, box_vectors):
@@ -125,17 +130,17 @@ class ElectrodeChargeReferenceTest(unittest.TestCase):
         box_vectors_unit = state.getPeriodicBoxVectors()
         positions = [
             (
-                float(pos.x / unit.nanometer),
-                float(pos.y / unit.nanometer),
-                float(pos.z / unit.nanometer),
+                pos.x.value_in_unit(unit.nanometer),
+                pos.y.value_in_unit(unit.nanometer),
+                pos.z.value_in_unit(unit.nanometer),
             )
             for pos in positions_unit
         ]
         box_vectors = [
             (
-                float(vec.x / unit.nanometer),
-                float(vec.y / unit.nanometer),
-                float(vec.z / unit.nanometer),
+                vec.x.value_in_unit(unit.nanometer),
+                vec.y.value_in_unit(unit.nanometer),
+                vec.z.value_in_unit(unit.nanometer),
             )
             for vec in box_vectors_unit
         ]
@@ -152,12 +157,12 @@ class ElectrodeChargeReferenceTest(unittest.TestCase):
         epsilon_cache = {}
         for idx in cathode_indices:
             charge, sigma, epsilon = nonbonded.getParticleParameters(idx)
-            sigma_cache[idx] = float(sigma)
-            epsilon_cache[idx] = float(epsilon)
+            sigma_cache[idx] = sigma.value_in_unit(unit.nanometer) if hasattr(sigma, 'value_in_unit') else float(sigma)
+            epsilon_cache[idx] = epsilon.value_in_unit(unit.kilojoule_per_mole) if hasattr(epsilon, 'value_in_unit') else float(epsilon)
         for idx in anode_indices:
             charge, sigma, epsilon = nonbonded.getParticleParameters(idx)
-            sigma_cache[idx] = float(sigma)
-            epsilon_cache[idx] = float(epsilon)
+            sigma_cache[idx] = sigma.value_in_unit(unit.nanometer) if hasattr(sigma, 'value_in_unit') else float(sigma)
+            epsilon_cache[idx] = epsilon.value_in_unit(unit.kilojoule_per_mole) if hasattr(epsilon, 'value_in_unit') else float(epsilon)
 
         cathode_voltage_kj = params["cathode_voltage"] * CONVERSION_EV_KJMOL
         anode_voltage_kj = params["anode_voltage"] * CONVERSION_EV_KJMOL
@@ -167,9 +172,9 @@ class ElectrodeChargeReferenceTest(unittest.TestCase):
             forces_unit = state.getForces()
             forces = [
                 (
-                    float(force.x / (unit.kilojoule_per_mole / unit.nanometer)),
-                    float(force.y / (unit.kilojoule_per_mole / unit.nanometer)),
-                    float(force.z / (unit.kilojoule_per_mole / unit.nanometer)),
+                    force.x.value_in_unit(unit.kilojoule_per_mole / unit.nanometer),
+                    force.y.value_in_unit(unit.kilojoule_per_mole / unit.nanometer),
+                    force.z.value_in_unit(unit.kilojoule_per_mole / unit.nanometer),
                 )
                 for force in forces_unit
             ]
@@ -269,16 +274,19 @@ class ElectrodeChargeReferenceTest(unittest.TestCase):
     def test_reference_kernel_matches_python_solver(self):
         system_plugin, nonbonded_plugin, _ = self._build_system(with_plugin=True)
         integrator_plugin = LangevinIntegrator(300 * unit.kelvin, 1.0 / unit.picosecond, 0.001 * unit.picoseconds)
-        context_plugin = Context(system_plugin, integrator_plugin)
+        platform_plugin = Platform.getPlatformByName('Reference')
+        context_plugin = Context(system_plugin, integrator_plugin, platform_plugin)
         self._set_initial_state(context_plugin)
 
-        # Trigger the plugin's iterative update
-        context_plugin.getState(getForces=True)
+        # CRITICAL: ElectrodeChargeForce is in group 1, so request only that group
+        # to avoid double-counting NonbondedForce (which is in group 0)
+        context_plugin.getState(getForces=True, groups=1<<1)
         charges_plugin = self._collect_charges(nonbonded_plugin)
 
         system_ref, nonbonded_ref, _ = self._build_system(with_plugin=False)
         integrator_ref = LangevinIntegrator(300 * unit.kelvin, 1.0 / unit.picosecond, 0.001 * unit.picoseconds)
-        context_ref = Context(system_ref, integrator_ref)
+        platform_ref = Platform.getPlatformByName('Reference')
+        context_ref = Context(system_ref, integrator_ref, platform_ref)
         self._set_initial_state(context_ref)
 
         charges_reference = self._run_reference_solver(context_ref, nonbonded_ref)
@@ -292,7 +300,7 @@ class ElectrodeChargeReferenceTest(unittest.TestCase):
             )
 
         # Invoke the plugin a second time to ensure recursion guard stability
-        context_plugin.getState(getForces=True)
+        context_plugin.getState(getForces=True, groups=1<<1)
         charges_second = self._collect_charges(nonbonded_plugin)
         self.assertEqual(charges_plugin, charges_second)
 

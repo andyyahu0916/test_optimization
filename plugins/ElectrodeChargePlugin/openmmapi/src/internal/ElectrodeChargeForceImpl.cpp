@@ -29,6 +29,9 @@ void ElectrodeChargeForceImpl::initialize(ContextImpl& context) {
     if (nonbondedForce == nullptr)
         throw OpenMMException("ElectrodeChargeForce requires a NonbondedForce in the System.");
 
+    // Linus patch: Store NonbondedForce group for iteration loop
+    nonbondedGroup = nonbondedForce->getForceGroup();
+
     cathodeSigmas.resize(owner.getCathode().atomIndices.size());
     cathodeEpsilons.resize(owner.getCathode().atomIndices.size());
     for (size_t i = 0; i < owner.getCathode().atomIndices.size(); i++) {
@@ -98,7 +101,9 @@ double ElectrodeChargeForceImpl::calcForcesAndEnergy(ContextImpl& context, bool 
         forces.clear();
         try {
             inInternalEvaluation = true;
-            context.calcForcesAndEnergy(true, false);
+            // Linus Patch: Only calculate NonbondedForce group (group 0)
+            // This prevents CUDA from accumulating ElectrodeChargeForce's contribution
+            context.calcForcesAndEnergy(true, false, 1 << nonbondedGroup);
             context.getForces(forces);
             inInternalEvaluation = false;
         } catch (...) {

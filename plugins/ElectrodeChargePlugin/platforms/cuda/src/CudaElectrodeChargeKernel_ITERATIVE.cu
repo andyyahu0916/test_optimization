@@ -279,13 +279,10 @@ __global__ void applyScaling(
     const int numCathode,
     const int* __restrict__ anodeIndices,
     const int numAnode,
-    const float* __restrict__ cathodeScalePtr,
-    const float* __restrict__ anodeScalePtr
+    const float cathodeScale,
+    const float anodeScale
 ) {
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    
-    float cathodeScale = *cathodeScalePtr;
-    float anodeScale = *anodeScalePtr;
     
     if (tid < numCathode) {
         int atomIdx = cathodeIndices[tid];
@@ -327,8 +324,6 @@ double CudaCalcElectrodeChargeKernel::execute(
     if (forcesDevicePersistent == nullptr) {
         forcesDevicePersistent = CudaArray::create<float3>(*cu, numParticles, "forcesPersistent");
         posqDevicePersistent = CudaArray::create<float4>(*cu, numParticles, "posqPersistent");
-        cathodeScaleDevice = CudaArray::create<float>(*cu, 1, "cathodeScalePersistent");
-        anodeScaleDevice = CudaArray::create<float>(*cu, 1, "anodeScalePersistent");
     }
     
     // Upload initial data ONCE
@@ -356,6 +351,10 @@ double CudaCalcElectrodeChargeKernel::execute(
     int numBlocksParticles = (numParticles + threadsPerBlock - 1) / threadsPerBlock;
     int numBlocksElectrodes = (parameters.cathodeIndices.size() + parameters.anodeIndices.size() + threadsPerBlock - 1) / threadsPerBlock;
     
+    // Allocate temporary buffers for scaling
+    CudaArray* cathodeScaleDevice = CudaArray::create<float>(*cu, 1, "cathodeScale");
+    CudaArray* anodeScaleDevice = CudaArray::create<float>(*cu, 1, "anodeScale");
+    
     // ========================================================================
     // GPU-RESIDENT ITERATION LOOP
     // ========================================================================
@@ -367,6 +366,7 @@ double CudaCalcElectrodeChargeKernel::execute(
             numParticles,
             coulombConstant
         );
+        cudaDeviceSynchronize();
         
         // Step 2: Update electrode charges (ON GPU)
         updateElectrodeChargesIterative<<<numBlocksElectrodes, threadsPerBlock>>>(
@@ -384,6 +384,7 @@ double CudaCalcElectrodeChargeKernel::execute(
             conversionKjmolNmAu,
             static_cast<float>(parameters.smallThreshold)
         );
+        cudaDeviceSynchronize();
         
         // Step 3: Compute target and scaling (ON GPU)
         computeTargetAndScale<<<numBlocksParticles, threadsPerBlock>>>(
@@ -407,22 +408,24 @@ double CudaCalcElectrodeChargeKernel::execute(
             (float*)cathodeScaleDevice->getDevicePointer(),
             (float*)anodeScaleDevice->getDevicePointer()
         );
+        cudaDeviceSynchronize();
         
-        // Step 4: Apply scaling (ON GPU - NO DOWNLOAD!)
+        // Step 4: Apply scaling (ON GPU)
+        float cathodeScale, anodeScale;
+        cathodeScaleDevice->download(&cathodeScale);
+        anodeScaleDevice->download(&anodeScale);
+        
         applyScaling<<<numBlocksElectrodes, threadsPerBlock>>>(
             (float4*)posqDevicePersistent->getDevicePointer(),
             (const int*)cathodeIndicesDevice->getDevicePointer(),
             parameters.cathodeIndices.size(),
             (const int*)anodeIndicesDevice->getDevicePointer(),
             parameters.anodeIndices.size(),
-            (const float*)cathodeScaleDevice->getDevicePointer(),
-            (const float*)anodeScaleDevice->getDevicePointer()
+            cathodeScale,
+            anodeScale
         );
-        // NO cudaDeviceSynchronize() here - let GPU pipeline!
+        cudaDeviceSynchronize();
     }
-    
-    // Final sync before download
-    cudaDeviceSynchronize();
     
     // Download final results ONCE
     posqDevicePersistent->download(posqFloat4);
@@ -439,6 +442,10 @@ double CudaCalcElectrodeChargeKernel::execute(
         int idx = parameters.anodeIndices[i];
         anodeCharges[i] = static_cast<double>(posqFloat4[idx].w);
     }
+    
+    // Clean up
+    delete cathodeScaleDevice;
+    delete anodeScaleDevice;
     
     // Set dummy targets (not used in this version)
     cathodeTarget = 0.0;
@@ -466,9 +473,7 @@ CudaCalcElectrodeChargeKernel::CudaCalcElectrodeChargeKernel(
     anodeTargetDevice(nullptr),
     chargeSum(nullptr),
     forcesDevicePersistent(nullptr),
-    posqDevicePersistent(nullptr),
-    cathodeScaleDevice(nullptr),
-    anodeScaleDevice(nullptr)
+    posqDevicePersistent(nullptr)
 {
 }
 

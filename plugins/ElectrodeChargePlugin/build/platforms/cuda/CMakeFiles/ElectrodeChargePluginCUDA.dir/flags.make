@@ -7,7 +7,7 @@ CUDA_DEFINES = -DElectrodeChargePluginCUDA_EXPORTS
 
 CUDA_INCLUDES = --options-file CMakeFiles/ElectrodeChargePluginCUDA.dir/includes_CUDA.rsp
 
-CUDA_FLAGS = -std=c++17 -Xcompiler=-fPIC -DOPENMM_BUILDING_SHARED_LIBRARY 
+CUDA_FLAGS = -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" "--generate-code=arch=compute_80,code=[compute_80,sm_80]" "--generate-code=arch=compute_86,code=[compute_86,sm_86]" "--generate-code=arch=compute_89,code=[compute_89,sm_89]" -Xcompiler=-fPIC -DOPENMM_BUILDING_SHARED_LIBRARY 
 
 CXX_DEFINES = -DElectrodeChargePluginCUDA_EXPORTS
 
