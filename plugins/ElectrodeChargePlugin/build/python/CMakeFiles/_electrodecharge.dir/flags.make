@@ -4,7 +4,7 @@
 # compile CXX with /home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++
 CXX_DEFINES = -D_electrodecharge_EXPORTS
 
-CXX_INCLUDES = -I/home/andy/test_optimization/plugins/ElectrodeChargePlugin/platforms/cuda/include -I/home/andy/test_optimization/plugins/ElectrodeChargePlugin/platforms/reference/include -I/home/andy/test_optimization/plugins/ElectrodeChargePlugin/openmmapi/include/internal -I/home/andy/test_optimization/plugins/ElectrodeChargePlugin/openmmapi/include -I/home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/python -isystem /home/andy/miniforge3/envs/cuda/include/python3.13
+CXX_INCLUDES = -I/home/andy/test_optimization/plugins/ElectrodeChargePlugin/platforms/cuda/include -I/home/andy/test_optimization/plugins/ElectrodeChargePlugin/platforms/reference/include -I/home/andy/test_optimization/plugins/ElectrodeChargePlugin/openmmapi/include/internal -I/home/andy/test_optimization/plugins/ElectrodeChargePlugin/openmmapi/include -I/home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/python -I/home/andy/miniforge3/envs/cuda/include/openmm -isystem /home/andy/miniforge3/envs/cuda/include/python3.13
 
 CXX_FLAGS = -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/andy/miniforge3/envs/cuda/include  -I/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include -std=gnu++11 -fPIC
 

@@ -71,7 +71,7 @@ include python/CMakeFiles/_electrodecharge.dir/flags.make
 
 python/ElectrodeChargePluginWrapper.cpp: /home/andy/test_optimization/plugins/ElectrodeChargePlugin/python/electrodecharge.i
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating ElectrodeChargePluginWrapper.cpp, electrodecharge.py"
-	cd /home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/python && /home/andy/miniforge3/envs/cuda/bin/swig -python -c++ -DSWIG_TYPE_TABLE=OpenMM -o /home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/python/ElectrodeChargePluginWrapper.cpp -I/home/andy/miniforge3/envs/cuda/include -I/home/andy/test_optimization/plugins/ElectrodeChargePlugin/openmmapi/include /home/andy/test_optimization/plugins/ElectrodeChargePlugin/python/electrodecharge.i
+	cd /home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/python && /home/andy/miniforge3/envs/cuda/bin/swig -python -c++ -DSWIG_TYPE_TABLE=OpenMM -o /home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/python/ElectrodeChargePluginWrapper.cpp -I/home/andy/miniforge3/envs/cuda/include -I/home/andy/miniforge3/envs/cuda/include/swig -I/home/andy/test_optimization/plugins/ElectrodeChargePlugin/openmmapi/include /home/andy/test_optimization/plugins/ElectrodeChargePlugin/python/electrodecharge.i
 
 python/electrodecharge.py: python/ElectrodeChargePluginWrapper.cpp
 	@$(CMAKE_COMMAND) -E touch_nocreate python/electrodecharge.py
@@ -104,6 +104,8 @@ python/_electrodecharge.cpython-313-x86_64-linux-gnu.so: python/CMakeFiles/_elec
 python/_electrodecharge.cpython-313-x86_64-linux-gnu.so: python/CMakeFiles/_electrodecharge.dir/build.make
 python/_electrodecharge.cpython-313-x86_64-linux-gnu.so: python/CMakeFiles/_electrodecharge.dir/compiler_depend.ts
 python/_electrodecharge.cpython-313-x86_64-linux-gnu.so: libElectrodeChargePlugin.so
+python/_electrodecharge.cpython-313-x86_64-linux-gnu.so: platforms/reference/libElectrodeChargePluginReference.so
+python/_electrodecharge.cpython-313-x86_64-linux-gnu.so: platforms/cuda/libElectrodeChargePluginCUDA.so
 python/_electrodecharge.cpython-313-x86_64-linux-gnu.so: python/CMakeFiles/_electrodecharge.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX shared module _electrodecharge.cpython-313-x86_64-linux-gnu.so"
 	cd /home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/python && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/_electrodecharge.dir/link.txt --verbose=$(VERBOSE)

@@ -1,9 +1,24 @@
 %module electrodecharge
 
-%import(module="openmm") "swig/OpenMMSwigHeaders.i"
+// Linus: Import only what exists. Don't fail on missing plugin classes.
+%{
+#include "OpenMM.h"
+#include "ElectrodeChargeForce.h"
+%}
+
+// Declare minimal OpenMM interface
+namespace OpenMM {
+    class Context;
+    class Force {
+    public:
+        virtual ~Force();
+    protected:
+        Force();
+    };
+}
+
 %include "swig/typemaps.i"
 %include "std_vector.i"
-
 namespace std {
   %template(IntVector) vector<int>;
 }
@@ -11,7 +26,6 @@ namespace std {
 %{
 #include "ElectrodeChargeForce.h"
 #include "OpenMM.h"
-#include "OpenMMException.h"
 %}
 
 %exception {

@@ -81,6 +81,7 @@ platforms/cuda/CMakeFiles/ElectrodeChargePluginCUDA.dir/src/CudaElectrodeChargeK
  /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeQueue.h
  /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeSort.h
  /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeVectorTypes.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ContextSelector.h
  /home/andy/miniforge3/envs/cuda/include/openmm/common/ExpressionUtilities.h
  /home/andy/miniforge3/envs/cuda/include/openmm/common/FFT3D.h
  /home/andy/miniforge3/envs/cuda/include/openmm/common/IntegrationUtilities.h
@@ -90,6 +91,7 @@ platforms/cuda/CMakeFiles/ElectrodeChargePluginCUDA.dir/src/CudaElectrodeChargeK
  /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaBondedUtilities.h
  /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaContext.h
  /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaExpressionUtilities.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaForceInfo.h
  /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaIntegrationUtilities.h
  /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaNonbondedUtilities.h
  /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaPlatform.h
@@ -390,60 +392,137 @@ platforms/cuda/CMakeFiles/ElectrodeChargePluginCUDA.dir/src/CudaElectrodeChargeK
 
 platforms/cuda/CMakeFiles/ElectrodeChargePluginCUDA.dir/src/CudaElectrodeChargeKernelFactory.cpp.o
  /home/andy/test_optimization/plugins/ElectrodeChargePlugin/platforms/cuda/src/CudaElectrodeChargeKernelFactory.cpp
+ /home/andy/miniforge3/envs/cuda/include/lepton/CustomFunction.h
+ /home/andy/miniforge3/envs/cuda/include/lepton/ExpressionTreeNode.h
+ /home/andy/miniforge3/envs/cuda/include/lepton/ParsedExpression.h
+ /home/andy/miniforge3/envs/cuda/include/lepton/windowsIncludes.h
  /home/andy/miniforge3/envs/cuda/include/openmm/Force.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/Kernel.h
  /home/andy/miniforge3/envs/cuda/include/openmm/KernelFactory.h
  /home/andy/miniforge3/envs/cuda/include/openmm/KernelImpl.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/OpenMMException.h
  /home/andy/miniforge3/envs/cuda/include/openmm/Platform.h
  /home/andy/miniforge3/envs/cuda/include/openmm/System.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/TabulatedFunction.h
  /home/andy/miniforge3/envs/cuda/include/openmm/Vec3.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ArrayInterface.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/BondedUtilities.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeArray.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeContext.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeEvent.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeForceInfo.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeKernel.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeParameterInfo.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeProgram.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeQueue.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeSort.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeVectorTypes.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/ExpressionUtilities.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/FFT3D.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/IntegrationUtilities.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/NonbondedUtilities.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/common/windowsExportCommon.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaArray.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaBondedUtilities.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaContext.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaExpressionUtilities.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaIntegrationUtilities.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaNonbondedUtilities.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaPlatform.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaQueue.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/internal/ContextImpl.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/internal/ThreadPool.h
  /home/andy/miniforge3/envs/cuda/include/openmm/internal/windowsExport.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/array
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/backward/auto_ptr.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/backward/binders.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bit
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/align.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/alloc_traits.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/allocated_ptr.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/allocator.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/atomic_base.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/atomic_lockfree_defines.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/basic_ios.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/basic_ios.tcc
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/basic_string.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/basic_string.tcc
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/char_traits.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/charconv.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/chrono.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/concept_check.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/cpp_type_traits.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/cxxabi_forced.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/cxxabi_init_exception.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/deque.tcc
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/enable_special_members.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/erase_if.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/exception.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/exception_defines.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/exception_ptr.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/functexcept.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/functional_hash.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/hash_bytes.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/hashtable.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/hashtable_policy.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/invoke.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/ios_base.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/istream.tcc
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/locale_classes.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/locale_classes.tcc
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/locale_facets.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/locale_facets.tcc
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/localefwd.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/memory_resource.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/memoryfwd.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/move.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/nested_exception.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/new_allocator.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/node_handle.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/ostream.tcc
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/ostream_insert.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/parse_numbers.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/postypes.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/predefined_ops.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/ptr_traits.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/range_access.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/refwrap.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/requires_hosted.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/shared_ptr.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/shared_ptr_atomic.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/shared_ptr_base.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/sstream.tcc
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/std_abs.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/std_function.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/std_mutex.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/std_thread.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_algobase.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_bvector.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_construct.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_deque.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_function.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_heap.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_iterator.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_iterator_base_funcs.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_iterator_base_types.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_map.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_multimap.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_pair.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_queue.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_raw_storage_iter.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_relops.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_tempbuf.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_tree.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_uninitialized.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_vector.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/streambuf.tcc
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/streambuf_iterator.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/string_view.tcc
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stringfwd.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/this_thread_sleep.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/unique_lock.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/unique_ptr.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/unordered_map.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/uses_allocator.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/uses_allocator_args.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/utility.h
@@ -453,53 +532,112 @@ platforms/cuda/CMakeFiles/ElectrodeChargePluginCUDA.dir/src/CudaElectrodeChargeK
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/cctype
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/cerrno
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/clocale
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/compare
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/concepts
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/condition_variable
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/cstddef
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/cstdint
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/cstdio
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/cstdlib
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/ctime
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/cwchar
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/cwctype
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/debug/assertions.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/debug/debug.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/deque
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/exception
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/ext/aligned_buffer.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/ext/alloc_traits.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/ext/atomicity.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/ext/concurrence.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/ext/numeric_traits.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/ext/string_conversions.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/ext/type_traits.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/functional
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/initializer_list
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/ios
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/iosfwd
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/iostream
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/istream
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/limits
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/map
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/memory
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/mutex
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/new
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/ostream
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/pstl/execution_defs.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/pstl/glue_memory_defs.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/pstl/pstl_config.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/queue
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/ratio
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/sstream
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/stdexcept
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/stdlib.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/streambuf
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/string
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/string_view
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/system_error
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/thread
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/tuple
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/type_traits
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/typeinfo
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/unordered_map
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/utility
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/vector
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/x86_64-conda-linux-gnu/bits/atomic_word.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/x86_64-conda-linux-gnu/bits/c++allocator.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/x86_64-conda-linux-gnu/bits/c++config.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/x86_64-conda-linux-gnu/bits/c++locale.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/x86_64-conda-linux-gnu/bits/cpu_defines.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/x86_64-conda-linux-gnu/bits/ctype_base.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/x86_64-conda-linux-gnu/bits/ctype_inline.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/x86_64-conda-linux-gnu/bits/error_constants.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/x86_64-conda-linux-gnu/bits/gthr-default.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/x86_64-conda-linux-gnu/bits/gthr.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/x86_64-conda-linux-gnu/bits/os_defines.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/limits.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/stdarg.h
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/stddef.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/stdint.h
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/syslimits.h
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include/builtin_types.h
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include/crt/host_defines.h
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include/cuda.h
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include/cuda_device_runtime_api.h
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include/cuda_runtime_api.h
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include/device_types.h
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include/driver_types.h
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include/surface_types.h
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include/texture_types.h
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include/vector_functions.h
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include/vector_functions.hpp
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include/vector_types.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/alloca.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/asm-generic/errno-base.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/asm-generic/errno.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/asm/errno.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/assert.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/byteswap.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/cpu-set.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/endian.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/endianness.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/errno.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/floatn-common.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/floatn.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/libc-header-start.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/local_lim.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/locale.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/long-double.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/posix1_lim.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/posix2_lim.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/pthread_stack_min-dynamic.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/pthreadtypes-arch.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/pthreadtypes.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/sched.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/select.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/setjmp.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/stdint-intn.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/stdint-uintn.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/stdio.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/stdio_lim.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/stdlib-bsearch.h
@@ -507,8 +645,10 @@ platforms/cuda/CMakeFiles/ElectrodeChargePluginCUDA.dir/src/CudaElectrodeChargeK
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/struct_mutex.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/struct_rwlock.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/thread-shared-types.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/time.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/time64.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/timesize.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/timex.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/FILE.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/__FILE.h
@@ -525,17 +665,24 @@ platforms/cuda/CMakeFiles/ElectrodeChargePluginCUDA.dir/src/CudaElectrodeChargeK
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/mbstate_t.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/sigset_t.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/struct_FILE.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/struct___jmp_buf_tag.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/struct_itimerspec.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/struct_sched_param.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/struct_timespec.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/struct_timeval.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/struct_tm.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/time_t.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/timer_t.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/types/wint_t.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/typesizes.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/uintn-identity.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/uio_lim.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/waitflags.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/waitstatus.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/wchar.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/wctype-wchar.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/wordsize.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/bits/xopen_lim.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/ctype.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/endian.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/errno.h
@@ -543,17 +690,55 @@ platforms/cuda/CMakeFiles/ElectrodeChargePluginCUDA.dir/src/CudaElectrodeChargeK
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/features.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/gnu/stubs-64.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/gnu/stubs.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/limits.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/linux/errno.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/linux/limits.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/locale.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/pthread.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/sched.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/stdc-predef.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/stdint.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/stdio.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/stdlib.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/sys/cdefs.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/sys/select.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/sys/single_threaded.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/sys/types.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/time.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/wchar.h
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/wctype.h
  /home/andy/test_optimization/plugins/ElectrodeChargePlugin/openmmapi/include/ElectrodeChargeForce.h
  /home/andy/test_optimization/plugins/ElectrodeChargePlugin/openmmapi/include/ElectrodeChargeKernels.h
  /home/andy/test_optimization/plugins/ElectrodeChargePlugin/platforms/cuda/include/CudaElectrodeChargeKernel.h
  /home/andy/test_optimization/plugins/ElectrodeChargePlugin/platforms/cuda/include/CudaElectrodeChargeKernelFactory.h
+
+platforms/cuda/libElectrodeChargePluginCUDA.so
+ /home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/libElectrodeChargePlugin.so
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/crtbeginS.o
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/crtendS.o
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/libgcc.a
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/lib64/ld-linux-x86-64.so.2
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/lib64/libc.so.6
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/lib64/libm.so.6
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/lib64/libmvec.so.1
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/crti.o
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/crtn.o
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/libc.so
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/libdl.a
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/libm.so
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/libpthread.a
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/librt.a
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib64/libc_nonshared.a
+ /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so
+ /home/andy/miniforge3/envs/cuda/lib/libOpenMMCUDA.so
+ /home/andy/miniforge3/envs/cuda/lib/libcudadevrt.a
+ /home/andy/miniforge3/envs/cuda/lib/libcudart_static.a
+ /home/andy/miniforge3/envs/cuda/lib/libgcc_s.so
+ /home/andy/miniforge3/envs/cuda/lib/libgcc_s.so.1
+ /home/andy/miniforge3/envs/cuda/lib/libstdc++.so
+ /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/lib/libcudart_static.a
+ /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/librt.a
+ /home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/platforms/cuda/CMakeFiles/ElectrodeChargePluginCUDA.dir/cmake_device_link.o
+ /home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/platforms/cuda/CMakeFiles/ElectrodeChargePluginCUDA.dir/src/CudaElectrodeChargeKernel.cu.o
+ /home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/platforms/cuda/CMakeFiles/ElectrodeChargePluginCUDA.dir/src/CudaElectrodeChargeKernelFactory.cpp.o
 

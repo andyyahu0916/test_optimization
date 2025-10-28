@@ -58,7 +58,16 @@ class _SwigNonDynamicMeta(type):
     __setattr__ = _swig_setattr_nondynamic_class_variable(type.__setattr__)
 
 
-import openmm
+class Force(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+
+    def __init__(self, *args, **kwargs):
+        raise AttributeError("No constructor defined")
+    __repr__ = _swig_repr
+    __swig_destroy__ = _electrodecharge.delete_Force
+
+# Register Force in _electrodecharge:
+_electrodecharge.Force_swigregister(Force)
 class SwigPyIterator(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
 
@@ -224,7 +233,7 @@ class IntVector(object):
 
 # Register IntVector in _electrodecharge:
 _electrodecharge.IntVector_swigregister(IntVector)
-class ElectrodeChargeForce(openmm.Force):
+class ElectrodeChargeForce(Force):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
 

@@ -293,7 +293,7 @@ double CudaCalcElectrodeChargeKernel::execute(
 ) {
     // Get CUDA context
     if (cu == nullptr) {
-        cu = &dynamic_cast<CudaPlatform&>(context.getPlatform()).getContextByIndex(context.getContextIndex());
+        cu = static_cast<CudaPlatform::PlatformData*>(context.getPlatformData())->contexts[0];
         initializeDeviceMemory();
     }
     

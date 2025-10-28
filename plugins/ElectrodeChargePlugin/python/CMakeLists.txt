@@ -20,6 +20,7 @@ add_custom_command(
         -DSWIG_TYPE_TABLE=OpenMM
         -o "${WRAP_FILE}"
         "-I${OPENMM_DIR}/include"
+        "-I${OPENMM_DIR}/include/swig"
         "-I${CMAKE_SOURCE_DIR}/openmmapi/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/electrodecharge.i"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/electrodecharge.i"
@@ -29,6 +30,7 @@ add_custom_command(
 include_directories(
     "${CMAKE_CURRENT_BINARY_DIR}"
     "${OPENMM_DIR}/include"
+    "${OPENMM_DIR}/include/openmm"
     "${CMAKE_SOURCE_DIR}/openmmapi/include"
     "${Python3_INCLUDE_DIRS}"
 )
@@ -37,6 +39,8 @@ add_library(_${MODULE_NAME} MODULE "${WRAP_FILE}")
 target_link_libraries(_${MODULE_NAME}
     ${OPENMM_LIBRARIES}
     ElectrodeChargePlugin
+    ${CMAKE_BINARY_DIR}/platforms/reference/libElectrodeChargePluginReference.so
+    ${CMAKE_BINARY_DIR}/platforms/cuda/libElectrodeChargePluginCUDA.so
     Python3::Module
 )
 set_target_properties(_${MODULE_NAME} PROPERTIES
