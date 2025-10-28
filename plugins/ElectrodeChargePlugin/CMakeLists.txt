@@ -2,15 +2,16 @@ cmake_minimum_required(VERSION 3.17)
 
 project(OpenMMElectrodeChargePlugin)
 
-set(OPENMM_DIR "/usr/local/openmm" CACHE PATH "Where OpenMM is installed")
+# ============================================================
+# Linus-style: Direct and simple. No bullshit find_package.
+# ============================================================
+set(OPENMM_DIR "/home/andy/miniforge3/envs/cuda" CACHE PATH "Where OpenMM is installed")
 
-if(NOT OpenMM_DIR AND DEFINED OPENMM_DIR)
-    set(OpenMM_DIR "${OPENMM_DIR}")
-endif()
+include_directories("${OPENMM_DIR}/include")
+link_directories("${OPENMM_DIR}/lib")
+set(OPENMM_LIBRARIES "OpenMM")
 
-find_package(OpenMM REQUIRED)
-
-include_directories(${OPENMM_INCLUDE_DIRS})
+# No more variables like ${OPENMM_INCLUDE_DIRS} - we know where it is!
 
 set(CMAKE_CXX_STANDARD 11)
 

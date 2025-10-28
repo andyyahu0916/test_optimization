@@ -1,0 +1,10 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/cmake_install.cmake",
+		"/home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/platforms/reference/cmake_install.cmake",
+		"/home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/platforms/cuda/cmake_install.cmake",
+		"/home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/python/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

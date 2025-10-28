@@ -1,8 +1,6 @@
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
-if(NOT DEFINED OPENMM_INCLUDE_DIRS OR NOT DEFINED OPENMM_LIBRARIES)
-    message(FATAL_ERROR "OpenMM package information not available in python build. Make sure find_package(OpenMM) is called in the parent scope.")
-endif()
+# Linus-style: We already know where OpenMM is. No bullshit checks.
 
 execute_process(
     COMMAND "${Python3_EXECUTABLE}" -c "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))"
@@ -21,7 +19,7 @@ add_custom_command(
         -python -c++
         -DSWIG_TYPE_TABLE=OpenMM
         -o "${WRAP_FILE}"
-        "-I${OPENMM_INCLUDE_DIRS}"
+        "-I${OPENMM_DIR}/include"
         "-I${CMAKE_SOURCE_DIR}/openmmapi/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/electrodecharge.i"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/electrodecharge.i"
@@ -30,7 +28,7 @@ add_custom_command(
 
 include_directories(
     "${CMAKE_CURRENT_BINARY_DIR}"
-    "${OPENMM_INCLUDE_DIRS}"
+    "${OPENMM_DIR}/include"
     "${CMAKE_SOURCE_DIR}/openmmapi/include"
     "${Python3_INCLUDE_DIRS}"
 )
