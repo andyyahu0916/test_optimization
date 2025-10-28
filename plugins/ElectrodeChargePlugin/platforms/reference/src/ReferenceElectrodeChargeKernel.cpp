@@ -21,10 +21,12 @@ void ReferenceCalcElectrodeChargeKernel::initialize(const System& system, const 
     numParticles = system.getNumParticles();
 
     electrodeMask.assign(numParticles, false);
+    conductorMask.assign(numParticles, false);  // 新增
     for (int index : parameters.cathodeIndices)
         electrodeMask[index] = true;
     for (int index : parameters.anodeIndices)
         electrodeMask[index] = true;
+    // TODO: 需要從 Python 端傳入導體索引來設定 conductorMask
 }
 
 double ReferenceCalcElectrodeChargeKernel::execute(ContextImpl& context,
@@ -79,7 +81,20 @@ double ReferenceCalcElectrodeChargeKernel::execute(ContextImpl& context,
         cathodeTarget += (cathodeDistance / parameters.lCell) * (-charge);
         anodeTarget += (anodeDistance / parameters.lCell) * (-charge);
     }
+    
+    // Image charge contribution from conductors (新增)
+    for (int i = 0; i < numParticles; i++) {
+        if (conductorMask[i]) {
+            double charge = allParticleCharges[i];
+            double zPos = positions[i][2];
+            double cathodeDistance = std::fabs(zPos - anodeZ);
+            double anodeDistance = std::fabs(zPos - cathodeZ);
+            cathodeTarget += (cathodeDistance / parameters.lCell) * (-charge);
+            anodeTarget += (anodeDistance / parameters.lCell) * (-charge);
+        }
+    }
 
+    // Update electrode charges
     for (size_t i = 0; i < parameters.cathodeIndices.size(); i++) {
         int index = parameters.cathodeIndices[i];
         double charge = allParticleCharges[index];
@@ -104,6 +119,51 @@ double ReferenceCalcElectrodeChargeKernel::execute(ContextImpl& context,
         if (std::fabs(newCharge) < parameters.smallThreshold)
             newCharge = -parameters.smallThreshold;  // Anode: negative threshold
         anodeCharges[i] = newCharge;
+    }
+    
+    // Conductor two-stage method (if conductors exist)
+    for (int i = 0; i < numParticles; i++) {
+        if (conductorMask[i]) {
+            // Step 1: Image charges (normal field projection)
+            double charge = allParticleCharges[i];
+            if (std::fabs(charge) > 0.9 * parameters.smallThreshold) {
+                // Simplified: assume normal is (0,0,1) for now
+                // TODO: Get actual normal from conductor geometry
+                double En_external = forces[i][2] / charge;
+                double newCharge = 2.0 / (4.0 * 3.14159265358979323846) * 
+                                 (sheetArea / numParticles) * En_external * 
+                                 (18.8973 / 2625.5);  // conversionKjmolNmAu
+                
+                if (std::fabs(newCharge) < parameters.smallThreshold) {
+                    newCharge = parameters.smallThreshold;
+                }
+                
+                // Update charge (simplified - would need to update NonbondedForce in real implementation)
+                allParticleCharges[i] = newCharge;
+            }
+            
+            // Step 2: Charge transfer (simplified - would need contact geometry)
+            // TODO: Implement proper contact point calculation and uniform distribution
+        }
+    }
+    
+    // Apply scaling
+    double cathodeTotal = std::accumulate(cathodeCharges.begin(), cathodeCharges.end(), 0.0);
+    if (std::fabs(cathodeTotal) > parameters.smallThreshold) {
+        double scale = cathodeTarget / cathodeTotal;
+        if (scale > 0.0) {
+            for (double& value : cathodeCharges)
+                value *= scale;
+        }
+    }
+    
+    double anodeTotal = std::accumulate(anodeCharges.begin(), anodeCharges.end(), 0.0);
+    if (std::fabs(anodeTotal) > parameters.smallThreshold) {
+        double scale = anodeTarget / anodeTotal;
+        if (scale > 0.0) {
+            for (double& value : anodeCharges)
+                value *= scale;
+        }
     }
 
     return 0.0;

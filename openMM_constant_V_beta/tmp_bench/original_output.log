@@ -1,0 +1,33 @@
+Warning: importing 'simtk.openmm' is deprecated.  Import 'openmm' instead.
+📦 Loading original MM classes (baseline performance)
+Creating Interaction Groups for CustomNonBonded.  These interactions will be computed between water-other, not water-water.
+Creating Exclusions for TFSI
+--- Initial State (Before Simulation) ---
+Initial Kinetic Energy: 909.0462699440824 kJ/mol
+Initial Potential Energy: -126512.23652998777 kJ/mol
+Force Group 0 (<class 'openmm.openmm.HarmonicBondForce'>): 11465.235590748001 kJ/mol
+Force Group 1 (<class 'openmm.openmm.PeriodicTorsionForce'>): 428.40808350003135 kJ/mol
+Force Group 2 (<class 'openmm.openmm.RBTorsionForce'>): -11134.159584501696 kJ/mol
+Force Group 3 (<class 'openmm.openmm.CustomTorsionForce'>): 0.0 kJ/mol
+Force Group 4 (<class 'openmm.openmm.NonbondedForce'>): -119833.17238584533 kJ/mol
+Force Group 5 (<class 'openmm.openmm.DrudeForce'>): 0.0 kJ/mol
+Force Group 6 (<class 'openmm.openmm.CustomNonbondedForce'>): -36249.918982199444 kJ/mol
+Force Group 7 (<class 'openmm.openmm.CustomBondForce'>): 405.19990209984826 kJ/mol
+Force Group 8 (<class 'openmm.openmm.CMMotionRemover'>): 0.0 kJ/mol
+Force Group 9 (<class 'openmm.openmm.HarmonicAngleForce'>): 28406.170602057562 kJ/mol
+------------------------------------------
+⚠️  No Electrode/Charge plugin force detected in system forces. (Will use Python solver)
+
+Starting simulation (Constant_V) for 20 ns...
+🔥 Logging mode set to: efficient
+--- Running in 'efficient' mode. Logging to bench_original_out/*.log ---
+Running Constant Voltage simulation for 100000 charge updates.
+ (MD timestep: 200 fs per charge update)
+TEST_SMALL=1: overriding to tiny workload for quick benchmark/testing
+Q_numeric , Q_analytic charges on  cathode 0.7634418756704247 0.7634418756704247
+Q_numeric , Q_analytic charges on  anode -0.775441875671941 -0.7754418756719414
+Q_numeric , Q_analytic charges on  cathode 0.8722378928838956 0.8722378928838959
+Q_numeric , Q_analytic charges on  anode -0.8842378928820606 -0.8842378928820602
+
+Simulation finished in 0:00:00.461799.
+done!

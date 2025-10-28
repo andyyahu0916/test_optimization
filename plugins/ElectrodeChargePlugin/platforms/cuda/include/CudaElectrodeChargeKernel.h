@@ -44,9 +44,19 @@ private:
     OpenMM::CudaArray* cathodeIndicesDevice;
     OpenMM::CudaArray* anodeIndicesDevice;
     OpenMM::CudaArray* electrodeMaskDevice;
+    OpenMM::CudaArray* conductorMaskDevice;
     OpenMM::CudaArray* cathodeTargetDevice;
     OpenMM::CudaArray* anodeTargetDevice;
     OpenMM::CudaArray* chargeSum;
+    
+    // Conductor-specific device arrays (新增)
+    OpenMM::CudaArray* conductorIndicesDevice;
+    OpenMM::CudaArray* conductorNormalsDevice;
+    OpenMM::CudaArray* conductorAreasDevice;
+    OpenMM::CudaArray* conductorContactIndicesDevice;
+    OpenMM::CudaArray* conductorContactNormalsDevice;
+    OpenMM::CudaArray* conductorGeometriesDevice;
+    OpenMM::CudaArray* conductorTypesDevice;
     
     // Persistent buffers for forces and positions (avoid repeated allocation)
     OpenMM::CudaArray* forcesDevicePersistent;

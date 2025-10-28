@@ -284,7 +284,10 @@ class MM(object):
     # This is the Fixed-Voltage Poisson Solver to optimize charges
     # on the electrode subject to applied voltage ...
     #************************************************
-    def Poisson_solver_fixed_voltage(self, Niterations=3):
+    def Poisson_solver_fixed_voltage(self, Niterations=3, use_warmstart_this_step=False, verify_interval=0,
+                                     enable_convergence=False, convergence_tol_energy_rel=1e-6,
+                                     convergence_tol_charge=1e-6, enforce_analytic_scaling_each_iter=True,
+                                     verify_invariants=False, invariants_tol_charge=1e-6):
       
         # if QM/MM , make sure we turn off vext_grid calculation to save time with forces... turn back on after converged
         if self.QMMM :
@@ -307,6 +310,7 @@ class MM(object):
         #   sys.exit(0)
 
         #*********  Self-consistently solve for electrode charges that obey Fixed-Voltage boundary condition ...
+        prev_total_energy = None
         for i_iter in range(Niterations):
 
             # need Efield on all electrode atoms, get this from forces on virtual electrode sheets ...
@@ -360,12 +364,40 @@ class MM(object):
                 self.Anode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Cathode.z_pos )
 
             # Now scale charges to exact Analytic normalization....
-            self.Scale_charges_analytic_general()
+            if enforce_analytic_scaling_each_iter:
+                self.Scale_charges_analytic_general()
             # update charges in context ...
             self.nbondedForce.updateParametersInContext(self.simmd.context)
 
+            # Optional convergence checks
+            if enable_convergence:
+                # total energy relative change
+                total_energy = self.simmd.context.getState(getEnergy=True).getPotentialEnergy()
+                if prev_total_energy is not None:
+                    denom = max(1.0, abs(prev_total_energy._value))
+                    rel_change = abs(total_energy._value - prev_total_energy._value) / denom
+                    if rel_change < convergence_tol_energy_rel:
+                        break
+                prev_total_energy = total_energy
+
         # this call is just for printing converged charges ...
         self.Scale_charges_analytic_general( print_flag = True )
+
+        # Optional invariant verification
+        if verify_invariants:
+            # After final scaling, numeric should match analytic within tolerance on each electrode
+            # Cathode
+            Qn_c = self.Cathode.get_total_charge()
+            Qa_c = self.Cathode.Q_analytic
+            # Anode
+            Qn_a = self.Anode.get_total_charge()
+            Qa_a = self.Anode.Q_analytic
+            def ok(a,b):
+                denom = max(1.0, abs(b))
+                return abs(a-b)/denom <= invariants_tol_charge
+            if (not ok(Qn_c, Qa_c)) or (not ok(Qn_a, Qa_a)):
+                print('Invariant check failed: Q_numeric vs Q_analytic after scaling', Qn_c, Qa_c, Qn_a, Qa_a)
+                sys.exit(3)
 
         # if QM/MM , turn vext back on ...
         if self.QMMM :

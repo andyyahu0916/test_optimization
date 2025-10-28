@@ -60,7 +60,7 @@ public:
 private:
     ElectrodeRegion cathode;
     ElectrodeRegion anode;
-    int numIterations = 3;
+    int numIterations = 4;
     double smallThreshold = 1.0e-6;
     double lGap = 1.0;
     double lCell = 1.0;

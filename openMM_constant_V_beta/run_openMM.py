@@ -199,6 +199,38 @@ cathode_index = parse_index_tuple(elec_config.get('cathode_index'))
 anode_index = parse_index_tuple(elec_config.get('anode_index'))
 # --- 結束：讀取設定檔 ---
 
+# [Validation] 區塊（可選）
+validation_enabled = False
+validation_interval = 50
+validation_tol_charge = 5e-4
+validation_tol_energy_rel = 5e-4
+validation_plugin_dir = ''
+if config.has_section('Validation'):
+    val_cfg = config['Validation']
+    validation_enabled = val_cfg.getboolean('enable', fallback=False)
+    validation_interval = val_cfg.getint('interval', fallback=50)
+    validation_tol_charge = val_cfg.getfloat('tol_charge', fallback=5e-4)
+    validation_tol_energy_rel = val_cfg.getfloat('tol_energy_rel', fallback=5e-4)
+    validation_plugin_dir = val_cfg.get('plugin_dir', fallback='').strip()
+
+# [Physics] 區塊（可選）
+physics_iterations = 4
+physics_enable_convergence = False
+physics_conv_tol_energy_rel = 1e-6
+physics_conv_tol_charge = 1e-6
+physics_enforce_scale_each_iter = True
+physics_verify_invariants = False
+physics_invariants_tol_charge = 1e-6
+if config.has_section('Physics'):
+    phy = config['Physics']
+    physics_iterations = phy.getint('iterations', fallback=4)
+    physics_enable_convergence = phy.getboolean('enable_convergence', fallback=False)
+    physics_conv_tol_energy_rel = phy.getfloat('convergence_tol_energy_rel', fallback=1e-6)
+    physics_conv_tol_charge = phy.getfloat('convergence_tol_charge', fallback=1e-6)
+    physics_enforce_scale_each_iter = phy.getboolean('enforce_analytic_scaling_each_iter', fallback=True)
+    physics_verify_invariants = phy.getboolean('verify_invariants', fallback=False)
+    physics_invariants_tol_charge = phy.getfloat('invariants_tol_charge', fallback=1e-6)
+
 
 # set output path
 if os.path.exists(outPath):
@@ -226,22 +258,110 @@ if USE_PLUGIN:
     print("\n" + "="*60)
     print("🔥 Configuring ElectrodeChargePlugin...")
     print("="*60)
-    
-    # 手動加載 Plugin
     import os
-    conda_prefix = os.environ.get('CONDA_PREFIX', '/home/andy/miniforge3/envs/cuda')
-    plugin_dir = os.path.join(conda_prefix, 'lib', 'plugins')
-    if os.path.exists(plugin_dir):
-        Platform.loadPluginsFromDirectory(plugin_dir)
-        print(f"✓ Loaded plugins from: {plugin_dir}")
-    
-    # 創建 ElectrodeChargeForce (需要用 C++ API，暫時用 Python 模擬)
-    # TODO: 實際上需要 Python wrapper 或直接用 C++ 代碼
-    print("⚠️  Plugin integration pending: need Python wrapper or C++ initialization")
-    print("    For now, testing with Python Poisson solver to verify correctness")
+    try:
+        plugin_dir_candidates = []
+        if validation_plugin_dir:
+            plugin_dir_candidates.append(validation_plugin_dir)
+        conda_prefix = os.environ.get('CONDA_PREFIX', '/home/andy/miniforge3/envs/cuda')
+        plugin_dir_candidates.append(os.path.join(conda_prefix, 'lib', 'plugins'))
+        plugin_loaded = False
+        for pdir in plugin_dir_candidates:
+            if pdir and os.path.exists(pdir):
+                Platform.loadPluginsFromDirectory(pdir)
+                print(f"✓ Loaded plugins from: {pdir}")
+                plugin_loaded = True
+                break
+        if not plugin_loaded:
+            print("⚠️  No plugin directory found. Proceeding without plugin.")
+            USE_PLUGIN = False
+        else:
+            print("✓ Plugin registry updated. Expecting ElectrodeChargeForce to be present in System.")
+    except Exception as e:
+        print(f"❌ Failed to load plugin: {e}")
+        USE_PLUGIN = False
     print("="*60 + "\n")
-    # 暫時降級到 Python 實現
-    USE_PLUGIN = False
+
+    # 實例化並加入 ElectrodeChargeForce（使 plugin 真正生效）
+    try:
+        import electrodecharge as ec
+    except Exception as e:
+        print(f"❌ Failed to import electrodecharge Python wrapper: {e}")
+        print("   Disabling plugin and falling back to Python Poisson solver.")
+        USE_PLUGIN = False
+
+    if USE_PLUGIN:
+        try:
+            force = ec.ElectrodeChargeForce()
+            # 收集電極原子索引
+            cathode_indices = [atom.atom_index for atom in MMsys.Cathode.electrode_atoms]
+            anode_indices = [atom.atom_index for atom in MMsys.Anode.electrode_atoms]
+            # 設定電極與電壓（正負由公式決定，這裡傳入幅值）
+            force.setCathode(cathode_indices, abs(Voltage))
+            force.setAnode(anode_indices, abs(Voltage))
+            # 幾何與數值
+            force.setSmallThreshold(MMsys.small_threshold)
+            force.setCellGap(MMsys.Lgap)
+            force.setCellLength(MMsys.Lcell)
+            force.setNumIterations(physics_iterations)
+            # 指定 force group 到最後一組，避免覆蓋
+            force.setForceGroup(MMsys.system.getNumForces())
+            # 加入系統
+            MMsys.system.addForce(force)
+            # 重新初始化 context 以使新增 Force 生效
+            state_tmp = MMsys.simmd.context.getState(getPositions=True, getVelocities=True)
+            MMsys.simmd.context.reinitialize()
+            MMsys.simmd.context.setPositions(state_tmp.getPositions())
+            if state_tmp.getVelocities() is not None:
+                MMsys.simmd.context.setVelocities(state_tmp.getVelocities())
+            print("✓ ElectrodeChargeForce attached to System and context reinitialized.")
+        except Exception as e:
+            print(f"❌ Failed to attach ElectrodeChargeForce: {e}")
+            print("   Disabling plugin and falling back to Python Poisson solver.")
+            USE_PLUGIN = False
+
+# ===== A/B 參考系統（僅在 plugin 且啟用驗證時建立） =====
+MMsys_ref = None
+if USE_PLUGIN and validation_enabled:
+    print("[Validation] 建立 reference 系統以進行 A/B 比對（Python Poisson）...")
+    MMsys_ref = MM( pdb_list = pdb_list , residue_xml_list = residue_xml_list , ff_xml_list = ff_xml_list )
+    MMsys_ref.set_periodic_residue(True)
+    MMsys_ref.set_platform(openmm_platform)
+    MMsys_ref.initialize_electrodes( Voltage, cathode_identifier = cathode_index , anode_identifier = anode_index , chain=True , exclude_element=("H",) )
+    MMsys_ref.initialize_electrolyte(Natom_cutoff=100)
+    MMsys_ref.generate_exclusions( flag_SAPT_FF_exclusions = True )
+    # 對齊 positions 與 box（確保與主系統完全一致）
+    state0 = MMsys.simmd.context.getState(getPositions=True)
+    MMsys_ref.simmd.context.setPositions(state0.getPositions())
+
+    # 收集電極索引順序（Cathode, Conductors, Anode），以便比較每原子電荷
+    def collect_electrode_indices(mm_obj):
+        idx = []
+        for atom in mm_obj.Cathode.electrode_atoms:
+            idx.append(atom.atom_index)
+        for Conductor in mm_obj.Conductor_list:
+            for atom in Conductor.electrode_atoms:
+                idx.append(atom.atom_index)
+        for atom in mm_obj.Anode.electrode_atoms:
+            idx.append(atom.atom_index)
+        return idx
+
+    electrode_index_order = collect_electrode_indices(MMsys)
+
+    def read_charges_for_indices(mm_obj, indices):
+        vals = []
+        for ai in indices:
+            (q_i, _, _) = mm_obj.nbondedForce.getParticleParameters(ai)
+            vals.append(q_i._value)
+        return vals
+
+    def energy_components(mm_obj):
+        comps = []
+        for j in range(mm_obj.system.getNumForces()):
+            e = mm_obj.simmd.context.getState(getEnergy=True, groups=2**j).getPotentialEnergy()
+            comps.append(e)
+        total = mm_obj.simmd.context.getState(getEnergy=True).getPotentialEnergy()
+        return total, comps
 
 state = MMsys.simmd.context.getState(getEnergy=True,getForces=True,getVelocities=False,getPositions=True)
 positions = state.getPositions()
@@ -378,17 +498,61 @@ elif simulation_type == "Constant_V":
         
         # 2️⃣ Poisson solver (更新電極電荷)
         if USE_PLUGIN:
-            # Plugin 在 Force 內部自動處理，不需要顯式調用
-            # 每次 step() 前會自動執行 ElectrodeChargeForce
-            pass
+            # Plugin 版：Force 內核自動處理；若啟用驗證，對照參考系統
+            if validation_enabled and (i % validation_interval == 0) and MMsys_ref is not None:
+                # 讓參考系統用 Python Poisson 更新
+                MMsys_ref.Poisson_solver_fixed_voltage(
+                    Niterations=physics_iterations,
+                    enable_convergence=physics_enable_convergence,
+                    convergence_tol_energy_rel=physics_conv_tol_energy_rel,
+                    convergence_tol_charge=physics_conv_tol_charge,
+                    enforce_analytic_scaling_each_iter=physics_enforce_scale_each_iter,
+                    verify_invariants=physics_verify_invariants,
+                    invariants_tol_charge=physics_invariants_tol_charge
+                )
+                # 對齊主系統電荷（由 plugin 內核更新），讀出兩邊電荷並比較
+                q_ref = read_charges_for_indices(MMsys_ref, electrode_index_order)
+                q_plug = read_charges_for_indices(MMsys, electrode_index_order)
+                # 計算每原子最大誤差
+                max_abs_err = max(abs(a-b) for a,b in zip(q_ref, q_plug)) if q_ref else 0.0
+                if max_abs_err > validation_tol_charge:
+                    print(f"❌ Validation failed: charge max|Δ|={max_abs_err:.3e} > tol={validation_tol_charge:.3e}")
+                    # 比較能量做輔助訊息
+                    Et_ref, comps_ref = energy_components(MMsys_ref)
+                    Et_plg, comps_plg = energy_components(MMsys)
+                    def rel(x,y):
+                        xv = x._value if hasattr(x, '_value') else float(x)
+                        yv = y._value if hasattr(y, '_value') else float(y)
+                        denom = max(1.0, abs(yv))
+                        return abs(xv - yv)/denom
+                    rel_total = rel(Et_ref, Et_plg)
+                    worst_rel = 0.0
+                    for a,b in zip(comps_ref, comps_plg):
+                        worst_rel = max(worst_rel, rel(a,b))
+                    print(f"   totalE relΔ={rel_total:.3e}, worst group relΔ={worst_rel:.3e}")
+                    sys.exit(2)
         elif mm_version == 'cython':
             MMsys.Poisson_solver_fixed_voltage(
-                Niterations=4,
+                Niterations=physics_iterations,
                 use_warmstart_this_step=use_warmstart_now,
-                verify_interval=verify_interval
+                verify_interval=verify_interval,
+                enable_convergence=physics_enable_convergence,
+                convergence_tol_energy_rel=physics_conv_tol_energy_rel,
+                convergence_tol_charge=physics_conv_tol_charge,
+                enforce_analytic_scaling_each_iter=physics_enforce_scale_each_iter,
+                verify_invariants=physics_verify_invariants,
+                invariants_tol_charge=physics_invariants_tol_charge
             )
         else:
-            MMsys.Poisson_solver_fixed_voltage(Niterations=4)
+            MMsys.Poisson_solver_fixed_voltage(
+                Niterations=physics_iterations,
+                enable_convergence=physics_enable_convergence,
+                convergence_tol_energy_rel=physics_conv_tol_energy_rel,
+                convergence_tol_charge=physics_conv_tol_charge,
+                enforce_analytic_scaling_each_iter=physics_enforce_scale_each_iter,
+                verify_invariants=physics_verify_invariants,
+                invariants_tol_charge=physics_invariants_tol_charge
+            )
         
         # 3️⃣ MD 步驟
         MMsys.simmd.step(steps_per_charge_update)

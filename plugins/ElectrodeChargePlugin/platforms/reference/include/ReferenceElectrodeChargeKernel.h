@@ -28,6 +28,7 @@ private:
     ElectrodeChargeParameters parameters;
     int numParticles = 0;
     std::vector<bool> electrodeMask;
+    std::vector<bool> conductorMask;  // 新增
 };
 
 } // namespace ElectrodeChargePlugin

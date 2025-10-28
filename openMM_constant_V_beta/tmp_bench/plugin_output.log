@@ -1,0 +1,41 @@
+Warning: importing 'simtk.openmm' is deprecated.  Import 'openmm' instead.
+🚀 Loading OpenMM Plugin (C++/CUDA implementation)
+   ⚡ Reference platform: 2-3x speedup (CPU, for testing)
+   🔥 CUDA platform: 10-20x speedup (GPU, production)
+✓ Loaded plugins from: /home/andy/miniforge3/envs/cuda/lib/plugins
+  plugin candidates: ['libOpenMMDrudeCUDA.so', 'libOpenMMAmoebaReference.so', 'libOpenMMCPU.so', 'libOpenMMDrudeOpenCL.so', 'libOpenMMAmoebaCUDA.so', 'libElectrodeChargePluginReference.so', 'libOpenMMAmoebaOpenCL.so', 'libOpenMMDrudeReference.so', 'libOpenMMRPMDOpenCL.so', 'libOpenMMCUDA.so', 'libElectrodeChargePluginCUDA.so', 'libOpenMMRPMDReference.so', 'libOpenMMOpenCL.so', 'libOpenMMRPMDCUDA.so', 'libOpenMMPME.so']
+Creating Interaction Groups for CustomNonBonded.  These interactions will be computed between water-other, not water-water.
+Creating Exclusions for TFSI
+
+============================================================
+🔥 Configuring ElectrodeChargePlugin (status check)...
+============================================================
+✓ Plugin was loaded earlier and is available to the system.
+  ElectrodeChargePlugin should be active (GPU/CPU implementations available).
+============================================================
+
+--- Initial State (Before Simulation) ---
+Initial Kinetic Energy: 909.0462614543269 kJ/mol
+Initial Potential Energy: -126512.23685619468 kJ/mol
+Force Group 0 (<class 'openmm.openmm.HarmonicBondForce'>): 11465.235590748001 kJ/mol
+Force Group 1 (<class 'openmm.openmm.PeriodicTorsionForce'>): 428.40808350003135 kJ/mol
+Force Group 2 (<class 'openmm.openmm.RBTorsionForce'>): -11134.159584501696 kJ/mol
+Force Group 3 (<class 'openmm.openmm.CustomTorsionForce'>): 0.0 kJ/mol
+Force Group 4 (<class 'openmm.openmm.NonbondedForce'>): -119833.17246601311 kJ/mol
+Force Group 5 (<class 'openmm.openmm.DrudeForce'>): 0.0 kJ/mol
+Force Group 6 (<class 'openmm.openmm.CustomNonbondedForce'>): -36249.91898219945 kJ/mol
+Force Group 7 (<class 'openmm.openmm.CustomBondForce'>): 405.19990209984826 kJ/mol
+Force Group 8 (<class 'openmm.openmm.CMMotionRemover'>): 0.0 kJ/mol
+Force Group 9 (<class 'openmm.openmm.HarmonicAngleForce'>): 28406.170602057562 kJ/mol
+------------------------------------------
+⚠️  No Electrode/Charge plugin force detected in system forces. (Will use Python solver)
+
+Starting simulation (Constant_V) for 20 ns...
+🔥 Logging mode set to: efficient
+--- Running in 'efficient' mode. Logging to bench_plugin_out/*.log ---
+Running Constant Voltage simulation for 100000 charge updates.
+ (MD timestep: 200 fs per charge update)
+TEST_SMALL=1: overriding to tiny workload for quick benchmark/testing
+
+Simulation finished in 0:00:00.031130.
+done!
