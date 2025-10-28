@@ -33,21 +33,9 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 import simtk.unit as units
 
-# Import from OPTIMIZED to get the rest of the classes (support both relative and absolute)
-try:
-    from .MM_classes_OPTIMIZED import MM as MM_OPTIMIZED
-except ImportError:
-    from MM_classes_OPTIMIZED import MM as MM_OPTIMIZED
-
-# Conversion factors
+# Conversion factors (defined once!)
 conversion_nmBohr = 18.8973
 conversion_KjmolNm_Au = conversion_nmBohr / 2625.5
-
-
-# Conversion factors
-conversion_nmBohr = 18.8973
-conversion_KjmolNm_Au = conversion_nmBohr / 2625.5
-
 
 #=========================================================================================
 # Import MM class from OPTIMIZED and override only the Poisson solver
@@ -197,14 +185,9 @@ class MM(MM_OPTIMIZED):
             forces = state.getForces() if self.Conductor_list else None
 
             # ============ Cathode (Cython optimized) ============
-            # 🔥 CYTHON OPTIMIZATION: Collect old charges (2.3x speedup)
-            if CYTHON_AVAILABLE:
-                cathode_q_old = ec_cython.collect_electrode_charges_cython(
-                    self.Cathode.electrode_atoms,
-                    self.nbondedForce
-                )
-            else:
-                cathode_q_old = numpy.array([atom.charge for atom in self.Cathode.electrode_atoms], dtype=numpy.float64)
+            # 🔥 Linus: 直接從 cache 讀！不要重複提取！
+            # OPTIMIZED 版本已經在 loop 外提取了，Cython 應該直接用同樣的邏輯
+            cathode_q_old = numpy.array([atom.charge for atom in self.Cathode.electrode_atoms], dtype=numpy.float64)
             
             # 🔥 CYTHON OPTIMIZATION: Compute new charges (2.7x speedup)
             if CYTHON_AVAILABLE:
@@ -245,14 +228,8 @@ class MM(MM_OPTIMIZED):
                     self.nbondedForce.setParticleParameters(atom.atom_index, cathode_q_new[i], 1.0, 0.0)
             
             # ============ Anode (Cython optimized) ============
-            # 🔥 CYTHON OPTIMIZATION: Collect old charges
-            if CYTHON_AVAILABLE:
-                anode_q_old = ec_cython.collect_electrode_charges_cython(
-                    self.Anode.electrode_atoms,
-                    self.nbondedForce
-                )
-            else:
-                anode_q_old = numpy.array([atom.charge for atom in self.Anode.electrode_atoms], dtype=numpy.float64)
+            # 🔥 Linus: 同上，直接讀 atom.charge，不繞路！
+            anode_q_old = numpy.array([atom.charge for atom in self.Anode.electrode_atoms], dtype=numpy.float64)
             
             # 🔥 CYTHON OPTIMIZATION: Compute new charges
             if CYTHON_AVAILABLE:
@@ -300,11 +277,13 @@ class MM(MM_OPTIMIZED):
 
                 self.nbondedForce.updateParametersInContext(self.simmd.context)
                 
-                # Update cached conductor charges after Numerical_charge_Conductor modifies them
-                self._conductor_charges = numpy.array([
-                    self.nbondedForce.getParticleParameters(idx)[0]._value
-                    for idx in self._conductor_indices
-                ], dtype=numpy.float64)
+                # 🔥 Linus: 直接從 Python objects 更新 cache！不要繞路 call OpenMM API！
+                # Numerical_charge_Conductor 已經更新了 atom.charge，直接讀就好！
+                idx = 0
+                for Conductor in self.Conductor_list:
+                    for atom in Conductor.electrode_atoms:
+                        self._conductor_charges[idx] = atom.charge
+                        idx += 1
                 
                 # Recompute analytic charges (conductors are part of electrolyte)
                 self.Cathode.compute_Electrode_charge_analytic( self , z_positions_array , self.Conductor_list, z_opposite = self.Anode.z_pos )

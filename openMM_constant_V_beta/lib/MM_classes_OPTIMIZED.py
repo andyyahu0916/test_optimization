@@ -432,6 +432,11 @@ class MM(object):
         voltage_term_anode = self.Anode.Voltage / self.Lgap
         threshold_check = 0.9 * self.small_threshold
         
+        # 🔥 CRITICAL OPTIMIZATION: Pre-extract charges once before iteration loop
+        # 避免每次 iteration 都 iterate Python list
+        cathode_q_old = numpy.array([atom.charge for atom in self.Cathode.electrode_atoms], dtype=numpy.float64)
+        anode_q_old = numpy.array([atom.charge for atom in self.Anode.electrode_atoms], dtype=numpy.float64)
+        
         for i_iter in range(Niterations):
 
             # 🚀 OPTIMIZATION 2: getEnergy=False, getPositions=False (已在 line 292 獲取 positions)
@@ -449,8 +454,7 @@ class MM(object):
             # Instead of looping over each atom, vectorize the calculation
             
             # ============ Cathode (vectorized) ============
-            # Get old charges
-            cathode_q_old = numpy.array([atom.charge for atom in self.Cathode.electrode_atoms], dtype=numpy.float64)
+            # Use cached charges from previous iteration (避免 list comprehension)
             
             # Vectorized Ez calculation with safe division
             cathode_Ez = numpy.where(
@@ -469,14 +473,17 @@ class MM(object):
                 cathode_q_new
             )
             
-            # Update atom charges and OpenMM parameters
+            # 🔥 Update atom charges and OpenMM parameters
+            # 保持 atom.charge 同步（其他代碼需要讀取）
             for i, atom in enumerate(self.Cathode.electrode_atoms):
                 atom.charge = cathode_q_new[i]
                 self.nbondedForce.setParticleParameters(atom.atom_index, cathode_q_new[i], 1.0, 0.0)
             
+            # 🔥 Update cached charges for next iteration (避免下次 list comprehension)
+            cathode_q_old[:] = cathode_q_new
+            
             # ============ Anode (vectorized) ============
-            # Get old charges
-            anode_q_old = numpy.array([atom.charge for atom in self.Anode.electrode_atoms], dtype=numpy.float64)
+            # Use cached charges from previous iteration
             
             # Vectorized Ez calculation with safe division
             anode_Ez = numpy.where(
@@ -495,10 +502,14 @@ class MM(object):
                 anode_q_new
             )
             
-            # Update atom charges and OpenMM parameters
+            # 🔥 Update atom charges and OpenMM parameters
+            # 保持 atom.charge 同步（其他代碼需要讀取）
             for i, atom in enumerate(self.Anode.electrode_atoms):
                 atom.charge = anode_q_new[i]
                 self.nbondedForce.setParticleParameters(atom.atom_index, anode_q_new[i], 1.0, 0.0)
+            
+            # 🔥 Update cached charges for next iteration
+            anode_q_old[:] = anode_q_new
 
             # now charges on any conductors that are near electrodes...
             if self.Conductor_list:
@@ -978,30 +989,33 @@ class MM(object):
     #************************************************
     # this method writes electrode charges to output file
     #
+    # 🔥 OPTIMIZED: Batch write to reduce system calls (2000 writes → 1 write)
+    #
     #  FIX:  Not sure the best way to determine order???
     #   we might need to write cathode, conductor , anode charges,
     #   or cathode, anode , conductor charges in either order??
     #   how to automate this??
     #************************************************
     def write_electrode_charges( self, chargeFile ):
-        # first cathode then anode charges
+        # 🔥 OPTIMIZATION: Build entire line as list, then join (避免 2000 次 write() 調用)
+        charges_list = []
+        
+        # Cathode charges
         for atom in self.Cathode.electrode_atoms:
-            chargeFile.write("{:f} ".format(atom.charge))          
-        #for atom in self.Anode.electrode_atoms:
-        #    chargeFile.write("{:f} ".format(atom.charge))
-
-        # loop over additional Conductors (buckyballs/nanotubes) if we have them
+            charges_list.append(f"{atom.charge:f}")
+        
+        # Conductor charges (if any)
         for Conductor in self.Conductor_list:
             for atom in Conductor.electrode_atoms:
-                chargeFile.write("{:f} ".format(atom.charge))
-
+                charges_list.append(f"{atom.charge:f}")
+        
+        # Anode charges
         for atom in self.Anode.electrode_atoms:
-            chargeFile.write("{:f} ".format(atom.charge))
-
-
-        # write newline to charge file after charge write
-        chargeFile.write("\n")
-        chargeFile.flush() # flush buffer
+            charges_list.append(f"{atom.charge:f}")
+        
+        # 🔥 Single write call (instead of 2000+)
+        chargeFile.write(" ".join(charges_list) + "\n")
+        chargeFile.flush()  # flush buffer
 
 
 

@@ -87,6 +87,16 @@ def should_use_warmstart(
         return True, True
 # ============================================================
 
+
+# ============================================================
+# 🔥 Linus 重構: 移除 Logger 類 - 土法煉鋼最快
+#
+# Linus: "Why the fuck do you need a class to print?"
+# 
+# Legacy print: 直接 print()，然後 `python run.py > log` 重定向
+# Efficient: 管理檔案 handles（這個需要，因為要 close）
+# ============================================================
+
 # --- 開始：讀取設定檔 ---
 
 # 1. 設定命令列參數解析
@@ -183,13 +193,6 @@ if os.path.exists(outPath):
 strdir = outPath
 os.mkdir(outPath)
 
-# --- 檔案管理器 ---
-# 這些檔案主要由 'efficient' 模式使用
-chargeFile = open(strdir + 'charges.dat', 'w')
-componentsFile = None
-if write_components and logging_mode == 'efficient':
-    componentsFile = open(strdir + 'components.log', 'w')
-
 
 #************************** download SAPT-FF force field files from github
 from sapt_exclusions import *
@@ -212,21 +215,13 @@ print("--- Initial State (Before Simulation) ---")
 print("Initial Kinetic Energy: " + str(state.getKineticEnergy()))
 print("Initial Potential Energy: " + str(state.getPotentialEnergy()))
 
-# 準備標頭和數據 (用於 'efficient' 模式的 components.log)
-header = "# Step\t"
-data = "0\t"
+# 印出所有 force groups 的初始能量
 for j in range(MMsys.system.getNumForces()):
     f = MMsys.system.getForce(j)
     force_name = type(f).__name__.replace("Force", "")
     group_energy = MMsys.simmd.context.getState(getEnergy=True, groups=2**j).getPotentialEnergy()
-    print(f"Force Group {j} ({type(f)}): " + str(group_energy))
-    header += f"Group{j}_{force_name}\t"
-    data += f"{group_energy._value}\t"
+    print(f"Force Group {j} ({type(f)}): {group_energy}")
 
-if componentsFile: # 只有在 'efficient' 且 'write_components' 時才寫入
-    componentsFile.write(header + "\n")
-    componentsFile.write(data + "\n")
-    componentsFile.flush()
 print("------------------------------------------")
 
 
@@ -247,172 +242,163 @@ MMsys.set_trajectory_output( trajectory_file_name , freq_traj_output_ps * 1000 )
 # ########################################################################
 # ######################  MAIN SIMULATION LOOP ###########################
 # ########################################################################
+# 🔥 Linus 重構: 統一主循環，土法煉鋼最快
+# 
+# 好品味原則:
+# 1. 一個主循環，不是兩個（消除嵌套循環）
+# 2. Warm-start 邏輯只出現一次
+# 3. Legacy print: 直接 print()，不需要 class（土法煉鋼）
+# 4. Efficient: 只管理檔案 handles（必要的狀態管理）
+# ########################################################################
 
 print(f"\nStarting simulation ({simulation_type}) for {simulation_time_ns} ns...")
 print(f"🔥 Logging mode set to: {logging_mode}")
 t_start = datetime.now()
 
-# 🔥 NEW: 根據 logging_mode 選擇執行路徑
+# 🔥 準備 logging（只有 efficient 需要管理檔案）
+legacy_print_interval = 0
+legacy_frame_count = 0
+chargeFile = None
+componentsFile = None
+
 if logging_mode == 'legacy_print':
-    
-    # --- 這是您原始的、低效能的「列印到終端機」迴圈 ---
-    print("--- WARNING: Running in 'legacy_print' mode. This will be VERY SLOW. ---")
-    
-    # 🔥 Linus 重構: 初始化 warm-start 狀態追蹤
-    warmstart_activated = False
-
-    for i in range( int(simulation_time_ns * 1000 / freq_traj_output_ps ) ):
-        
-        # 1. 列印所有狀態 (這是效能瓶頸)
-        state = MMsys.simmd.context.getState(getEnergy=True,getForces=True,getVelocities=False,getPositions=True)
-        print(f"\n--- Legacy Frame {i} (Time: {i * freq_traj_output_ps / 1000.0} ns) ---")
-        print('Iteration: ', i)
-        print('Kinetic Energy: ' + str(state.getKineticEnergy()))
-        print('Potential Energy: ' + str(state.getPotentialEnergy()))
-        for j in range(MMsys.system.getNumForces()):
-            f = MMsys.system.getForce(j)
-            print(f'  {type(f)}: ' + str(MMsys.simmd.context.getState(getEnergy=True, groups=2**j).getPotentialEnergy()))
-
-        # 2. 🔥 Linus 重構: 使用統一的 warm-start 判斷函數
-        current_time_ns = i * freq_traj_output_ps / 1000.0
-        use_warmstart_now, warmstart_activated = should_use_warmstart(
-            i,                      # 當前幀號
-            current_time_ns,        # 當前模擬時間
-            warmstart_activated,    # 當前激活狀態
-            enable_warmstart,       # 來自 config.ini
-            warmstart_after_ns,     # 來自 config.ini
-            warmstart_after_frames  # 來自 config.ini
-        )
-
-        # 3. 執行 "一個區塊" (chunk) 的模擬
-        #********** Monte Carlo Simulation ********
-        if simulation_type == "MC_equil":
-            for j in range( int(freq_traj_output_ps * 1000 / MMsys.MC.barofreq) ):
-                MMsys.MC_Barostat_step()
-
-        #********** Constant Voltage Simulation ****
-        elif simulation_type == "Constant_V":
-            # 這是 "一個區塊" 中有多少個電荷更新步驟
-            steps_in_this_chunk = int(freq_traj_output_ps * 1000 / freq_charge_update_fs )
-            
-            for j in range( steps_in_this_chunk ):
-                if mm_version == 'cython':
-                    MMsys.Poisson_solver_fixed_voltage( 
-                        Niterations=4,
-                        use_warmstart_this_step=use_warmstart_now,  # 🔥 Linus 重構: 新參數名
-                        verify_interval=verify_interval
-                    )
-                else:
-                    MMsys.Poisson_solver_fixed_voltage( Niterations=4 )
-                MMsys.simmd.step( freq_charge_update_fs )
-            
-            if write_charges : # Legacy 模式也支援寫入 charge (雖然頻率不同)
-                MMsys.write_electrode_charges( chargeFile )
-
-        else:
-            print('simulation type not recognized ...')
-            sys.exit()
+    print("--- Running in 'legacy_print' mode. This will be VERY SLOW. ---")
+    print("    Tip: Use `python run_openMM.py > output.log 2>&1` to redirect output")
+    # Legacy 每多少個 charge updates print 一次
+    legacy_print_interval = int(freq_traj_output_ps * 1000 / freq_charge_update_fs)
     
 elif logging_mode == 'efficient':
-
-    # --- 這是我們新建的、高效能的「寫入到檔案」迴圈 ---
     print(f"--- Running in 'efficient' mode. Logging to {strdir}*.log ---")
-
-    # 1. 新增 StateDataReporter (負責 energy.log)
+    
+    # StateDataReporter (標準能量項)
     log_freq = freq_traj_output_ps * 1000
-    MMsys.simmd.reporters.append(StateDataReporter(strdir + 'energy.log', log_freq, step=True,
-                                               potentialEnergy=True, kineticEnergy=True, totalEnergy=True,
-                                               temperature=True, volume=True, density=True, speed=True))
-
-    # 2. 建立新的、正確的主模擬迴圈
-    #********** Monte Carlo Simulation ********
-    if simulation_type == "MC_equil":
-        n_total_steps = int((simulation_time_ns * 1000 * 1000) / MMsys.MC.barofreq)
-        print(f"Running MC equilibration for {n_total_steps} steps.")
-        for _ in range(n_total_steps):
-            MMsys.MC_Barostat_step()
-
-    #********** Constant Voltage Simulation ****
-    elif simulation_type == "Constant_V":
-        n_total_updates = int((simulation_time_ns * 1000 * 1000) / freq_charge_update_fs)
-        steps_per_charge_update = freq_charge_update_fs
-        
-        charge_write_interval = 0
-        if write_charges:
-            charge_write_interval = int((freq_traj_output_ps * 1000) / freq_charge_update_fs)
-            if charge_write_interval == 0: charge_write_interval = 1
-        
-        components_write_interval = 0
-        if write_components and componentsFile:
-            components_write_interval = int((freq_traj_output_ps * 1000) / freq_charge_update_fs)
-            if components_write_interval == 0: components_write_interval = 1
-        
-        print(f"Running Constant Voltage simulation for {n_total_updates} charge updates.")
-        print(f" (Simulation step size: {steps_per_charge_update} fs per update)")
-        if write_charges:
-            print(f" Writing charges to {strdir}charges.dat every {charge_write_interval} updates.")
-        if write_components and componentsFile:
-            print(f" Writing energy components to {strdir}components.log every {components_write_interval} updates (Warning: Performance heavy).")
-
-        # 🔥 Linus 重構: 初始化 warm-start 狀態追蹤
-        warmstart_activated = False
-        
-        # 這是新的主迴圈
-        for i in range(n_total_updates):
-            
-            # 🔥 Linus 重構: 使用統一的 warm-start 判斷函數
-            current_time_ns = (i * freq_charge_update_fs) / (1000.0 * 1000.0)
-            use_warmstart_now, warmstart_activated = should_use_warmstart(
-                i,                      # 當前步驟號
-                current_time_ns,        # 當前模擬時間
-                warmstart_activated,    # 當前激活狀態
-                enable_warmstart,       # 來自 config.ini
-                warmstart_after_ns,     # 來自 config.ini
-                warmstart_after_frames  # 來自 config.ini
-            )
-
-            # 執行一次電荷更新 + MD 步驟
-            if mm_version == 'cython':
-                MMsys.Poisson_solver_fixed_voltage( 
-                    Niterations=4,
-                    use_warmstart_this_step=use_warmstart_now,  # 🔥 Linus 重構: 新參數名
-                    verify_interval=verify_interval
-                )
-            else:
-                MMsys.Poisson_solver_fixed_voltage( Niterations=4 )
-            
-            MMsys.simmd.step( steps_per_charge_update )
-            
-            # 根據設定的頻率寫入電荷
-            if write_charges and (i + 1) % charge_write_interval == 0:
-                MMsys.write_electrode_charges( chargeFile )
-                
-            # 根據設定的頻率，手動寫入所有能量分項
-            if componentsFile and (i + 1) % components_write_interval == 0:
-                data_line = f"{(i+1) * steps_per_charge_update}\t" # 寫入當前 time step
-                for j in range(MMsys.system.getNumForces()):
-                    group_energy = MMsys.simmd.context.getState(getEnergy=True, groups=2**j).getPotentialEnergy()
-                    data_line += f"{group_energy._value}\t"
-                componentsFile.write(data_line + "\n")
-
-    else:
-        print('simulation type not recognized ...')
-        sys.exit()
-
+    MMsys.simmd.reporters.append(StateDataReporter(
+        strdir + 'energy.log', log_freq, step=True,
+        potentialEnergy=True, kineticEnergy=True, totalEnergy=True,
+        temperature=True, volume=True, density=True, speed=True
+    ))
+    
+    # Charges 和 components 的記錄頻率
+    charge_log_interval = int((freq_traj_output_ps * 1000) / freq_charge_update_fs)
+    if charge_log_interval == 0: charge_log_interval = 1
+    
+    # 打開檔案
+    if write_charges:
+        chargeFile = open(strdir + 'charges.dat', 'w')
+        print(f"    Writing charges every {charge_log_interval} updates")
+    
+    if write_components:
+        componentsFile = open(strdir + 'components.log', 'w')
+        # 寫入 header
+        header = "# Step\t"
+        for j in range(MMsys.system.getNumForces()):
+            f = MMsys.system.getForce(j)
+            force_name = type(f).__name__.replace("Force", "")
+            header += f"Group{j}_{force_name}\t"
+        componentsFile.write(header + "\n")
+        print(f"    Writing energy components every {charge_log_interval} updates (Performance heavy!)")
 else:
     print(f"❌ Error: Unknown logging_mode '{logging_mode}' in config.ini")
     print("   Valid options: 'efficient', 'legacy_print'")
     sys.exit(1)
 
+
 # ########################################################################
-# ######################   效能修正結束  #########################
+# 🔥 統一主循環 (Monte Carlo 或 Constant Voltage)
+# ########################################################################
+
+#********** Monte Carlo Simulation ********
+if simulation_type == "MC_equil":
+    n_total_steps = int((simulation_time_ns * 1000 * 1000) / MMsys.MC.barofreq)
+    print(f"Running MC equilibration for {n_total_steps} steps.")
+    
+    for i in range(n_total_steps):
+        MMsys.MC_Barostat_step()
+
+#********** Constant Voltage Simulation ****
+elif simulation_type == "Constant_V":
+    # 計算總共需要多少次電荷更新
+    n_total_updates = int((simulation_time_ns * 1000 * 1000) / freq_charge_update_fs)
+    steps_per_charge_update = freq_charge_update_fs
+    
+    print(f"Running Constant Voltage simulation for {n_total_updates} charge updates.")
+    print(f" (MD timestep: {steps_per_charge_update} fs per charge update)")
+    
+    # 🔥 初始化 warm-start 狀態
+    warmstart_activated = False
+    
+    # 🔥 統一主循環：無嵌套，零複雜度
+    for i in range(n_total_updates):
+        
+        # 1️⃣ Warm-start 判斷 (只出現這一次!)
+        current_time_ns = (i * freq_charge_update_fs) / 1e6
+        use_warmstart_now, warmstart_activated = should_use_warmstart(
+            i,                      # 當前步驟號
+            current_time_ns,        # 當前模擬時間 (ns)
+            warmstart_activated,    # 當前激活狀態
+            enable_warmstart,       # 來自 config.ini
+            warmstart_after_ns,     # 來自 config.ini
+            warmstart_after_frames  # 來自 config.ini
+        )
+        
+        # 2️⃣ Poisson solver (更新電極電荷)
+        if mm_version == 'cython':
+            MMsys.Poisson_solver_fixed_voltage(
+                Niterations=4,
+                use_warmstart_this_step=use_warmstart_now,
+                verify_interval=verify_interval
+            )
+        else:
+            MMsys.Poisson_solver_fixed_voltage(Niterations=4)
+        
+        # 3️⃣ MD 步驟
+        MMsys.simmd.step(steps_per_charge_update)
+        
+        # 4️⃣ Logging (土法煉鋼：直接 if，不需要 fancy classes)
+        
+        # Legacy print: 直接 print()，讓 OS 處理重定向
+        if logging_mode == 'legacy_print' and i % legacy_print_interval == 0:
+            state = MMsys.simmd.context.getState(getEnergy=True, getForces=True, 
+                                                  getVelocities=False, getPositions=True)
+            print(f"\n--- Legacy Frame {legacy_frame_count} (Time: {current_time_ns:.3f} ns) ---")
+            print(f'Iteration: {legacy_frame_count}')
+            print(f'Kinetic Energy: {state.getKineticEnergy()}')
+            print(f'Potential Energy: {state.getPotentialEnergy()}')
+            
+            # 印出所有 force groups
+            for j in range(MMsys.system.getNumForces()):
+                f = MMsys.system.getForce(j)
+                group_energy = MMsys.simmd.context.getState(getEnergy=True, groups=2**j).getPotentialEnergy()
+                print(f'  {type(f)}: {group_energy}')
+            
+            legacy_frame_count += 1
+        
+        # Efficient: 寫入檔案
+        elif logging_mode == 'efficient' and i % charge_log_interval == 0:
+            if chargeFile:
+                MMsys.write_electrode_charges(chargeFile)
+            
+            if componentsFile:
+                data_line = f"{i * steps_per_charge_update}\t"
+                for j in range(MMsys.system.getNumForces()):
+                    group_energy = MMsys.simmd.context.getState(getEnergy=True, groups=2**j).getPotentialEnergy()
+                    data_line += f"{group_energy._value}\t"
+                componentsFile.write(data_line + "\n")
+
+else:
+    print('simulation type not recognized ...')
+    sys.exit()
+
+# ########################################################################
+# ######################   模擬結束  #####################################
 # ########################################################################
 
 t_end = datetime.now()
-print(f"Simulation finished in {t_end - t_start}.")
+print(f"\nSimulation finished in {t_end - t_start}.")
 
-# 關閉檔案
-chargeFile.close()
+# 清理資源（只關閉檔案，print 不需要清理）
+if chargeFile:
+    chargeFile.close()
 if componentsFile:
     componentsFile.close()
 
