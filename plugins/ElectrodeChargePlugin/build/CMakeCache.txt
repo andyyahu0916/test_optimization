@@ -678,6 +678,8 @@ _Python3_INCLUDE_DIR:INTERNAL=/home/andy/miniforge3/envs/cuda/include/python3.13
 //Python3 Properties
 _Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;13;9;64;<none>;cpython-313-x86_64-linux-gnu;abi3;/home/andy/miniforge3/envs/cuda/lib/python3.13;/home/andy/miniforge3/envs/cuda/lib/python3.13;/home/andy/miniforge3/envs/cuda/lib/python3.13/site-packages;/home/andy/miniforge3/envs/cuda/lib/python3.13/site-packages
 _Python3_INTERPRETER_SIGNATURE:INTERNAL=4c0cdecdc2273f2ee2a41105bb534ded
+//Interpreter reason failure
+_Python3_Interpreter_REASON_FAILURE:INTERNAL=
 //Path to a library.
 _Python3_LIBRARY_RELEASE:INTERNAL=/home/andy/miniforge3/envs/cuda/lib/libpython3.13.so
 //NumPy reason failure

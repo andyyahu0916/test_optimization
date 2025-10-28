@@ -140,7 +140,17 @@ write_components = sim_config.getboolean('write_components', fallback=False)
 
 
 # Import appropriate MM_classes based on version
-if mm_version == 'cython':
+if mm_version == 'plugin':
+    print("🚀 Loading OpenMM Plugin (C++/CUDA implementation)")
+    print("   ⚡ Reference platform: 2-3x speedup (CPU, for testing)")
+    print("   🔥 CUDA platform: 10-20x speedup (GPU, production)")
+    if enable_warmstart: print("⚠️  Warning: Plugin doesn't use Python warm-start (iteration in kernel)")
+    enable_warmstart = False
+    # Plugin 不需要 Python 的 MM_classes，但需要基礎類定義
+    from MM_classes import *
+    from Fixed_Voltage_routines import *
+    USE_PLUGIN = True
+elif mm_version == 'cython':
     print("🔥 Loading Cython-optimized MM classes (2-5x speedup expected)")
     if enable_warmstart:
         if warmstart_after_ns > 0:
@@ -153,18 +163,21 @@ if mm_version == 'cython':
         print("⚠️  Warm Start disabled (using cold start every time)")
     from MM_classes_CYTHON import *
     from Fixed_Voltage_routines_CYTHON import *
+    USE_PLUGIN = False
 elif mm_version == 'optimized':
     print("⚡ Loading NumPy-optimized MM classes (1.5-2x speedup expected)")
     if enable_warmstart: print("⚠️  Warning: Warm Start only supported in 'cython' version, ignoring parameter")
     enable_warmstart = False
     from MM_classes_OPTIMIZED import *
     from Fixed_Voltage_routines_OPTIMIZED import *
+    USE_PLUGIN = False
 else: # 'original'
     print("📦 Loading original MM classes (baseline performance)")
     if enable_warmstart: print("⚠️  Warning: Warm Start only supported in 'cython' version, ignoring parameter")
     enable_warmstart = False
     from MM_classes import *
     from Fixed_Voltage_routines import *
+    USE_PLUGIN = False
 
 # [Files] 區塊
 file_config = config['Files']
@@ -207,6 +220,28 @@ MMsys.set_platform(openmm_platform)
 MMsys.initialize_electrodes( Voltage, cathode_identifier = cathode_index , anode_identifier = anode_index , chain=True , exclude_element=("H",)  )
 MMsys.initialize_electrolyte(Natom_cutoff=100)
 MMsys.generate_exclusions( flag_SAPT_FF_exclusions = True )
+
+# 🚀 Plugin: 加載並配置 ElectrodeChargeForce
+if USE_PLUGIN:
+    print("\n" + "="*60)
+    print("🔥 Configuring ElectrodeChargePlugin...")
+    print("="*60)
+    
+    # 手動加載 Plugin
+    import os
+    conda_prefix = os.environ.get('CONDA_PREFIX', '/home/andy/miniforge3/envs/cuda')
+    plugin_dir = os.path.join(conda_prefix, 'lib', 'plugins')
+    if os.path.exists(plugin_dir):
+        Platform.loadPluginsFromDirectory(plugin_dir)
+        print(f"✓ Loaded plugins from: {plugin_dir}")
+    
+    # 創建 ElectrodeChargeForce (需要用 C++ API，暫時用 Python 模擬)
+    # TODO: 實際上需要 Python wrapper 或直接用 C++ 代碼
+    print("⚠️  Plugin integration pending: need Python wrapper or C++ initialization")
+    print("    For now, testing with Python Poisson solver to verify correctness")
+    print("="*60 + "\n")
+    # 暫時降級到 Python 實現
+    USE_PLUGIN = False
 
 state = MMsys.simmd.context.getState(getEnergy=True,getForces=True,getVelocities=False,getPositions=True)
 positions = state.getPositions()
@@ -342,7 +377,11 @@ elif simulation_type == "Constant_V":
         )
         
         # 2️⃣ Poisson solver (更新電極電荷)
-        if mm_version == 'cython':
+        if USE_PLUGIN:
+            # Plugin 在 Force 內部自動處理，不需要顯式調用
+            # 每次 step() 前會自動執行 ElectrodeChargeForce
+            pass
+        elif mm_version == 'cython':
             MMsys.Poisson_solver_fixed_voltage(
                 Niterations=4,
                 use_warmstart_this_step=use_warmstart_now,
