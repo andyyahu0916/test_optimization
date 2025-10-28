@@ -1,0 +1,133 @@
+#---------------------------------------------------
+# OpenMM Electrode Charge Plugin
+# 
+# 這是一個示例 CMakeLists.txt,展示如何正確配置
+# OpenMM plugin 項目
+#---------------------------------------------------
+
+CMAKE_MINIMUM_REQUIRED(VERSION 3.17)
+
+PROJECT(OpenMMElectrodeChargePlugin)
+
+# ===========================================
+# 配置 OpenMM
+# ===========================================
+
+# 方式 1: 使用自定義的 SetupOpenMM.cmake (推薦)
+INCLUDE(${CMAKE_SOURCE_DIR}/cmake/SetupOpenMM.cmake)
+
+# 方式 2: 直接在這裡設置 (簡單直接)
+# SET(OPENMM_DIR "/home/andy/miniforge3/envs/cuda" CACHE PATH "Where OpenMM is installed")
+# INCLUDE_DIRECTORIES("${OPENMM_DIR}/include")
+# LINK_DIRECTORIES("${OPENMM_DIR}/lib" "${OPENMM_DIR}/lib/plugins")
+
+# ===========================================
+# C++ 版本設定
+# ===========================================
+SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# ===========================================
+# 編譯選項
+# ===========================================
+IF(APPLE)
+    SET(CMAKE_INSTALL_NAME_DIR "@rpath")
+    SET(EXTRA_COMPILE_FLAGS "-msse2 -stdlib=libc++")
+ENDIF(APPLE)
+
+# ===========================================
+# 安裝路徑
+# ===========================================
+IF(${CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT})
+    SET(CMAKE_INSTALL_PREFIX "${OPENMM_DIR}" CACHE PATH "Where to install the plugin" FORCE)
+ENDIF()
+
+MESSAGE(STATUS "Plugin will be installed to: ${CMAKE_INSTALL_PREFIX}")
+
+# ===========================================
+# 源文件組織
+# ===========================================
+
+# 插件源代碼子目錄
+SET(PLUGIN_SOURCE_SUBDIRS openmmapi)
+
+# API 頭文件目錄
+SET(API_INCLUDE_DIRS "openmmapi/include" "openmmapi/include/internal")
+
+# 收集頭文件
+SET(API_INCLUDE_FILES)
+FOREACH(dir ${API_INCLUDE_DIRS})
+    FILE(GLOB fullpaths ${dir}/*.h)
+    SET(API_INCLUDE_FILES ${API_INCLUDE_FILES} ${fullpaths})
+ENDFOREACH(dir)
+
+# 收集源文件
+SET(SOURCE_FILES)
+SET(SOURCE_INCLUDE_FILES)
+FOREACH(subdir ${PLUGIN_SOURCE_SUBDIRS})
+    FILE(GLOB src_files  ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/src/*.cpp)
+    FILE(GLOB incl_files ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/src/*.h)
+    SET(SOURCE_FILES         ${SOURCE_FILES}         ${src_files})
+    SET(SOURCE_INCLUDE_FILES ${SOURCE_INCLUDE_FILES} ${incl_files})
+    
+    INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/include)
+ENDFOREACH(subdir)
+
+# ===========================================
+# 創建共享庫
+# ===========================================
+
+SET(PLUGIN_LIBRARY_NAME ElectrodeChargePlugin)
+SET(SHARED_TARGET ${PLUGIN_LIBRARY_NAME})
+
+ADD_LIBRARY(${SHARED_TARGET} SHARED 
+    ${SOURCE_FILES} 
+    ${SOURCE_INCLUDE_FILES} 
+    ${API_INCLUDE_FILES}
+)
+
+SET_TARGET_PROPERTIES(${SHARED_TARGET} PROPERTIES
+    COMPILE_FLAGS "-DELECTRODE_BUILDING_SHARED_LIBRARY ${EXTRA_COMPILE_FLAGS}"
+    LINK_FLAGS "${EXTRA_COMPILE_FLAGS}"
+)
+
+# ===========================================
+# 鏈接 OpenMM 庫 (關鍵步驟!)
+# ===========================================
+TARGET_LINK_LIBRARIES(${SHARED_TARGET} OpenMM)
+
+# ===========================================
+# 安裝配置
+# ===========================================
+
+# 安裝庫文件
+INSTALL(TARGETS ${SHARED_TARGET} 
+    LIBRARY DESTINATION lib/plugins
+    RUNTIME DESTINATION lib/plugins
+)
+
+# 安裝頭文件
+FILE(GLOB API_ONLY_INCLUDE_FILES "openmmapi/include/*.h")
+INSTALL(FILES ${API_ONLY_INCLUDE_FILES} DESTINATION include)
+
+FILE(GLOB API_ONLY_INCLUDE_FILES_INTERNAL "openmmapi/include/internal/*.h")
+INSTALL(FILES ${API_ONLY_INCLUDE_FILES_INTERNAL} DESTINATION include/internal)
+
+# ===========================================
+# 測試
+# ===========================================
+ENABLE_TESTING()
+# ADD_SUBDIRECTORY(tests)
+
+# ===========================================
+# Platform 實現 (可選)
+# ===========================================
+# ADD_SUBDIRECTORY(platforms/reference)
+# ADD_SUBDIRECTORY(platforms/cuda)
+# ADD_SUBDIRECTORY(platforms/opencl)
+
+MESSAGE(STATUS "")
+MESSAGE(STATUS "========================================")
+MESSAGE(STATUS "ElectrodeChargePlugin Configuration Complete")
+MESSAGE(STATUS "========================================")
+MESSAGE(STATUS "")
