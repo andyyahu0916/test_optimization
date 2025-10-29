@@ -314,13 +314,19 @@ if USE_PLUGIN:
                 contact_normals = []     # flattened nx,ny,nz per conductor
                 geometries = []          # per conductor
                 types = []               # 0=buckyball, 1=nanotube
+                atom_cond_ids = []       # per atom -> conductor id
+                atom_counts = []         # per conductor
 
-                for Conductor in MMsys.Conductor_list:
+                for cond_id, Conductor in enumerate(MMsys.Conductor_list):
                     # per-atom data
+                    atom_count = 0
                     for atom in Conductor.electrode_atoms:
                         conductor_indices.append(atom.atom_index)
                         conductor_normals.extend([atom.nx, atom.ny, atom.nz])
                         conductor_areas.append(Conductor.area_atom)
+                        atom_cond_ids.append(cond_id)
+                        atom_count += 1
+                    atom_counts.append(atom_count)
                     # contact point
                     ci = Conductor.Electrode_contact_atom.atom_index
                     cn = Conductor.Electrode_contact_atom
@@ -344,7 +350,9 @@ if USE_PLUGIN:
                                            contact_indices,
                                            contact_normals,
                                            geometries,
-                                           types)
+                                           types,
+                                           atom_cond_ids,
+                                           atom_counts)
                     print(f"✓ Passed {len(conductor_indices)} conductor atoms across {len(contact_indices)} conductors to plugin")
                 except Exception as e:
                     print(f"⚠️  Passing conductor data to plugin failed: {e}")

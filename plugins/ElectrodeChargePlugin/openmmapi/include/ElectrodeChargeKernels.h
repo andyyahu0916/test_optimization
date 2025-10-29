@@ -28,6 +28,8 @@ struct ElectrodeChargeParameters {
     std::vector<double> conductorContactNormals; // flattened nx,ny,nz per conductor
     std::vector<double> conductorGeometries;   // per conductor
     std::vector<int> conductorTypes;           // per conductor (0=buckyball,1=nanotube)
+    std::vector<int> conductorAtomCondIds;     // per conductor atom, maps to conductor id
+    std::vector<int> conductorAtomCounts;      // per conductor, atom counts
 };
 
 /**

@@ -57,6 +57,9 @@ private:
     OpenMM::CudaArray* conductorContactNormalsDevice;
     OpenMM::CudaArray* conductorGeometriesDevice;
     OpenMM::CudaArray* conductorTypesDevice;
+    OpenMM::CudaArray* conductorAtomCondIdsDevice;
+    OpenMM::CudaArray* conductorAtomCountsDevice;
+    OpenMM::CudaArray* conductorDQDevice; // per conductor total dQ
     
     // Persistent buffers for forces and positions (avoid repeated allocation)
     OpenMM::CudaArray* forcesDevicePersistent;

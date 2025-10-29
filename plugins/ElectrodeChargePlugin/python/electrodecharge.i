@@ -69,7 +69,9 @@ public:
                           const std::vector<int>& contactIndices,
                           const std::vector<double>& contactNormals,
                           const std::vector<double>& geometries,
-                          const std::vector<int>& types);
+                          const std::vector<int>& types,
+                          const std::vector<int>& atomCondIds,
+                          const std::vector<int>& atomCountsPerConductor);
 };
 
 }

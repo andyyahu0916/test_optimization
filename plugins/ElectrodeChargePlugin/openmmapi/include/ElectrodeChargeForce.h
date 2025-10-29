@@ -68,7 +68,9 @@ public:
                           const std::vector<int>& contactIndices,
                           const std::vector<double>& contactNormals,
                           const std::vector<double>& geometries,
-                          const std::vector<int>& types) {
+                          const std::vector<int>& types,
+                          const std::vector<int>& atomCondIds,
+                          const std::vector<int>& atomCountsPerConductor) {
         conductorIndices = indices;
         conductorNormals = normals;
         conductorAreas = areas;
@@ -76,6 +78,8 @@ public:
         conductorContactNormals = contactNormals;
         conductorGeometries = geometries;
         conductorTypes = types;
+        conductorAtomCondIds = atomCondIds;
+        conductorAtomCounts = atomCountsPerConductor;
     }
 
     const std::vector<int>& getConductorIndices() const { return conductorIndices; }
@@ -85,6 +89,8 @@ public:
     const std::vector<double>& getConductorContactNormals() const { return conductorContactNormals; }
     const std::vector<double>& getConductorGeometries() const { return conductorGeometries; }
     const std::vector<int>& getConductorTypes() const { return conductorTypes; }
+    const std::vector<int>& getConductorAtomCondIds() const { return conductorAtomCondIds; }
+    const std::vector<int>& getConductorAtomCounts() const { return conductorAtomCounts; }
 
     /**
      * OpenMM book-keeping overrides.
@@ -108,6 +114,8 @@ private:
     std::vector<double> conductorContactNormals;
     std::vector<double> conductorGeometries;
     std::vector<int> conductorTypes;
+    std::vector<int> conductorAtomCondIds;       // length = numConductorAtoms, maps each atom to conductor id
+    std::vector<int> conductorAtomCounts;        // length = numConductors, number of atoms per conductor
 };
 
 } // namespace ElectrodeChargePlugin

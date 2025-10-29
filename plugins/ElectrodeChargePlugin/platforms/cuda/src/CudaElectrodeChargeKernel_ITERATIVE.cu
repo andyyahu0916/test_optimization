@@ -73,9 +73,10 @@ __global__ void updateElectrodeChargesIterative(
         float newCharge = twoOverFourPi * cathodeArea * 
                          ((cathodeVoltageKj / lGap) + ezExternal) * conversionKjmolNmAu;
         
-        if (fabsf(newCharge) < smallThreshold) {
-            newCharge = smallThreshold;
-        }
+        // branchless clamp to preserve threshold rule
+        float absNC = fabsf(newCharge);
+        float clamped = fmaxf(absNC, smallThreshold);
+        newCharge = copysignf(clamped, 1.0f);
         
         pq.w = newCharge;
         posq[atomIdx] = pq;
@@ -98,9 +99,10 @@ __global__ void updateElectrodeChargesIterative(
         float newCharge = -twoOverFourPi * anodeArea * 
                          ((anodeVoltageKj / lGap) + ezExternal) * conversionKjmolNmAu;
         
-        if (fabsf(newCharge) < smallThreshold) {
-            newCharge = -smallThreshold;
-        }
+        // branchless clamp with negative sign for anode
+        float absNA = fabsf(newCharge);
+        float clampedA = fmaxf(absNA, smallThreshold);
+        newCharge = -clampedA;
         
         pq.w = newCharge;
         posq[atomIdx] = pq;
@@ -130,13 +132,15 @@ __global__ void computeTargetAndScale(
     const float lCell,
     const float conversionKjmolNmAu,
     const float smallThreshold,
-    float* __restrict__ cathodeScaleOut,    // Output: scaling factor
+    float* __restrict__ cathodeScaleOut,    // Output: scaling factor (kept for compatibility)
     float* __restrict__ anodeScaleOut
 ) {
     __shared__ float cathodeSumShared[256];
     __shared__ float anodeSumShared[256];
     __shared__ float cathodeTargetShared[256];
     __shared__ float anodeTargetShared[256];
+    __shared__ float scaleCathode;
+    __shared__ float scaleAnode;
     
     int tid = threadIdx.x;
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -226,9 +230,26 @@ __global__ void computeTargetAndScale(
         if (fabsf(anodeSum) > smallThreshold && anodeTarget < 0.0f) {
             anodeScale = anodeTarget / anodeSum;
         }
-        
+        // write back for compatibility and store to shared for in-kernel scaling
         atomicExch(cathodeScaleOut, cathodeScale);
         atomicExch(anodeScaleOut, anodeScale);
+        scaleCathode = cathodeScale;
+        scaleAnode = anodeScale;
+    }
+    __syncthreads();
+
+    // Apply scaling in the same kernel (eliminate extra launch)
+    if (idx < numCathode) {
+        int atomIdx = cathodeIndices[idx];
+        float4 pq = posqOut[atomIdx];
+        pq.w *= scaleCathode;
+        posqOut[atomIdx] = pq;
+    }
+    if (idx < numAnode) {
+        int atomIdx = anodeIndices[idx];
+        float4 pq = posqOut[atomIdx];
+        pq.w *= scaleAnode;
+        posqOut[atomIdx] = pq;
     }
 }
 
@@ -262,11 +283,10 @@ __global__ void conductorImageCharges(
             float En_external = (force.x * normal.x + force.y * normal.y + force.z * normal.z) / oldCharge;
             // Solve for surface charge requiring normal field be zero inside conductor
             float newCharge = 2.0f / (4.0f * 3.14159265358979323846f) * conductorAreas[tid] * En_external * conversionKjmolNmAu;
-            
-            if (fabsf(newCharge) < smallThreshold) {
-                newCharge = smallThreshold;
-            }
-            
+            // branchless clamp positive
+            float absNC = fabsf(newCharge);
+            float clamped = fmaxf(absNC, smallThreshold);
+            newCharge = copysignf(clamped, 1.0f);
             pq.w = newCharge;
             posq[atomIdx] = pq;
         }
@@ -278,54 +298,87 @@ __global__ void conductorImageCharges(
  */
 __global__ void conductorChargeTransfer(
     const float3* __restrict__ forces,
-    float4* __restrict__ posq,
-    const int* __restrict__ conductorIndices,
+    const int* __restrict__ conductorContactIndices,  // per conductor
+    const float3* __restrict__ conductorContactNormals,
+    const float* __restrict__ conductorGeometries,
+    const int* __restrict__ conductorTypes,
+    float* __restrict__ dQPerConductor,
     const int numConductors,
-    const int* __restrict__ conductorContactIndices,  // contact atom index for each conductor
-    const float3* __restrict__ conductorContactNormals, // normal at contact point
-    const float* __restrict__ conductorGeometries,     // dr_center_contact for Buckyball, dr*length/2 for Nanotube
-    const int* __restrict__ conductorTypes,            // 0=Buckyball, 1=Nanotube
     const float cathodeVoltageKj,
     const float lGap,
     const float conversionKjmolNmAu,
     const float smallThreshold
 ) {
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    
     if (tid < numConductors) {
         int contactIdx = conductorContactIndices[tid];
         float3 force = forces[contactIdx];
         float3 normal = conductorContactNormals[tid];
-        
-        float q_i = posq[contactIdx].w;
+        float q_i = 1.0f; // threshold guard only
         float En_external = 0.0f;
-        
         if (fabsf(q_i) > 0.9f * smallThreshold) {
             En_external = (force.x * normal.x + force.y * normal.y + force.z * normal.z) / q_i;
         }
-        
-        // Boundary condition: dE_conductor = -(Eext + dV/2L) for electrode contact
         float dE_conductor = -(En_external + cathodeVoltageKj / lGap / 2.0f) * conversionKjmolNmAu;
-        
-        // Charge depends on conductor geometry
-        float dQ_conductor;
-        if (conductorTypes[tid] == 0) {  // Buckyball
-            dQ_conductor = -1.0f * dE_conductor * conductorGeometries[tid] * conductorGeometries[tid];
-        } else {  // Nanotube
-            dQ_conductor = -1.0f * dE_conductor * conductorGeometries[tid];
-        }
-        
-        // Per atom charge (uniform distribution)
-        float dq_atom = dQ_conductor / numConductors;  // Simplified: assume all conductors have same Natoms
-        
-        // Add excess charge to conductor
+        float dQ_conductor = (conductorTypes[tid] == 0)
+            ? (-1.0f * dE_conductor * conductorGeometries[tid] * conductorGeometries[tid])
+            : (-1.0f * dE_conductor * conductorGeometries[tid]);
+        dQPerConductor[tid] = dQ_conductor;
+    }
+}
+
+__global__ void applyConductorDQ(
+    float4* __restrict__ posq,
+    const int* __restrict__ conductorIndices,      // per atom
+    const int* __restrict__ conductorAtomCondIds,  // per atom -> cond id
+    const int numConductorAtoms,
+    const float* __restrict__ dQPerConductor,      // per conductor
+    const int* __restrict__ atomCountsPerConductor // per conductor
+) {
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < numConductorAtoms) {
         int atomIdx = conductorIndices[tid];
+        int condId = conductorAtomCondIds[tid];
+        int count = atomCountsPerConductor[condId];
+        float dq = dQPerConductor[condId] / (float)count;
         float4 pq = posq[atomIdx];
-        pq.w += dq_atom;
+        pq.w += dq;
         posq[atomIdx] = pq;
     }
 }
 
+
+/**
+ * Kernel: Apply scaling to electrode charges (reads scale from device)
+ */
+__global__ void applyScaling(
+    float4* __restrict__ posq,
+    const int* __restrict__ cathodeIndices,
+    const int numCathode,
+    const int* __restrict__ anodeIndices,
+    const int numAnode,
+    const float* __restrict__ cathodeScalePtr,
+    const float* __restrict__ anodeScalePtr
+) {
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    float cathodeScale = *cathodeScalePtr;
+    float anodeScale = *anodeScalePtr;
+
+    if (tid < numCathode) {
+        int atomIdx = cathodeIndices[tid];
+        float4 pq = posq[atomIdx];
+        pq.w *= cathodeScale;
+        posq[atomIdx] = pq;
+    }
+
+    int anodeTid = tid - numCathode;
+    if (anodeTid >= 0 && anodeTid < numAnode) {
+        int atomIdx = anodeIndices[anodeTid];
+        float4 pq = posq[atomIdx];
+        pq.w *= anodeScale;
+        posq[atomIdx] = pq;
+    }
+}
 
 // ============================================================================
 // Host code: execute with GPU-resident iteration
@@ -409,7 +462,6 @@ double CudaCalcElectrodeChargeKernel::execute(
         conversionKjmolNmAu,
         static_cast<float>(parameters.smallThreshold)
     );
-    cudaDeviceSynchronize();
     
     // Compute target and scaling (ON GPU)
     computeTargetAndScale<<<numBlocksParticles, threadsPerBlock>>>(
@@ -434,59 +486,51 @@ double CudaCalcElectrodeChargeKernel::execute(
         (float*)cathodeScaleDevice->getDevicePointer(),
         (float*)anodeScaleDevice->getDevicePointer()
     );
-    cudaDeviceSynchronize();
     
     // Conductor two-stage method (if conductors exist)
-    int numConductors = conductorIndicesDevice->getSize();
+    int numConductorAtoms = conductorIndicesDevice->getSize();
+    int numConductors = conductorContactIndicesDevice->getSize();
     if (numConductors > 0) {
+        int numBlocksCondAtoms = (numConductorAtoms + threadsPerBlock - 1) / threadsPerBlock;
         int numBlocksConductors = (numConductors + threadsPerBlock - 1) / threadsPerBlock;
         
         // Step 1: Image charges (normal field projection)
-        conductorImageCharges<<<numBlocksConductors, threadsPerBlock>>>(
+        conductorImageCharges<<<numBlocksCondAtoms, threadsPerBlock>>>(
             (const float3*)forcesDevicePersistent->getDevicePointer(),
             (float4*)posqDevicePersistent->getDevicePointer(),
             (const int*)conductorIndicesDevice->getDevicePointer(),
-            numConductors,
+            numConductorAtoms,
             (const float3*)conductorNormalsDevice->getDevicePointer(),
             (const float*)conductorAreasDevice->getDevicePointer(),
             conversionKjmolNmAu,
             static_cast<float>(parameters.smallThreshold)
         );
-        cudaDeviceSynchronize();
         
         // Step 2: Charge transfer (uniform distribution)
         conductorChargeTransfer<<<numBlocksConductors, threadsPerBlock>>>(
             (const float3*)forcesDevicePersistent->getDevicePointer(),
-            (float4*)posqDevicePersistent->getDevicePointer(),
-            (const int*)conductorIndicesDevice->getDevicePointer(),
-            numConductors,
             (const int*)conductorContactIndicesDevice->getDevicePointer(),
             (const float3*)conductorContactNormalsDevice->getDevicePointer(),
             (const float*)conductorGeometriesDevice->getDevicePointer(),
             (const int*)conductorTypesDevice->getDevicePointer(),
+            (float*)conductorDQDevice->getDevicePointer(),
+            numConductors,
             cathodeVoltageKj,
             static_cast<float>(parameters.lGap),
             conversionKjmolNmAu,
             static_cast<float>(parameters.smallThreshold)
         );
-        cudaDeviceSynchronize();
+        applyConductorDQ<<<numBlocksCondAtoms, threadsPerBlock>>>(
+            (float4*)posqDevicePersistent->getDevicePointer(),
+            (const int*)conductorIndicesDevice->getDevicePointer(),
+            (const int*)conductorAtomCondIdsDevice->getDevicePointer(),
+            numConductorAtoms,
+            (const float*)conductorDQDevice->getDevicePointer(),
+            (const int*)conductorAtomCountsDevice->getDevicePointer()
+        );
     }
     
-    // Apply scaling (ON GPU)
-    float cathodeScale, anodeScale;
-    cathodeScaleDevice->download(&cathodeScale);
-    anodeScaleDevice->download(&anodeScale);
-    
-    applyScaling<<<numBlocksElectrodes, threadsPerBlock>>>(
-        (float4*)posqDevicePersistent->getDevicePointer(),
-        (const int*)cathodeIndicesDevice->getDevicePointer(),
-        parameters.cathodeIndices.size(),
-        (const int*)anodeIndicesDevice->getDevicePointer(),
-        parameters.anodeIndices.size(),
-        cathodeScale,
-        anodeScale
-    );
-    cudaDeviceSynchronize();
+    // Scaling already applied inside computeTargetAndScale; no extra kernel needed
     
     // Download final results ONCE
     posqDevicePersistent->download(posqFloat4);
@@ -593,6 +637,9 @@ void CudaCalcElectrodeChargeKernel::initializeDeviceMemory() {
     conductorContactNormalsDevice = CudaArray::create<float3>(*cu, 0, "conductorContactNormals");
     conductorGeometriesDevice = CudaArray::create<float>(*cu, 0, "conductorGeometries");
     conductorTypesDevice = CudaArray::create<int>(*cu, 0, "conductorTypes");
+    conductorAtomCondIdsDevice = CudaArray::create<int>(*cu, 0, "conductorAtomCondIds");
+    conductorAtomCountsDevice = CudaArray::create<int>(*cu, 0, "conductorAtomCounts");
+    conductorDQDevice = CudaArray::create<float>(*cu, 0, "conductorDQ");
     
     cathodeTargetDevice = CudaArray::create<float>(*cu, 1, "cathodeTarget");
     anodeTargetDevice = CudaArray::create<float>(*cu, 1, "anodeTarget");
@@ -611,6 +658,8 @@ void CudaCalcElectrodeChargeKernel::copyParametersToContext(
     const std::vector<double>& cContactNormals = force.getConductorContactNormals();
     const std::vector<double>& cGeom = force.getConductorGeometries();
     const std::vector<int>& cTypes = force.getConductorTypes();
+    const std::vector<int>& cAtomCondIds = force.getConductorAtomCondIds();
+    const std::vector<int>& cAtomCounts = force.getConductorAtomCounts();
 
     if (cIdx.size() > 0) {
         // conductor mask (per-particle)
@@ -667,5 +716,19 @@ void CudaCalcElectrodeChargeKernel::copyParametersToContext(
         if (conductorTypesDevice == nullptr || (int)conductorTypesDevice->getSize() != nCond)
             conductorTypesDevice = CudaArray::create<int>(*cu, nCond, "conductorTypes");
         conductorTypesDevice->upload(cTypes);
+
+        // atom -> conductor id
+        if (conductorAtomCondIdsDevice == nullptr || (int)conductorAtomCondIdsDevice->getSize() != (int)cAtomCondIds.size())
+            conductorAtomCondIdsDevice = CudaArray::create<int>(*cu, (int)cAtomCondIds.size(), "conductorAtomCondIds");
+        conductorAtomCondIdsDevice->upload(cAtomCondIds);
+
+        // per conductor counts
+        if (conductorAtomCountsDevice == nullptr || (int)conductorAtomCountsDevice->getSize() != nCond)
+            conductorAtomCountsDevice = CudaArray::create<int>(*cu, nCond, "conductorAtomCounts");
+        conductorAtomCountsDevice->upload(cAtomCounts);
+
+        // dQ per conductor buffer
+        if (conductorDQDevice == nullptr || (int)conductorDQDevice->getSize() != nCond)
+            conductorDQDevice = CudaArray::create<float>(*cu, nCond, "conductorDQ");
     }
 }
