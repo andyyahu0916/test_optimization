@@ -20,6 +20,7 @@ public:
                    double anodeZ,
                    std::vector<double>& cathodeCharges,
                    std::vector<double>& anodeCharges,
+                   std::vector<std::vector<double>>& conductorCharges,
                    double& cathodeTarget,
                    double& anodeTarget) override;
     void copyParametersToContext(OpenMM::ContextImpl& context, const ElectrodeChargeForce& force) override;

@@ -14,6 +14,7 @@ namespace ElectrodeChargePlugin {
 struct ElectrodeChargeParameters {
     std::vector<int> cathodeIndices;
     std::vector<int> anodeIndices;
+    std::vector<std::vector<int>> conductorIndices;
     double cathodeVoltage = 0.0;
     double anodeVoltage = 0.0;
     int numIterations = 0;
@@ -45,6 +46,7 @@ public:
                            double anodeZ,
                            std::vector<double>& cathodeCharges,
                            std::vector<double>& anodeCharges,
+                           std::vector<std::vector<double>>& conductorCharges,
                            double& cathodeTarget,
                            double& anodeTarget) = 0;
 

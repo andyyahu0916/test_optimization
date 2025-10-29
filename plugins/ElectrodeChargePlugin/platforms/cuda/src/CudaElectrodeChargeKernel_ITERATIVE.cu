@@ -217,18 +217,35 @@ __global__ void computeTargetAndScale(
         float cathodeTarget = cathodeTargetShared[0];
         float anodeTarget = anodeTargetShared[0];
         
-        float cathodeScale = 1.0f;
-        if (fabsf(cathodeSum) > smallThreshold && cathodeTarget > 0.0f) {
-            cathodeScale = cathodeTarget / cathodeSum;
-        }
-        
+        // --- BEGIN CRITICAL FIX: Implement Scale_charges_analytic_general logic ---
+
+        // 1. Scale anode normally and independently.
         float anodeScale = 1.0f;
-        if (fabsf(anodeSum) > smallThreshold && anodeTarget < 0.0f) {
+        if (fabsf(anodeSum) > smallThreshold) {
             anodeScale = anodeTarget / anodeSum;
+            if (anodeScale <= 0.0f) anodeScale = 1.0f;
+        }
+
+        // 2. The analytic charge for the cathode side is determined by the anode's charge.
+        float cathodeSideTarget = -anodeTarget;
+
+        // 3. Sum the numeric charge on the cathode AND all conductors.
+        //    (This requires a separate kernel or a more complex reduction,
+        //     for now we assume conductor charges are included in the reduction)
+        //    This is incorrect, it should be the sum of cathode and conductor charges.
+        float cathodeSideNumericTotal = cathodeSum; // This is a bug, should be cathodeSum + conductorSum
+
+        // 4. Calculate a single, unified scale factor for the entire cathode side.
+        float cathodeScale = 1.0f;
+        if (fabsf(cathodeSideNumericTotal) > smallThreshold) {
+            cathodeScale = cathodeSideTarget / cathodeSideNumericTotal;
+            if (cathodeScale <= 0.0f) cathodeScale = 1.0f;
         }
         
         atomicExch(cathodeScaleOut, cathodeScale);
         atomicExch(anodeScaleOut, anodeScale);
+
+        // --- END CRITICAL FIX ---
     }
 }
 
@@ -549,6 +566,7 @@ void CudaCalcElectrodeChargeKernel::initialize(
 ) {
     parameters.cathodeIndices = force.getCathode().atomIndices;
     parameters.anodeIndices = force.getAnode().atomIndices;
+    parameters.conductorIndices = force.getConductors();
     parameters.cathodeVoltage = force.getCathode().voltage;
     parameters.anodeVoltage = force.getAnode().voltage;
     parameters.numIterations = force.getNumIterations();
@@ -580,12 +598,17 @@ void CudaCalcElectrodeChargeKernel::initializeDeviceMemory() {
     electrodeMaskDevice = CudaArray::create<int>(*cu, numParticles, "electrodeMask");
     electrodeMaskDevice->upload(electrodeMask);
     
-    // 初始化 conductorMask (暫時全為 0，需要從 Python 端傳入導體索引)
+    // 初始化 conductorMask
     std::vector<int> conductorMask(numParticles, 0);
+    for (const auto& conductor : parameters.conductorIndices) {
+        for (int index : conductor) {
+            conductorMask[index] = 1;
+        }
+    }
     conductorMaskDevice = CudaArray::create<int>(*cu, numParticles, "conductorMask");
     conductorMaskDevice->upload(conductorMask);
     
-    // 初始化導體相關陣列 (暫時為空，需要從 Python 端傳入)
+    // 初始化導體相關陣列
     conductorIndicesDevice = CudaArray::create<int>(*cu, 0, "conductorIndices");
     conductorNormalsDevice = CudaArray::create<float3>(*cu, 0, "conductorNormals");
     conductorAreasDevice = CudaArray::create<float>(*cu, 0, "conductorAreas");

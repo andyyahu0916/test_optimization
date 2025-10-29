@@ -117,9 +117,9 @@ config.read(config_path)
 
 # [Simulation] 區塊
 sim_config = config['Simulation']
-simulation_time_ns = sim_config.getint('simulation_time_ns')
+simulation_time_ns = sim_config.getfloat('simulation_time_ns')
 freq_charge_update_fs = sim_config.getint('freq_charge_update_fs')
-freq_traj_output_ps = sim_config.getint('freq_traj_output_ps')
+freq_traj_output_ps = sim_config.getfloat('freq_traj_output_ps')
 simulation_type = sim_config.get('simulation_type')
 openmm_platform = sim_config.get('platform')
 Voltage = sim_config.getfloat('voltage')
@@ -301,6 +301,15 @@ if USE_PLUGIN:
             # 設定電極與電壓（正負由公式決定，這裡傳入幅值）
             force.setCathode(cathode_indices, abs(Voltage))
             force.setAnode(anode_indices, abs(Voltage))
+
+            # 新增：傳遞導體資訊給 C++ 插件
+            if hasattr(MMsys, 'Conductor_list') and MMsys.Conductor_list:
+                print("✓ Passing conductor information to C++ plugin...")
+                for conductor in MMsys.Conductor_list:
+                    conductor_indices = [atom.atom_index for atom in conductor.electrode_atoms]
+                    force.addConductor(conductor_indices)
+                print(f"  {len(MMsys.Conductor_list)} conductor(s) added.")
+
             # 幾何與數值
             force.setSmallThreshold(MMsys.small_threshold)
             force.setCellGap(MMsys.Lgap)

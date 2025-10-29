@@ -12,6 +12,7 @@ ReferenceCalcElectrodeChargeKernel::ReferenceCalcElectrodeChargeKernel(const std
 void ReferenceCalcElectrodeChargeKernel::initialize(const System& system, const ElectrodeChargeForce& force) {
     parameters.cathodeIndices = force.getCathode().atomIndices;
     parameters.anodeIndices = force.getAnode().atomIndices;
+    parameters.conductorIndices = force.getConductors();
     parameters.cathodeVoltage = force.getCathode().voltage;
     parameters.anodeVoltage = force.getAnode().voltage;
     parameters.numIterations = force.getNumIterations();
@@ -21,12 +22,16 @@ void ReferenceCalcElectrodeChargeKernel::initialize(const System& system, const 
     numParticles = system.getNumParticles();
 
     electrodeMask.assign(numParticles, false);
-    conductorMask.assign(numParticles, false);  // 新增
+    conductorMask.assign(numParticles, false);
     for (int index : parameters.cathodeIndices)
         electrodeMask[index] = true;
     for (int index : parameters.anodeIndices)
         electrodeMask[index] = true;
-    // TODO: 需要從 Python 端傳入導體索引來設定 conductorMask
+    for (const auto& conductor : parameters.conductorIndices) {
+        for (int index : conductor) {
+            conductorMask[index] = true;
+        }
+    }
 }
 
 double ReferenceCalcElectrodeChargeKernel::execute(ContextImpl& context,
@@ -38,6 +43,7 @@ double ReferenceCalcElectrodeChargeKernel::execute(ContextImpl& context,
                                                    double anodeZ,
                                                    std::vector<double>& cathodeCharges,
                                                    std::vector<double>& anodeCharges,
+                   std::vector<std::vector<double>>& conductorCharges,
                                                    double& cathodeTarget,
                                                    double& anodeTarget) {
     (void) context;
@@ -51,6 +57,10 @@ double ReferenceCalcElectrodeChargeKernel::execute(ContextImpl& context,
 
     cathodeCharges.resize(parameters.cathodeIndices.size());
     anodeCharges.resize(parameters.anodeIndices.size());
+    conductorCharges.resize(parameters.conductorIndices.size());
+    for (size_t i = 0; i < parameters.conductorIndices.size(); ++i) {
+        conductorCharges[i].resize(parameters.conductorIndices[i].size());
+    }
 
     const double conversionNmBohr = 18.8973;
     const double conversionKjmolNmAu = conversionNmBohr / 2625.5;
@@ -147,24 +157,59 @@ double ReferenceCalcElectrodeChargeKernel::execute(ContextImpl& context,
         }
     }
     
-    // Apply scaling
-    double cathodeTotal = std::accumulate(cathodeCharges.begin(), cathodeCharges.end(), 0.0);
-    if (std::fabs(cathodeTotal) > parameters.smallThreshold) {
-        double scale = cathodeTarget / cathodeTotal;
+    // --- BEGIN CRITICAL FIX: Implement Scale_charges_analytic_general logic ---
+
+    // 1. Scale anode normally and independently.
+    double anodeNumericTotal = 0.0;
+    for (double charge : anodeCharges) {
+        anodeNumericTotal += charge;
+    }
+
+    if (std::fabs(anodeNumericTotal) > parameters.smallThreshold) {
+        double scale = anodeTarget / anodeNumericTotal;
         if (scale > 0.0) {
-            for (double& value : cathodeCharges)
-                value *= scale;
+            for (double& charge : anodeCharges) {
+                charge *= scale;
+            }
         }
     }
+
+    // 2. The analytic charge for the cathode side is determined by the anode's charge.
+    double cathodeSideTarget = -anodeTarget;
     
-    double anodeTotal = std::accumulate(anodeCharges.begin(), anodeCharges.end(), 0.0);
-    if (std::fabs(anodeTotal) > parameters.smallThreshold) {
-        double scale = anodeTarget / anodeTotal;
-        if (scale > 0.0) {
-            for (double& value : anodeCharges)
-                value *= scale;
+    // 3. Sum the numeric charge on the cathode AND all conductors.
+    double cathodeSideNumericTotal = 0.0;
+    for (double charge : cathodeCharges) {
+        cathodeSideNumericTotal += charge;
+    }
+    for (size_t i = 0; i < parameters.conductorIndices.size(); ++i) {
+        for (size_t j = 0; j < parameters.conductorIndices[i].size(); ++j) {
+            int index = parameters.conductorIndices[i][j];
+            // Simplified logic for conductor charge calculation
+            double charge = allParticleCharges[index];
+            conductorCharges[i][j] = charge;
+            cathodeSideNumericTotal += charge;
         }
     }
+
+    // 4. Calculate a single, unified scale factor for the entire cathode side.
+    if (std::fabs(cathodeSideNumericTotal) > parameters.smallThreshold) {
+        double scale_factor = cathodeSideTarget / cathodeSideNumericTotal;
+
+        // 5. Apply this unified scale factor to the cathode AND all conductors.
+        if (scale_factor > 0.0) {
+            for (double& charge : cathodeCharges) {
+                charge *= scale_factor;
+            }
+            for (auto& conductor : conductorCharges) {
+                for (double& charge : conductor) {
+                    charge *= scale_factor;
+                }
+            }
+        }
+    }
+
+    // --- END CRITICAL FIX ---
 
     return 0.0;
 }

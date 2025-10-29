@@ -31,10 +31,17 @@ public:
     void setAnode(const std::vector<int>& indices, double voltage);
 
     /**
+     * Add a conductor region by specifying its atom indices.
+     * This method can be called multiple times for multiple conductors.
+     */
+    void addConductor(const std::vector<int>& indices);
+
+    /**
      * Accessors used by the ForceImpl/kernels.
      */
     const ElectrodeRegion& getCathode() const { return cathode; }
     const ElectrodeRegion& getAnode() const { return anode; }
+    const std::vector<std::vector<int>>& getConductors() const { return conductors; }
 
     /**
      * Solver configuration.
@@ -60,6 +67,7 @@ public:
 private:
     ElectrodeRegion cathode;
     ElectrodeRegion anode;
+    std::vector<std::vector<int>> conductors;
     int numIterations = 4;
     double smallThreshold = 1.0e-6;
     double lGap = 1.0;

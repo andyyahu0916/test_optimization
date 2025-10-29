@@ -90,6 +90,7 @@ double ElectrodeChargeForceImpl::calcForcesAndEnergy(ContextImpl& context, bool 
     std::vector<Vec3> forces;
     std::vector<double> cathodeCharges;
     std::vector<double> anodeCharges;
+    std::vector<std::vector<double>> conductorCharges;
     double cathodeTarget = 0.0;
     double anodeTarget = 0.0;
 
@@ -120,26 +121,9 @@ double ElectrodeChargeForceImpl::calcForcesAndEnergy(ContextImpl& context, bool 
                                                           anodeZ,
                                                           cathodeCharges,
                                                           anodeCharges,
+                                                          conductorCharges,
                                                           cathodeTarget,
                                                           anodeTarget);
-
-        double cathodeTotal = std::accumulate(cathodeCharges.begin(), cathodeCharges.end(), 0.0);
-        if (std::fabs(cathodeTotal) > owner.getSmallThreshold()) {
-            double scale = cathodeTarget / cathodeTotal;
-            if (scale > 0.0) {
-                for (double& value : cathodeCharges)
-                    value *= scale;
-            }
-        }
-
-        double anodeTotal = std::accumulate(anodeCharges.begin(), anodeCharges.end(), 0.0);
-        if (std::fabs(anodeTotal) > owner.getSmallThreshold()) {
-            double scale = anodeTarget / anodeTotal;
-            if (scale > 0.0) {
-                for (double& value : anodeCharges)
-                    value *= scale;
-            }
-        }
 
         for (size_t i = 0; i < owner.getCathode().atomIndices.size(); i++) {
             int index = owner.getCathode().atomIndices[i];
@@ -150,6 +134,15 @@ double ElectrodeChargeForceImpl::calcForcesAndEnergy(ContextImpl& context, bool 
             int index = owner.getAnode().atomIndices[i];
             nonbondedForce->setParticleParameters(index, anodeCharges[i], anodeSigmas[i], anodeEpsilons[i]);
             allCharges[index] = anodeCharges[i];
+        }
+        for (size_t i = 0; i < owner.getConductors().size(); i++) {
+            for (size_t j = 0; j < owner.getConductors()[i].size(); j++) {
+                int index = owner.getConductors()[i][j];
+                double charge, sigma, epsilon;
+                nonbondedForce->getParticleParameters(index, charge, sigma, epsilon);
+                nonbondedForce->setParticleParameters(index, conductorCharges[i][j], sigma, epsilon);
+                allCharges[index] = conductorCharges[i][j];
+            }
         }
         nonbondedForce->updateParametersInContext(context.getOwner());
     }

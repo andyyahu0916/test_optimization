@@ -21,6 +21,10 @@ void ElectrodeChargeForce::setAnode(const std::vector<int>& indices, double volt
     anode.voltage = voltage;
 }
 
+void ElectrodeChargeForce::addConductor(const std::vector<int>& indices) {
+    conductors.push_back(indices);
+}
+
 ForceImpl* ElectrodeChargeForce::createImpl() const {
     return new ElectrodeChargeForceImpl(*this);
 }
