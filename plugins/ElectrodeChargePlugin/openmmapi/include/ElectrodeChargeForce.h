@@ -52,6 +52,41 @@ public:
     double getCellLength() const { return lCell; }
 
     /**
+     * Conductor metadata setters/getters (optional; enable conductor two-stage method).
+     * All conductor arrays are parallel and refer to virtual conductor atoms.
+     * - indices: atom indices of conductor virtual atoms (flattened across all conductors)
+     * - normals: per-atom surface normals (flattened triplets nx,ny,nz; size = 3*indices.size())
+     * - areas: per-atom surface area (same length as indices)
+     * - contactIndices: per-conductor contact atom index (length = numConductors)
+     * - contactNormals: per-conductor contact normal (flattened triplets; size = 3*numConductors)
+     * - geometries: per-conductor geometry scalar (buckyball: r_contact^2; nanotube: r_contact*L/2)
+     * - types: per-conductor type id (0=buckyball, 1=nanotube)
+     */
+    void setConductorData(const std::vector<int>& indices,
+                          const std::vector<double>& normals,
+                          const std::vector<double>& areas,
+                          const std::vector<int>& contactIndices,
+                          const std::vector<double>& contactNormals,
+                          const std::vector<double>& geometries,
+                          const std::vector<int>& types) {
+        conductorIndices = indices;
+        conductorNormals = normals;
+        conductorAreas = areas;
+        conductorContactIndices = contactIndices;
+        conductorContactNormals = contactNormals;
+        conductorGeometries = geometries;
+        conductorTypes = types;
+    }
+
+    const std::vector<int>& getConductorIndices() const { return conductorIndices; }
+    const std::vector<double>& getConductorNormals() const { return conductorNormals; }
+    const std::vector<double>& getConductorAreas() const { return conductorAreas; }
+    const std::vector<int>& getConductorContactIndices() const { return conductorContactIndices; }
+    const std::vector<double>& getConductorContactNormals() const { return conductorContactNormals; }
+    const std::vector<double>& getConductorGeometries() const { return conductorGeometries; }
+    const std::vector<int>& getConductorTypes() const { return conductorTypes; }
+
+    /**
      * OpenMM book-keeping overrides.
      */
     OpenMM::ForceImpl* createImpl() const override;
@@ -64,6 +99,15 @@ private:
     double smallThreshold = 1.0e-6;
     double lGap = 1.0;
     double lCell = 1.0;
+
+    // Conductor metadata (optional)
+    std::vector<int> conductorIndices;
+    std::vector<double> conductorNormals;
+    std::vector<double> conductorAreas;
+    std::vector<int> conductorContactIndices;
+    std::vector<double> conductorContactNormals;
+    std::vector<double> conductorGeometries;
+    std::vector<int> conductorTypes;
 };
 
 } // namespace ElectrodeChargePlugin

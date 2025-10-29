@@ -304,6 +304,50 @@ if USE_PLUGIN:
             force.setCellGap(MMsys.Lgap)
             force.setCellLength(MMsys.Lcell)
             force.setNumIterations(physics_iterations)
+
+            # 傳入導體資料（若有）
+            if len(MMsys.Conductor_list) > 0:
+                conductor_indices = []
+                conductor_normals = []   # flattened nx,ny,nz per atom
+                conductor_areas = []
+                contact_indices = []     # one per conductor
+                contact_normals = []     # flattened nx,ny,nz per conductor
+                geometries = []          # per conductor
+                types = []               # 0=buckyball, 1=nanotube
+
+                for Conductor in MMsys.Conductor_list:
+                    # per-atom data
+                    for atom in Conductor.electrode_atoms:
+                        conductor_indices.append(atom.atom_index)
+                        conductor_normals.extend([atom.nx, atom.ny, atom.nz])
+                        conductor_areas.append(Conductor.area_atom)
+                    # contact point
+                    ci = Conductor.Electrode_contact_atom.atom_index
+                    cn = Conductor.Electrode_contact_atom
+                    contact_indices.append(ci)
+                    contact_normals.extend([cn.nx, cn.ny, cn.nz])
+                    # geometry and type
+                    cname = type(Conductor).__name__
+                    if cname == 'Buckyball_Virtual':
+                        geometries.append(Conductor.dr_center_contact**2)
+                        types.append(0)
+                    elif cname == 'Nanotube_Virtual':
+                        geometries.append(Conductor.dr_center_contact * Conductor.length / 2.0)
+                        types.append(1)
+                    else:
+                        continue
+
+                try:
+                    force.setConductorData(conductor_indices,
+                                           conductor_normals,
+                                           conductor_areas,
+                                           contact_indices,
+                                           contact_normals,
+                                           geometries,
+                                           types)
+                    print(f"✓ Passed {len(conductor_indices)} conductor atoms across {len(contact_indices)} conductors to plugin")
+                except Exception as e:
+                    print(f"⚠️  Passing conductor data to plugin failed: {e}")
             # 指定 force group 到最後一組，避免覆蓋
             force.setForceGroup(MMsys.system.getNumForces())
             # 加入系統

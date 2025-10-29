@@ -8000,3 +8000,20 @@ events:
       Cuda compilation tools, release 12.9, V12.9.86
       Build cuda_12.9.r12.9/compiler.36037853_0
 ...
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CMakeDetermineCompilerId.cmake:1131 (message)"
+      - "/usr/share/cmake-3.28/Modules/CMakeDetermineCUDACompiler.cmake:75 (CMAKE_DETERMINE_COMPILER_ID_VENDOR)"
+      - "platforms/cuda/CMakeLists.txt:1 (enable_language)"
+    message: |
+      Checking whether the CUDA compiler is NVIDIA using "" matched "nvcc: NVIDIA \\(R\\) Cuda compiler driver":
+      nvcc: NVIDIA (R) Cuda compiler driver
+      Copyright (c) 2005-2025 NVIDIA Corporation
+      Built on Tue_May_27_02:21:03_PDT_2025
+      Cuda compilation tools, release 12.9, V12.9.86
+      Build cuda_12.9.r12.9/compiler.36037853_0
+...

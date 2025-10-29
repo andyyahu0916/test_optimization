@@ -20,6 +20,14 @@ struct ElectrodeChargeParameters {
     double smallThreshold = 0.0;
     double lGap = 0.0;
     double lCell = 0.0;
+    // Optional conductor metadata (parallel arrays)
+    std::vector<int> conductorIndices;
+    std::vector<double> conductorNormals;      // flattened nx,ny,nz per atom
+    std::vector<double> conductorAreas;        // per atom
+    std::vector<int> conductorContactIndices;  // per conductor
+    std::vector<double> conductorContactNormals; // flattened nx,ny,nz per conductor
+    std::vector<double> conductorGeometries;   // per conductor
+    std::vector<int> conductorTypes;           // per conductor (0=buckyball,1=nanotube)
 };
 
 /**

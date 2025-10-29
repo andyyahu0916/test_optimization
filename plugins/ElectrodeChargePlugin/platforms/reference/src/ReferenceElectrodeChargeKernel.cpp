@@ -170,5 +170,8 @@ double ReferenceCalcElectrodeChargeKernel::execute(ContextImpl& context,
 }
 
 void ReferenceCalcElectrodeChargeKernel::copyParametersToContext(ContextImpl& context, const ElectrodeChargeForce& force) {
-    initialize(context.getSystem(), force);
+    // Update masks from force
+    const auto& idx = force.getConductorIndices();
+    conductorMask.assign(numParticles, false);
+    for (int i : idx) if (i >= 0 && i < numParticles) conductorMask[i] = true;
 }

@@ -21,6 +21,7 @@ namespace OpenMM {
 %include "std_vector.i"
 namespace std {
   %template(IntVector) vector<int>;
+  %template(DoubleVector) vector<double>;
 }
 
 %{
@@ -60,6 +61,15 @@ public:
     void setCellLength(double length);
     double getCellLength() const;
     bool usesPeriodicBoundaryConditions() const;
+
+    // Conductor data setters
+    void setConductorData(const std::vector<int>& indices,
+                          const std::vector<double>& normals,
+                          const std::vector<double>& areas,
+                          const std::vector<int>& contactIndices,
+                          const std::vector<double>& contactNormals,
+                          const std::vector<double>& geometries,
+                          const std::vector<int>& types);
 };
 
 }

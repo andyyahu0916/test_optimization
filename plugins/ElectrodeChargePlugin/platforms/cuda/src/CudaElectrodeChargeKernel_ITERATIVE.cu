@@ -603,5 +603,69 @@ void CudaCalcElectrodeChargeKernel::copyParametersToContext(
     ContextImpl& context, 
     const ElectrodeChargeForce& force
 ) {
-    initialize(context.getSystem(), force);
+    // Upload conductor metadata if provided
+    const std::vector<int>& cIdx = force.getConductorIndices();
+    const std::vector<double>& cNormals = force.getConductorNormals();
+    const std::vector<double>& cAreas = force.getConductorAreas();
+    const std::vector<int>& cContactIdx = force.getConductorContactIndices();
+    const std::vector<double>& cContactNormals = force.getConductorContactNormals();
+    const std::vector<double>& cGeom = force.getConductorGeometries();
+    const std::vector<int>& cTypes = force.getConductorTypes();
+
+    if (cIdx.size() > 0) {
+        // conductor mask (per-particle)
+        std::vector<int> conductorMask(numParticles, 0);
+        for (int idx : cIdx) if (idx >= 0 && idx < numParticles) conductorMask[idx] = 1;
+        if (conductorMaskDevice == nullptr || (int)conductorMaskDevice->getSize() != numParticles)
+            conductorMaskDevice = CudaArray::create<int>(*cu, numParticles, "conductorMask");
+        conductorMaskDevice->upload(conductorMask);
+
+        // indices
+        if (conductorIndicesDevice == nullptr || (int)conductorIndicesDevice->getSize() != (int)cIdx.size())
+            conductorIndicesDevice = CudaArray::create<int>(*cu, (int)cIdx.size(), "conductorIndices");
+        conductorIndicesDevice->upload(cIdx);
+
+        // normals per atom (packed float3)
+        int nAtoms = (int)cIdx.size();
+        std::vector<float3> normals3(nAtoms);
+        for (int i = 0; i < nAtoms; i++) {
+            normals3[i].x = (float)cNormals[3*i+0];
+            normals3[i].y = (float)cNormals[3*i+1];
+            normals3[i].z = (float)cNormals[3*i+2];
+        }
+        if (conductorNormalsDevice == nullptr || (int)conductorNormalsDevice->getSize() != nAtoms)
+            conductorNormalsDevice = CudaArray::create<float3>(*cu, nAtoms, "conductorNormals");
+        conductorNormalsDevice->upload(normals3);
+
+        // areas per atom
+        std::vector<float> areasF(cAreas.begin(), cAreas.end());
+        if (conductorAreasDevice == nullptr || (int)conductorAreasDevice->getSize() != nAtoms)
+            conductorAreasDevice = CudaArray::create<float>(*cu, nAtoms, "conductorAreas");
+        conductorAreasDevice->upload(areasF);
+
+        // per-conductor arrays
+        int nCond = (int)cContactIdx.size();
+        if (conductorContactIndicesDevice == nullptr || (int)conductorContactIndicesDevice->getSize() != nCond)
+            conductorContactIndicesDevice = CudaArray::create<int>(*cu, nCond, "conductorContactIndices");
+        conductorContactIndicesDevice->upload(cContactIdx);
+
+        std::vector<float3> cNormals3(nCond);
+        for (int i = 0; i < nCond; i++) {
+            cNormals3[i].x = (float)cContactNormals[3*i+0];
+            cNormals3[i].y = (float)cContactNormals[3*i+1];
+            cNormals3[i].z = (float)cContactNormals[3*i+2];
+        }
+        if (conductorContactNormalsDevice == nullptr || (int)conductorContactNormalsDevice->getSize() != nCond)
+            conductorContactNormalsDevice = CudaArray::create<float3>(*cu, nCond, "conductorContactNormals");
+        conductorContactNormalsDevice->upload(cNormals3);
+
+        std::vector<float> geomF(cGeom.begin(), cGeom.end());
+        if (conductorGeometriesDevice == nullptr || (int)conductorGeometriesDevice->getSize() != nCond)
+            conductorGeometriesDevice = CudaArray::create<float>(*cu, nCond, "conductorGeometries");
+        conductorGeometriesDevice->upload(geomF);
+
+        if (conductorTypesDevice == nullptr || (int)conductorTypesDevice->getSize() != nCond)
+            conductorTypesDevice = CudaArray::create<int>(*cu, nCond, "conductorTypes");
+        conductorTypesDevice->upload(cTypes);
+    }
 }
