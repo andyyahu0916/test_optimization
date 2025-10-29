@@ -273,22 +273,24 @@ if USE_PLUGIN:
                 plugin_loaded = True
                 break
         if not plugin_loaded:
-            print("⚠️  No plugin directory found. Proceeding without plugin.")
-            USE_PLUGIN = False
+            print("❌ Error: No valid plugin directory found.", file=sys.stderr)
+            print("   Searched paths:", plugin_dir_candidates, file=sys.stderr)
+            sys.exit(1)
         else:
             print("✓ Plugin registry updated. Expecting ElectrodeChargeForce to be present in System.")
     except Exception as e:
-        print(f"❌ Failed to load plugin: {e}")
-        USE_PLUGIN = False
+        print(f"❌ Failed to load plugin from directories {plugin_dir_candidates}: {e}", file=sys.stderr)
+        sys.exit(1)
     print("="*60 + "\n")
 
     # 實例化並加入 ElectrodeChargeForce（使 plugin 真正生效）
     try:
         import electrodecharge as ec
     except Exception as e:
-        print(f"❌ Failed to import electrodecharge Python wrapper: {e}")
-        print("   Disabling plugin and falling back to Python Poisson solver.")
-        USE_PLUGIN = False
+        print(f"❌ Failed to import 'electrodecharge' Python wrapper.", file=sys.stderr)
+        print(f"   Error: {e}", file=sys.stderr)
+        print(f"   Please ensure the plugin is correctly compiled and the Python wrapper is in your PYTHONPATH.", file=sys.stderr)
+        sys.exit(1)
 
     if USE_PLUGIN:
         try:
@@ -316,9 +318,10 @@ if USE_PLUGIN:
                 MMsys.simmd.context.setVelocities(state_tmp.getVelocities())
             print("✓ ElectrodeChargeForce attached to System and context reinitialized.")
         except Exception as e:
-            print(f"❌ Failed to attach ElectrodeChargeForce: {e}")
-            print("   Disabling plugin and falling back to Python Poisson solver.")
-            USE_PLUGIN = False
+            print(f"❌ Failed to attach ElectrodeChargeForce to the system.", file=sys.stderr)
+            print(f"   Error: {e}", file=sys.stderr)
+            print(f"   This might indicate a problem with the plugin's C++ code or its interaction with OpenMM.", file=sys.stderr)
+            sys.exit(1)
 
 # ===== A/B 參考系統（僅在 plugin 且啟用驗證時建立） =====
 MMsys_ref = None
