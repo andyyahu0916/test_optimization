@@ -13,7 +13,7 @@ print("\n[1/4] 測試 OpenMM...")
 try:
     from openmm.app import *
     from openmm import *
-    from openmm.unit import *
+    from openmm.unit import *    
     print("✓ OpenMM 導入成功")
     print(f"  版本: {Platform.getOpenMMVersion()}")
     print(f"  可用平台: {[Platform.getPlatform(i).getName() for i in range(Platform.getNumPlatforms())]}")

@@ -1,9 +1,9 @@
 /**
- * CUDA Kernel Header (對應 CudaElectrodeChargeKernel_LINUS.cu)
+ * Optimized CUDA Kernel Header for ElectrodeChargeForce (Linus Version)
  */
 
-#ifndef CUDA_ELECTRODE_CHARGE_KERNEL_LINUS_H_
-#define CUDA_ELECTRODE_CHARGE_KERNEL_LINUS_H_
+#ifndef CUDA_ELECTRODE_CHARGE_KERNEL_H_
+#define CUDA_ELECTRODE_CHARGE_KERNEL_H_
 
 #include "ElectrodeChargeKernels.h"
 #include "openmm/cuda/CudaContext.h"
@@ -14,60 +14,46 @@ namespace ElectrodeChargePlugin {
 class CudaCalcElectrodeChargeKernel : public CalcElectrodeChargeKernel {
 public:
     CudaCalcElectrodeChargeKernel(const std::string& name, const OpenMM::Platform& platform, OpenMM::CudaContext& cu);
-    
+    ~CudaCalcElectrodeChargeKernel();
+
     void initialize(const OpenMM::System& system, const ElectrodeChargeForce& force) override;
-    
-    double execute(OpenMM::ContextImpl& context,
-                  const std::vector<OpenMM::Vec3>& positions,
-                  const std::vector<OpenMM::Vec3>& forces,
-                  const std::vector<double>& allParticleCharges,
-                  double sheetArea,
-                  double cathodeZ,
-                  double anodeZ,
-                  std::vector<double>& cathodeCharges,
-                  std::vector<double>& anodeCharges,
-                  double& cathodeTarget,
-                  double& anodeTarget) override;
-    
+
+    double execute(OpenMM::ContextImpl& context, bool includeForces, bool includeEnergy) override;
+
     void copyParametersToContext(OpenMM::ContextImpl& context, const ElectrodeChargeForce& force) override;
 
 private:
     void initializeDeviceMemory();
-    
-    ElectrodeChargeParameters parameters;
+    void cleanup();
+
+    bool hasInitialized = false;
     OpenMM::CudaContext* cu;
     int numParticles;
-    
-    // Device arrays (persistent)
-    OpenMM::CudaArray* cathodeChargesDevice;
-    OpenMM::CudaArray* anodeChargesDevice;
-    OpenMM::CudaArray* cathodeIndicesDevice;
-    OpenMM::CudaArray* anodeIndicesDevice;
-    OpenMM::CudaArray* electrodeMaskDevice;
-    OpenMM::CudaArray* conductorMaskDevice;
-    OpenMM::CudaArray* cathodeTargetDevice;
-    OpenMM::CudaArray* anodeTargetDevice;
-    OpenMM::CudaArray* chargeSum;
-    
-    // Conductor-specific device arrays (新增)
-    OpenMM::CudaArray* conductorIndicesDevice;
-    OpenMM::CudaArray* conductorNormalsDevice;
-    OpenMM::CudaArray* conductorAreasDevice;
-    OpenMM::CudaArray* conductorContactIndicesDevice;
-    OpenMM::CudaArray* conductorContactNormalsDevice;
-    OpenMM::CudaArray* conductorGeometriesDevice;
-    OpenMM::CudaArray* conductorTypesDevice;
-    OpenMM::CudaArray* conductorAtomCondIdsDevice;
-    OpenMM::CudaArray* conductorAtomCountsDevice;
-    OpenMM::CudaArray* conductorDQDevice; // per conductor total dQ
-    
-    // Persistent buffers for forces and positions (avoid repeated allocation)
-    OpenMM::CudaArray* forcesDevicePersistent;
-    OpenMM::CudaArray* posqDevicePersistent;
-    OpenMM::CudaArray* cathodeScaleDevice;
-    OpenMM::CudaArray* anodeScaleDevice;
+    ElectrodeChargeForce::Parameters parameters;
+
+    // Device arrays for electrode and conductor indices/masks
+    OpenMM::CudaArray* cathodeIndicesDevice = nullptr;
+    OpenMM::CudaArray* anodeIndicesDevice = nullptr;
+    OpenMM::CudaArray* electrodeMaskDevice = nullptr;
+    OpenMM::CudaArray* conductorMaskDevice = nullptr;
+
+    // Device arrays for conductor-specific data
+    OpenMM::CudaArray* conductorIndicesDevice = nullptr;
+    OpenMM::CudaArray* conductorNormalsDevice = nullptr;
+    OpenMM::CudaArray* conductorAreasDevice = nullptr;
+    OpenMM::CudaArray* conductorContactIndicesDevice = nullptr;
+    OpenMM::CudaArray* conductorContactNormalsDevice = nullptr;
+    OpenMM::CudaArray* conductorGeometriesDevice = nullptr;
+    OpenMM::CudaArray* conductorAtomCondIdsDevice = nullptr;
+    OpenMM::CudaArray* conductorAtomCountsDevice = nullptr;
+    OpenMM::CudaArray* conductorDQDevice = nullptr;
+
+    // Persistent buffer for reduction results
+    OpenMM::CudaArray* chargeSumBuffers = nullptr;
+
+    bool inInternalEvaluation = false;
 };
 
 } // namespace ElectrodeChargePlugin
 
-#endif // CUDA_ELECTRODE_CHARGE_KERNEL_LINUS_H_
+#endif // CUDA_ELECTRODE_CHARGE_KERNEL_H_

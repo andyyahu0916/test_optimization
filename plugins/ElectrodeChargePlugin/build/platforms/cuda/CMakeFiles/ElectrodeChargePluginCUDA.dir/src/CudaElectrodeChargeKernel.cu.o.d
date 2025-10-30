@@ -383,5 +383,4 @@ platforms/cuda/CMakeFiles/ElectrodeChargePluginCUDA.dir/src/CudaElectrodeChargeK
     /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/array \
     /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/compare \
     /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaQueue.h \
-    /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaForceInfo.h \
     /home/andy/miniforge3/envs/cuda/include/openmm/common/ContextSelector.h

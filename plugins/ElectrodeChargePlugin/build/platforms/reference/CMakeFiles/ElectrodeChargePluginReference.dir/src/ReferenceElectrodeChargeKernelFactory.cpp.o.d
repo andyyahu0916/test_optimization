@@ -160,4 +160,25 @@ platforms/reference/CMakeFiles/ElectrodeChargePluginReference.dir/src/ReferenceE
  /home/andy/miniforge3/envs/cuda/include/openmm/Platform.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/System.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/Vec3.h \
- /home/andy/miniforge3/envs/cuda/include/openmm/Vec3.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/Vec3.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/NonbondedForce.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/Context.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/Integrator.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/State.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/serialization/SerializationNode.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/serialization/SerializationProxy.h \
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/typeinfo \
+ /home/andy/miniforge3/envs/cuda/include/openmm/OpenMMException.h \
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/exception \
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/exception_ptr.h \
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/cxxabi_init_exception.h \
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/nested_exception.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/System.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/internal/OSRngSeed.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/internal/windowsExport.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/Force.h \
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/set \
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_set.h \
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_multiset.h \
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/utility \
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/stl_relops.h

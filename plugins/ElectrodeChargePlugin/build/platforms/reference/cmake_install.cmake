@@ -2,7 +2,7 @@
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/usr/local/openmm")
+  set(CMAKE_INSTALL_PREFIX "/home/andy/miniforge3/envs/cuda")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -43,29 +43,29 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  if(EXISTS "$ENV{DESTDIR}/usr/local/openmm/lib/plugins/libElectrodeChargePluginReference.so" AND
-     NOT IS_SYMLINK "$ENV{DESTDIR}/usr/local/openmm/lib/plugins/libElectrodeChargePluginReference.so")
+  if(EXISTS "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libElectrodeChargePluginReference.so" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libElectrodeChargePluginReference.so")
     file(RPATH_CHECK
-         FILE "$ENV{DESTDIR}/usr/local/openmm/lib/plugins/libElectrodeChargePluginReference.so"
+         FILE "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libElectrodeChargePluginReference.so"
          RPATH "")
   endif()
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/usr/local/openmm/lib/plugins/libElectrodeChargePluginReference.so")
+   "/home/andy/miniforge3/envs/cuda/lib/plugins/libElectrodeChargePluginReference.so")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/usr/local/openmm/lib/plugins" TYPE SHARED_LIBRARY FILES "/home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/platforms/reference/libElectrodeChargePluginReference.so")
-  if(EXISTS "$ENV{DESTDIR}/usr/local/openmm/lib/plugins/libElectrodeChargePluginReference.so" AND
-     NOT IS_SYMLINK "$ENV{DESTDIR}/usr/local/openmm/lib/plugins/libElectrodeChargePluginReference.so")
+  file(INSTALL DESTINATION "/home/andy/miniforge3/envs/cuda/lib/plugins" TYPE SHARED_LIBRARY FILES "/home/andy/test_optimization/plugins/ElectrodeChargePlugin/build/platforms/reference/libElectrodeChargePluginReference.so")
+  if(EXISTS "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libElectrodeChargePluginReference.so" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libElectrodeChargePluginReference.so")
     file(RPATH_CHANGE
-         FILE "$ENV{DESTDIR}/usr/local/openmm/lib/plugins/libElectrodeChargePluginReference.so"
+         FILE "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libElectrodeChargePluginReference.so"
          OLD_RPATH "/home/andy/test_optimization/plugins/ElectrodeChargePlugin/build:"
          NEW_RPATH "")
     if(CMAKE_INSTALL_DO_STRIP)
-      execute_process(COMMAND "/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-strip" "$ENV{DESTDIR}/usr/local/openmm/lib/plugins/libElectrodeChargePluginReference.so")
+      execute_process(COMMAND "/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-strip" "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libElectrodeChargePluginReference.so")
     endif()
   endif()
 endif()

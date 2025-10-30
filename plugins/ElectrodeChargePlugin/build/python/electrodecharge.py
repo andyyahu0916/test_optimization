@@ -233,6 +233,111 @@ class IntVector(object):
 
 # Register IntVector in _electrodecharge:
 _electrodecharge.IntVector_swigregister(IntVector)
+class DoubleVector(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def iterator(self):
+        return _electrodecharge.DoubleVector_iterator(self)
+    def __iter__(self):
+        return self.iterator()
+
+    def __nonzero__(self):
+        return _electrodecharge.DoubleVector___nonzero__(self)
+
+    def __bool__(self):
+        return _electrodecharge.DoubleVector___bool__(self)
+
+    def __len__(self):
+        return _electrodecharge.DoubleVector___len__(self)
+
+    def __getslice__(self, i, j):
+        return _electrodecharge.DoubleVector___getslice__(self, i, j)
+
+    def __setslice__(self, *args):
+        return _electrodecharge.DoubleVector___setslice__(self, *args)
+
+    def __delslice__(self, i, j):
+        return _electrodecharge.DoubleVector___delslice__(self, i, j)
+
+    def __delitem__(self, *args):
+        return _electrodecharge.DoubleVector___delitem__(self, *args)
+
+    def __getitem__(self, *args):
+        return _electrodecharge.DoubleVector___getitem__(self, *args)
+
+    def __setitem__(self, *args):
+        return _electrodecharge.DoubleVector___setitem__(self, *args)
+
+    def pop(self):
+        return _electrodecharge.DoubleVector_pop(self)
+
+    def append(self, x):
+        return _electrodecharge.DoubleVector_append(self, x)
+
+    def empty(self):
+        return _electrodecharge.DoubleVector_empty(self)
+
+    def size(self):
+        return _electrodecharge.DoubleVector_size(self)
+
+    def swap(self, v):
+        return _electrodecharge.DoubleVector_swap(self, v)
+
+    def begin(self):
+        return _electrodecharge.DoubleVector_begin(self)
+
+    def end(self):
+        return _electrodecharge.DoubleVector_end(self)
+
+    def rbegin(self):
+        return _electrodecharge.DoubleVector_rbegin(self)
+
+    def rend(self):
+        return _electrodecharge.DoubleVector_rend(self)
+
+    def clear(self):
+        return _electrodecharge.DoubleVector_clear(self)
+
+    def get_allocator(self):
+        return _electrodecharge.DoubleVector_get_allocator(self)
+
+    def pop_back(self):
+        return _electrodecharge.DoubleVector_pop_back(self)
+
+    def erase(self, *args):
+        return _electrodecharge.DoubleVector_erase(self, *args)
+
+    def __init__(self, *args):
+        _electrodecharge.DoubleVector_swiginit(self, _electrodecharge.new_DoubleVector(*args))
+
+    def push_back(self, x):
+        return _electrodecharge.DoubleVector_push_back(self, x)
+
+    def front(self):
+        return _electrodecharge.DoubleVector_front(self)
+
+    def back(self):
+        return _electrodecharge.DoubleVector_back(self)
+
+    def assign(self, n, x):
+        return _electrodecharge.DoubleVector_assign(self, n, x)
+
+    def resize(self, *args):
+        return _electrodecharge.DoubleVector_resize(self, *args)
+
+    def insert(self, *args):
+        return _electrodecharge.DoubleVector_insert(self, *args)
+
+    def reserve(self, n):
+        return _electrodecharge.DoubleVector_reserve(self, n)
+
+    def capacity(self):
+        return _electrodecharge.DoubleVector_capacity(self)
+    __swig_destroy__ = _electrodecharge.delete_DoubleVector
+
+# Register DoubleVector in _electrodecharge:
+_electrodecharge.DoubleVector_swigregister(DoubleVector)
 class ElectrodeChargeForce(Force):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
@@ -246,38 +351,32 @@ class ElectrodeChargeForce(Force):
     def setAnode(self, indices, voltage):
         return _electrodecharge.ElectrodeChargeForce_setAnode(self, indices, voltage)
 
-    def getCathode(self):
-        return _electrodecharge.ElectrodeChargeForce_getCathode(self)
-
-    def getAnode(self):
-        return _electrodecharge.ElectrodeChargeForce_getAnode(self)
-
     def setNumIterations(self, iterations):
         return _electrodecharge.ElectrodeChargeForce_setNumIterations(self, iterations)
-
-    def getNumIterations(self):
-        return _electrodecharge.ElectrodeChargeForce_getNumIterations(self)
 
     def setSmallThreshold(self, value):
         return _electrodecharge.ElectrodeChargeForce_setSmallThreshold(self, value)
 
-    def getSmallThreshold(self):
-        return _electrodecharge.ElectrodeChargeForce_getSmallThreshold(self)
-
     def setCellGap(self, gap):
         return _electrodecharge.ElectrodeChargeForce_setCellGap(self, gap)
-
-    def getCellGap(self):
-        return _electrodecharge.ElectrodeChargeForce_getCellGap(self)
 
     def setCellLength(self, length):
         return _electrodecharge.ElectrodeChargeForce_setCellLength(self, length)
 
-    def getCellLength(self):
-        return _electrodecharge.ElectrodeChargeForce_getCellLength(self)
+    def setSheetArea(self, area):
+        return _electrodecharge.ElectrodeChargeForce_setSheetArea(self, area)
+
+    def setCathodeZ(self, z):
+        return _electrodecharge.ElectrodeChargeForce_setCathodeZ(self, z)
+
+    def setAnodeZ(self, z):
+        return _electrodecharge.ElectrodeChargeForce_setAnodeZ(self, z)
 
     def usesPeriodicBoundaryConditions(self):
         return _electrodecharge.ElectrodeChargeForce_usesPeriodicBoundaryConditions(self)
+
+    def setConductorData(self, indices, normals, areas, contactIndices, contactNormals, geometries, atomCondIds, atomCountsPerConductor):
+        return _electrodecharge.ElectrodeChargeForce_setConductorData(self, indices, normals, areas, contactIndices, contactNormals, geometries, atomCondIds, atomCountsPerConductor)
     __swig_destroy__ = _electrodecharge.delete_ElectrodeChargeForce
 
 # Register ElectrodeChargeForce in _electrodecharge:

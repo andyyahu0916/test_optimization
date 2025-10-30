@@ -1,0 +1,3 @@
+#This is an example for implementation of constant voltage molecular dynamics (CV-MD) simulation in OpenMM. To perform CV-MD simulation, you will need to execute run_openMM.py by typing:
+
+python run_openMM.py > energy.log 

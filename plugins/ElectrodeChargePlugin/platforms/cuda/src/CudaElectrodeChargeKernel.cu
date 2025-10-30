@@ -1,24 +1,15 @@
 /**
- * 🔥 CUDA Kernel with GPU-resident Iteration
- * 
- * Goal: Keep ALL data on GPU during Poisson solver iterations.
- * No CPU-GPU transfers inside iteration loop!
- * 
- * Architecture:
- *   1. Upload initial data (positions, charges) - ONCE
- *   2. Iterate 3 times on GPU:
- *      - Compute Coulomb forces (our own kernel)
- *      - Update electrode charges
- *      - Scale to target
- *   3. Download final charges - ONCE
- * 
- * Expected speedup: 50-100× over CPU iteration
+ * 🔥 Corrected and Refactored CUDA Kernel for ElectrodeChargeForce (Linus Version)
+ *
+ * This version is algorithmically pure and uses correct, modern OpenMM/CUDA APIs.
+ * - All constants are passed as kernel arguments.
+ * - `cudaMemset` is used to correctly clear buffers.
+ * - All C++ compilation errors are fixed.
  */
 
 #include "CudaElectrodeChargeKernel.h"
 #include "openmm/cuda/CudaContext.h"
 #include "openmm/cuda/CudaArray.h"
-#include "openmm/cuda/CudaForceInfo.h"
 #include "openmm/common/ContextSelector.h"
 #include "openmm/internal/ContextImpl.h"
 #include <cuda.h>
@@ -28,495 +19,494 @@ using namespace ElectrodeChargePlugin;
 using namespace OpenMM;
 
 // ============================================================================
-// CUDA Kernels for GPU-resident iteration
+// WARP SHUFFLE REDUCTION
+// ============================================================================
+__device__ inline double warpReduceSum(double val) {
+    val += __shfl_down_sync(0xffffffff, val, 16);
+    val += __shfl_down_sync(0xffffffff, val, 8);
+    val += __shfl_down_sync(0xffffffff, val, 4);
+    val += __shfl_down_sync(0xffffffff, val, 2);
+    val += __shfl_down_sync(0xffffffff, val, 1);
+    return val;
+}
+
+// ============================================================================
+// CUDA KERNELS (DE-FUSED for Algorithmic Purity)
 // ============================================================================
 
-/**
- * Kernel: Compute Coulomb forces (simple N^2 version for now)
- * 
- * For production, should use:
- *   - Neighbor lists
- *   - PME for long-range
- *   - Optimized memory access
- * 
- * But for proof-of-concept, brute force is fine.
- */
-__global__ void computeCoulombForcesSimple(
-    const float4* __restrict__ posq,     // (x, y, z, charge)
-    float3* __restrict__ forces,         // Output forces
-    const int numParticles,
-    const float coulombConstant          // 138.935 kJ·nm/(mol·e²)
-) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    
-    if (i >= numParticles) return;
-    
-    float4 pos_i = posq[i];
-    float qi = pos_i.w;
-    
-    float3 force_i = make_float3(0.0f, 0.0f, 0.0f);
-    
-    // Sum over all other particles
-    for (int j = 0; j < numParticles; j++) {
-        if (i == j) continue;
-        
-        float4 pos_j = posq[j];
-        float qj = pos_j.w;
-        
-        // Vector from j to i
-        float dx = pos_i.x - pos_j.x;
-        float dy = pos_i.y - pos_j.y;
-        float dz = pos_i.z - pos_j.z;
-        
-        float r2 = dx*dx + dy*dy + dz*dz;
-        float r = sqrtf(r2);
-        
-        if (r < 1e-6f) continue;  // Avoid singularity
-        
-        // Coulomb force: F = k * qi * qj / r^2 * (r_ij / r)
-        float forceMag = coulombConstant * qi * qj / r2;
-        
-        force_i.x += forceMag * dx / r;
-        force_i.y += forceMag * dy / r;
-        force_i.z += forceMag * dz / r;
-    }
-    
-    forces[i] = force_i;
-}
-
-
-/**
- * Kernel: Update electrode charges from electric field
- * Combined for both cathode and anode to minimize kernel launches
- */
-__global__ void updateElectrodeChargesIterative(
-    const float3* __restrict__ forces,       // Input forces
-    float4* __restrict__ posq,               // In/Out: positions + charges
+__global__ void updateFlatElectrodeCharges(
+    const double4* __restrict__ forces,
+    double4* __restrict__ posq,
     const int* __restrict__ cathodeIndices,
     const int numCathode,
     const int* __restrict__ anodeIndices,
     const int numAnode,
-    const float cathodeArea,
-    const float anodeArea,
-    const float cathodeVoltageKj,
-    const float anodeVoltageKj,
-    const float lGap,
-    const float conversionKjmolNmAu,
-    const float smallThreshold
-) {
-    int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    
-    const float twoOverFourPi = 2.0f / (4.0f * 3.14159265358979323846f);
-    
-    // Process cathode
-    if (tid < numCathode) {
-        int atomIdx = cathodeIndices[tid];
-        float4 pq = posq[atomIdx];
-        float3 force = forces[atomIdx];
-        
-        float oldCharge = pq.w;
-        float ezExternal = 0.0f;
-        
-        if (fabsf(oldCharge) > 0.9f * smallThreshold) {
-            ezExternal = force.z / oldCharge;
+    const double cathodeArea,
+    const double anodeArea,
+    const double cathodeVoltageKj,
+    const double anodeVoltageKj,
+    const double lGap,
+    const double smallThreshold,
+    const double PI,
+    const double CONV_KJMOL_NM_AU) {
+
+    const int i = blockIdx.x * blockDim.x + threadIdx.x;
+    const double twoOverFourPi = 2.0 / (4.0 * PI);
+
+    if (i < numCathode) {
+        const int atomIdx = cathodeIndices[i];
+        const double oldCharge = posq[atomIdx].w;
+        double ezExternal = 0.0;
+        if (fabs(oldCharge) > 0.9 * smallThreshold) {
+            ezExternal = forces[atomIdx].z / oldCharge;
         }
-        
-        float newCharge = twoOverFourPi * cathodeArea * 
-                         ((cathodeVoltageKj / lGap) + ezExternal) * conversionKjmolNmAu;
-        
-        if (fabsf(newCharge) < smallThreshold) {
-            newCharge = smallThreshold;
-        }
-        
-        pq.w = newCharge;
-        posq[atomIdx] = pq;
+        double newCharge = twoOverFourPi * cathodeArea * ((cathodeVoltageKj / lGap) + ezExternal) * CONV_KJMOL_NM_AU;
+        posq[atomIdx].w = copysign(fmax(fabs(newCharge), smallThreshold), 1.0);
     }
-    
-    // Process anode
-    int anodeTid = tid - numCathode;
-    if (anodeTid >= 0 && anodeTid < numAnode) {
-        int atomIdx = anodeIndices[anodeTid];
-        float4 pq = posq[atomIdx];
-        float3 force = forces[atomIdx];
-        
-        float oldCharge = pq.w;
-        float ezExternal = 0.0f;
-        
-        if (fabsf(oldCharge) > 0.9f * smallThreshold) {
-            ezExternal = force.z / oldCharge;
+
+    if (i < numAnode) {
+        const int atomIdx = anodeIndices[i];
+        const double oldCharge = posq[atomIdx].w;
+        double ezExternal = 0.0;
+        if (fabs(oldCharge) > 0.9 * smallThreshold) {
+            ezExternal = forces[atomIdx].z / oldCharge;
         }
-        
-        float newCharge = -twoOverFourPi * anodeArea * 
-                         ((anodeVoltageKj / lGap) + ezExternal) * conversionKjmolNmAu;
-        
-        if (fabsf(newCharge) < smallThreshold) {
-            newCharge = -smallThreshold;
-        }
-        
-        pq.w = newCharge;
-        posq[atomIdx] = pq;
+        double newCharge = -twoOverFourPi * anodeArea * ((anodeVoltageKj / lGap) + ezExternal) * CONV_KJMOL_NM_AU;
+        posq[atomIdx].w = -fmax(fabs(newCharge), smallThreshold);
     }
 }
 
+__global__ void conductorImageCharges(
+    const double4* __restrict__ forces,
+    double4* __restrict__ posq,
+    const int* __restrict__ conductorAtomIndices,
+    const int numConductorAtoms,
+    const double3* __restrict__ conductorNormals,
+    const double* __restrict__ conductorAreas,
+    const double smallThreshold,
+    const double PI,
+    const double CONV_KJMOL_NM_AU) {
 
-/**
- * Kernel: Compute analytic target and scale charges
- */
-__global__ void computeTargetAndScale(
-    const float4* __restrict__ posq,
-    float4* __restrict__ posqOut,           // Output after scaling
-    const int* __restrict__ cathodeIndices,
-    const int numCathode,
-    const int* __restrict__ anodeIndices,
-    const int numAnode,
-    const int* __restrict__ electrodeMask,  // 1=electrode, 0=electrolyte
+    const int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= numConductorAtoms) return;
+
+    const int atomIdx = conductorAtomIndices[i];
+    const double oldCharge = posq[atomIdx].w;
+
+    if (fabs(oldCharge) > 0.9 * smallThreshold) {
+        const double3 force = ((const double3*)forces)[atomIdx];
+        const double3 normal = conductorNormals[i];
+        const double En_external = (force.x * normal.x + force.y * normal.y + force.z * normal.z) / oldCharge;
+        const double newCharge = (2.0 / (4.0 * PI)) * conductorAreas[i] * En_external * CONV_KJMOL_NM_AU;
+        // Physical necessity: |q| >= threshold to prevent E=F/q blow-up in next iteration
+        // Preserve sign: if physics correct, q>0 naturally; if q<0, reveals a bug
+        posq[atomIdx].w = (fabs(newCharge) < smallThreshold) ?
+                          copysign(smallThreshold, newCharge) : newCharge;
+    } else {
+        posq[atomIdx].w = smallThreshold;
+    }
+}
+
+__global__ void conductorChargeTransfer(
+    const double4* __restrict__ forces,
+    const double4* __restrict__ posq,
+    const int* __restrict__ conductorContactIndices,
+    const double3* __restrict__ conductorContactNormals,
+    const double* __restrict__ conductorGeometries,
+    double* __restrict__ dQPerConductor,
+    const int numConductors,
+    const double cathodeVoltageKj,
+    const double lGap,
+    const double smallThreshold,
+    const double CONV_KJMOL_NM_AU) {
+
+    const int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= numConductors) return;
+
+    const int contactIdx = conductorContactIndices[i];
+    const double q_i = posq[contactIdx].w;
+    double En_external = 0.0;
+
+    if (fabs(q_i) > 0.9 * smallThreshold) {
+        const double3 force = ((const double3*)forces)[contactIdx];
+        const double3 normal = conductorContactNormals[i];
+        En_external = (force.x * normal.x + force.y * normal.y + force.z * normal.z) / q_i;
+    }
+
+    const double dE_conductor = -(En_external + (cathodeVoltageKj / lGap / 2.0)) * CONV_KJMOL_NM_AU;
+
+    // Good taste: geometry factor already encodes conductor type (Buckyball: dr^2, Nanotube: dr*L/2)
+    // No need for type-based branching - the formula is universal: dQ = -dE * geometry
+    const double geom = conductorGeometries[i];
+    const double dQ = -1.0 * dE_conductor * geom;
+    dQPerConductor[i] = dQ;
+}
+
+__global__ void applyConductorDQ(
+    double4* __restrict__ posq,
+    const int* __restrict__ conductorAtomIndices,
+    const int* __restrict__ conductorAtomCondIds,
+    const int numConductorAtoms,
+    const double* __restrict__ dQPerConductor,
+    const int* __restrict__ atomCountsPerConductor) {
+
+    const int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= numConductorAtoms) return;
+
+    const int atomIdx = conductorAtomIndices[i];
+    const int condId = conductorAtomCondIds[i];
+    const int count = atomCountsPerConductor[condId];
+    if (count > 0) {
+        const double dq_atom = dQPerConductor[condId] / (double)count;
+        posq[atomIdx].w += dq_atom;
+    }
+}
+
+__global__ void computeTargetAndNumericSums(
+    const double4* __restrict__ posq,
     const int numParticles,
-    const float cathodeZ,
-    const float anodeZ,
-    const float sheetArea,
-    const float cathodeVoltageKj,
-    const float anodeVoltageKj,
-    const float lGap,
-    const float lCell,
-    const float conversionKjmolNmAu,
-    const float smallThreshold,
-    float* __restrict__ cathodeScaleOut,    // Output: scaling factor
-    float* __restrict__ anodeScaleOut
-) {
-    __shared__ float cathodeSumShared[256];
-    __shared__ float anodeSumShared[256];
-    __shared__ float cathodeTargetShared[256];
-    __shared__ float anodeTargetShared[256];
-    
-    int tid = threadIdx.x;
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    
-    cathodeSumShared[tid] = 0.0f;
-    anodeSumShared[tid] = 0.0f;
-    cathodeTargetShared[tid] = 0.0f;
-    anodeTargetShared[tid] = 0.0f;
-    
-    const float oneOverFourPi = 1.0f / (4.0f * 3.14159265358979323846f);
-    
-    // Geometric contribution (thread 0 only)
-    if (idx == 0) {
-        float cathodeGeom = oneOverFourPi * sheetArea * 
-                           ((cathodeVoltageKj / lGap) + (cathodeVoltageKj / lCell)) * 
-                           conversionKjmolNmAu;
-        float anodeGeom = -oneOverFourPi * sheetArea * 
-                         ((anodeVoltageKj / lGap) + (anodeVoltageKj / lCell)) * 
-                         conversionKjmolNmAu;
-        cathodeTargetShared[0] = cathodeGeom;
-        anodeTargetShared[0] = anodeGeom;
+    const int* __restrict__ electrodeMask,
+    const int* __restrict__ conductorMask,
+    const double anodeZ,
+    const double lCell,
+    const double sheetArea,
+    const double voltageKj,
+    const double lGap,
+    double* __restrict__ chargeSumBuffers,
+    const double PI,
+    const double CONV_KJMOL_NM_AU) {
+
+    double localAnodeTarget = 0.0;
+    double localCathodeTarget = 0.0;
+    double localAnodeNumeric = 0.0;
+    double localCathodeNumeric = 0.0;
+    const int lane = threadIdx.x & 31;
+
+    for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < numParticles; i += gridDim.x * blockDim.x) {
+        const double4 p = posq[i];
+        if (electrodeMask[i] == 0) {
+            const double zDist = fabs(p.z - anodeZ);
+            const double imgCharge = (zDist / lCell) * (-p.w);
+            localAnodeTarget += imgCharge;
+            localCathodeTarget += imgCharge;
+        }
+        if (electrodeMask[i] == 2) {
+            localAnodeNumeric += p.w;
+        } else if (electrodeMask[i] == 1 || conductorMask[i] == 1) {
+            localCathodeNumeric += p.w;
+        }
     }
-    
-    // Sum electrode charges
-    if (idx < numCathode) {
-        int atomIdx = cathodeIndices[idx];
-        cathodeSumShared[tid] = posq[atomIdx].w;
+
+    localAnodeTarget = warpReduceSum(localAnodeTarget);
+    localCathodeTarget = warpReduceSum(localCathodeTarget);
+    localAnodeNumeric = warpReduceSum(localAnodeNumeric);
+    localCathodeNumeric = warpReduceSum(localCathodeNumeric);
+
+    __shared__ double sharedSums[4*32];
+    const int warp = threadIdx.x >> 5;
+    if (lane == 0) {
+        sharedSums[4*warp + 0] = localAnodeTarget;
+        sharedSums[4*warp + 1] = localCathodeTarget;
+        sharedSums[4*warp + 2] = localAnodeNumeric;
+        sharedSums[4*warp + 3] = localCathodeNumeric;
     }
-    
-    if (idx < numAnode) {
-        int atomIdx = anodeIndices[idx];
-        anodeSumShared[tid] = posq[atomIdx].w;
-    }
-    
-    // Image charge contribution from electrolyte
-    if (idx < numParticles && electrodeMask[idx] == 0) {
-        float4 particle = posq[idx];
-        float charge = particle.w;
-        float zPos = particle.z;
-        
-        float cathodeDistance = fabsf(zPos - anodeZ);
-        float anodeDistance = fabsf(zPos - cathodeZ);
-        
-        cathodeTargetShared[tid] += (cathodeDistance / lCell) * (-charge);
-        anodeTargetShared[tid] += (anodeDistance / lCell) * (-charge);
-    }
-    
     __syncthreads();
-    
-    // Reduction
-    for (int s = blockDim.x / 2; s > 0; s >>= 1) {
-        if (tid < s) {
-            cathodeSumShared[tid] += cathodeSumShared[tid + s];
-            anodeSumShared[tid] += anodeSumShared[tid + s];
-            cathodeTargetShared[tid] += cathodeTargetShared[tid + s];
-            anodeTargetShared[tid] += anodeTargetShared[tid + s];
+
+    if (warp == 0) {
+        localAnodeTarget = (lane < (blockDim.x >> 5)) ? sharedSums[4*lane + 0] : 0.0;
+        localCathodeTarget = (lane < (blockDim.x >> 5)) ? sharedSums[4*lane + 1] : 0.0;
+        localAnodeNumeric = (lane < (blockDim.x >> 5)) ? sharedSums[4*lane + 2] : 0.0;
+        localCathodeNumeric = (lane < (blockDim.x >> 5)) ? sharedSums[4*lane + 3] : 0.0;
+
+        localAnodeTarget = warpReduceSum(localAnodeTarget);
+        localCathodeTarget = warpReduceSum(localCathodeTarget);
+        localAnodeNumeric = warpReduceSum(localAnodeNumeric);
+        localCathodeNumeric = warpReduceSum(localCathodeNumeric);
+
+        if (lane == 0) {
+            const double geomTerm = (1.0 / (4.0 * PI)) * sheetArea * ((voltageKj / lGap) + (voltageKj / lCell)) * CONV_KJMOL_NM_AU;
+            atomicAdd(&chargeSumBuffers[0], localAnodeTarget - geomTerm);
+            atomicAdd(&chargeSumBuffers[1], localCathodeTarget + geomTerm);
+            atomicAdd(&chargeSumBuffers[2], localAnodeNumeric);
+            atomicAdd(&chargeSumBuffers[3], localCathodeNumeric);
         }
-        __syncthreads();
-    }
-    
-    // Compute scaling factors
-    if (tid == 0) {
-        float cathodeSum = cathodeSumShared[0];
-        float anodeSum = anodeSumShared[0];
-        float cathodeTarget = cathodeTargetShared[0];
-        float anodeTarget = anodeTargetShared[0];
-        
-        float cathodeScale = 1.0f;
-        if (fabsf(cathodeSum) > smallThreshold && cathodeTarget > 0.0f) {
-            cathodeScale = cathodeTarget / cathodeSum;
-        }
-        
-        float anodeScale = 1.0f;
-        if (fabsf(anodeSum) > smallThreshold && anodeTarget < 0.0f) {
-            anodeScale = anodeTarget / anodeSum;
-        }
-        
-        atomicExch(cathodeScaleOut, cathodeScale);
-        atomicExch(anodeScaleOut, anodeScale);
     }
 }
 
-
-/**
- * Kernel: Apply scaling to electrode charges
- */
 __global__ void applyScaling(
-    float4* __restrict__ posq,
-    const int* __restrict__ cathodeIndices,
-    const int numCathode,
-    const int* __restrict__ anodeIndices,
-    const int numAnode,
-    const float* __restrict__ cathodeScalePtr,
-    const float* __restrict__ anodeScalePtr
-) {
-    int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    
-    float cathodeScale = *cathodeScalePtr;
-    float anodeScale = *anodeScalePtr;
-    
-    if (tid < numCathode) {
-        int atomIdx = cathodeIndices[tid];
-        float4 pq = posq[atomIdx];
-        pq.w *= cathodeScale;
-        posq[atomIdx] = pq;
+    double4* __restrict__ posq,
+    const int numParticles,
+    const int* __restrict__ electrodeMask,
+    const int* __restrict__ conductorMask,
+    const double* __restrict__ chargeSumBuffers,
+    const double smallThreshold) {
+
+    __shared__ double scales[2];
+    if (threadIdx.x == 0 && blockIdx.x == 0) {
+        const double anodeTarget = chargeSumBuffers[0];
+        const double cathodeSideTarget = -anodeTarget;
+        const double anodeNumericSum = chargeSumBuffers[2];
+        const double cathodeAndConductorNumericSum = chargeSumBuffers[3];
+
+        double anodeScale = (fabs(anodeNumericSum) > smallThreshold) ? (anodeTarget / anodeNumericSum) : 1.0;
+        double cathodeAndConductorScale = (fabs(cathodeAndConductorNumericSum) > smallThreshold) ? (cathodeSideTarget / cathodeAndConductorNumericSum) : 1.0;
+
+        scales[0] = (anodeScale > 0.0) ? anodeScale : 1.0;
+        scales[1] = (cathodeAndConductorScale > 0.0) ? cathodeAndConductorScale : 1.0;
     }
-    
-    int anodeTid = tid - numCathode;
-    if (anodeTid >= 0 && anodeTid < numAnode) {
-        int atomIdx = anodeIndices[anodeTid];
-        float4 pq = posq[atomIdx];
-        pq.w *= anodeScale;
-        posq[atomIdx] = pq;
+    __syncthreads();
+
+    const double anodeScale = scales[0];
+    const double cathodeAndConductorScale = scales[1];
+
+    for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < numParticles; i += gridDim.x * blockDim.x) {
+        if (electrodeMask[i] == 2) { // Anode
+            posq[i].w *= anodeScale;
+        } else if (electrodeMask[i] == 1 || conductorMask[i] == 1) { // Cathode or Conductor
+            posq[i].w *= cathodeAndConductorScale;
+        }
     }
 }
 
-
-// ============================================================================
-// Host code: execute with GPU-resident iteration
-// ============================================================================
-
-double CudaCalcElectrodeChargeKernel::execute(
-    ContextImpl& context,
-    const std::vector<Vec3>& positions,
-    const std::vector<Vec3>& forces,
-    const std::vector<double>& allParticleCharges,
-    double sheetArea,
-    double cathodeZ,
-    double anodeZ,
-    std::vector<double>& cathodeCharges,
-    std::vector<double>& anodeCharges,
-    double& cathodeTarget,
-    double& anodeTarget
-) {
-    ContextSelector selector(*cu);
-    
-    // Initialize persistent buffers on first call
-    if (forcesDevicePersistent == nullptr) {
-        forcesDevicePersistent = CudaArray::create<float3>(*cu, numParticles, "forcesPersistent");
-        posqDevicePersistent = CudaArray::create<float4>(*cu, numParticles, "posqPersistent");
-        cathodeScaleDevice = CudaArray::create<float>(*cu, 1, "cathodeScalePersistent");
-        anodeScaleDevice = CudaArray::create<float>(*cu, 1, "anodeScalePersistent");
-    }
-    
-    // Upload initial data ONCE
-    std::vector<float4> posqFloat4(numParticles);
-    for (int i = 0; i < numParticles; i++) {
-        posqFloat4[i].x = static_cast<float>(positions[i][0]);
-        posqFloat4[i].y = static_cast<float>(positions[i][1]);
-        posqFloat4[i].z = static_cast<float>(positions[i][2]);
-        posqFloat4[i].w = static_cast<float>(allParticleCharges[i]);
-    }
-    posqDevicePersistent->upload(posqFloat4);
-    
-    // Conversion constants
-    const float conversionNmBohr = 18.8973f;
-    const float conversionKjmolNmAu = conversionNmBohr / 2625.5f;
-    const float conversionEvKjmol = 96.487f;
-    const float coulombConstant = 138.935f;  // kJ·nm/(mol·e²)
-    
-    float cathodeVoltageKj = std::fabs(parameters.cathodeVoltage) * conversionEvKjmol;
-    float anodeVoltageKj = std::fabs(parameters.anodeVoltage) * conversionEvKjmol;
-    float cathodeArea = sheetArea / static_cast<float>(parameters.cathodeIndices.size());
-    float anodeArea = sheetArea / static_cast<float>(parameters.anodeIndices.size());
-    
-    int threadsPerBlock = 256;
-    int numBlocksParticles = (numParticles + threadsPerBlock - 1) / threadsPerBlock;
-    int numBlocksElectrodes = (parameters.cathodeIndices.size() + parameters.anodeIndices.size() + threadsPerBlock - 1) / threadsPerBlock;
-    
-    // ========================================================================
-    // GPU-RESIDENT ITERATION LOOP
-    // ========================================================================
-    for (int iter = 0; iter < parameters.numIterations; iter++) {
-        // Step 1: Compute Coulomb forces (ON GPU)
-        computeCoulombForcesSimple<<<numBlocksParticles, threadsPerBlock>>>(
-            (const float4*)posqDevicePersistent->getDevicePointer(),
-            (float3*)forcesDevicePersistent->getDevicePointer(),
-            numParticles,
-            coulombConstant
-        );
-        
-        // Step 2: Update electrode charges (ON GPU)
-        updateElectrodeChargesIterative<<<numBlocksElectrodes, threadsPerBlock>>>(
-            (const float3*)forcesDevicePersistent->getDevicePointer(),
-            (float4*)posqDevicePersistent->getDevicePointer(),
-            (const int*)cathodeIndicesDevice->getDevicePointer(),
-            parameters.cathodeIndices.size(),
-            (const int*)anodeIndicesDevice->getDevicePointer(),
-            parameters.anodeIndices.size(),
-            cathodeArea,
-            anodeArea,
-            cathodeVoltageKj,
-            anodeVoltageKj,
-            static_cast<float>(parameters.lGap),
-            conversionKjmolNmAu,
-            static_cast<float>(parameters.smallThreshold)
-        );
-        
-        // Step 3: Compute target and scaling (ON GPU)
-        computeTargetAndScale<<<numBlocksParticles, threadsPerBlock>>>(
-            (const float4*)posqDevicePersistent->getDevicePointer(),
-            (float4*)posqDevicePersistent->getDevicePointer(),
-            (const int*)cathodeIndicesDevice->getDevicePointer(),
-            parameters.cathodeIndices.size(),
-            (const int*)anodeIndicesDevice->getDevicePointer(),
-            parameters.anodeIndices.size(),
-            (const int*)electrodeMaskDevice->getDevicePointer(),
-            numParticles,
-            static_cast<float>(cathodeZ),
-            static_cast<float>(anodeZ),
-            static_cast<float>(sheetArea),
-            cathodeVoltageKj,
-            anodeVoltageKj,
-            static_cast<float>(parameters.lGap),
-            static_cast<float>(parameters.lCell),
-            conversionKjmolNmAu,
-            static_cast<float>(parameters.smallThreshold),
-            (float*)cathodeScaleDevice->getDevicePointer(),
-            (float*)anodeScaleDevice->getDevicePointer()
-        );
-        
-        // Step 4: Apply scaling (ON GPU - NO DOWNLOAD!)
-        applyScaling<<<numBlocksElectrodes, threadsPerBlock>>>(
-            (float4*)posqDevicePersistent->getDevicePointer(),
-            (const int*)cathodeIndicesDevice->getDevicePointer(),
-            parameters.cathodeIndices.size(),
-            (const int*)anodeIndicesDevice->getDevicePointer(),
-            parameters.anodeIndices.size(),
-            (const float*)cathodeScaleDevice->getDevicePointer(),
-            (const float*)anodeScaleDevice->getDevicePointer()
-        );
-        // NO cudaDeviceSynchronize() here - let GPU pipeline!
-    }
-    
-    // Final sync before download
-    cudaDeviceSynchronize();
-    
-    // Download final results ONCE
-    posqDevicePersistent->download(posqFloat4);
-    
-    cathodeCharges.resize(parameters.cathodeIndices.size());
-    anodeCharges.resize(parameters.anodeIndices.size());
-    
-    for (size_t i = 0; i < parameters.cathodeIndices.size(); i++) {
-        int idx = parameters.cathodeIndices[i];
-        cathodeCharges[i] = static_cast<double>(posqFloat4[idx].w);
-    }
-    
-    for (size_t i = 0; i < parameters.anodeIndices.size(); i++) {
-        int idx = parameters.anodeIndices[i];
-        anodeCharges[i] = static_cast<double>(posqFloat4[idx].w);
-    }
-    
-    // Set dummy targets (not used in this version)
-    cathodeTarget = 0.0;
-    anodeTarget = 0.0;
-    
-    return 0.0;
-}
-
-// ============================================================================
-// Other member functions (unchanged)
-// ============================================================================
 
 CudaCalcElectrodeChargeKernel::CudaCalcElectrodeChargeKernel(
-    const std::string& name, 
+    const std::string& name,
     const Platform& platform,
     CudaContext& cu
-) : CalcElectrodeChargeKernel(name, platform),
-    cu(&cu),
-    cathodeChargesDevice(nullptr),
-    anodeChargesDevice(nullptr),
-    cathodeIndicesDevice(nullptr),
-    anodeIndicesDevice(nullptr),
-    electrodeMaskDevice(nullptr),
-    cathodeTargetDevice(nullptr),
-    anodeTargetDevice(nullptr),
-    chargeSum(nullptr),
-    forcesDevicePersistent(nullptr),
-    posqDevicePersistent(nullptr),
-    cathodeScaleDevice(nullptr),
-    anodeScaleDevice(nullptr)
-{
+) : CalcElectrodeChargeKernel(name, platform), cu(&cu) {
+}
+
+CudaCalcElectrodeChargeKernel::~CudaCalcElectrodeChargeKernel() {
+    cleanup();
+}
+
+void CudaCalcElectrodeChargeKernel::cleanup() {
+    delete cathodeIndicesDevice;
+    delete anodeIndicesDevice;
+    delete electrodeMaskDevice;
+    delete conductorMaskDevice;
+    delete conductorIndicesDevice;
+    delete conductorNormalsDevice;
+    delete conductorAreasDevice;
+    delete conductorContactIndicesDevice;
+    delete conductorContactNormalsDevice;
+    delete conductorGeometriesDevice;
+    delete conductorAtomCondIdsDevice;
+    delete conductorAtomCountsDevice;
+    delete conductorDQDevice;
+    delete chargeSumBuffers;
 }
 
 void CudaCalcElectrodeChargeKernel::initialize(
-    const System& system, 
-    const ElectrodeChargeForce& force
-) {
-    parameters.cathodeIndices = force.getCathode().atomIndices;
-    parameters.anodeIndices = force.getAnode().atomIndices;
-    parameters.cathodeVoltage = force.getCathode().voltage;
-    parameters.anodeVoltage = force.getAnode().voltage;
-    parameters.numIterations = force.getNumIterations();
-    parameters.smallThreshold = force.getSmallThreshold();
-    parameters.lGap = force.getCellGap();
-    parameters.lCell = force.getCellLength();
-    
+    const System& system,
+    const ElectrodeChargeForce& force) {
+    parameters = force.getParameters();
     numParticles = system.getNumParticles();
-    
+
     ContextSelector selector(*cu);
     initializeDeviceMemory();
 }
 
-void CudaCalcElectrodeChargeKernel::initializeDeviceMemory() {
-    cathodeChargesDevice = CudaArray::create<float>(*cu, parameters.cathodeIndices.size(), "cathodeCharges");
-    anodeChargesDevice = CudaArray::create<float>(*cu, parameters.anodeIndices.size(), "anodeCharges");
-    
-    cathodeIndicesDevice = CudaArray::create<int>(*cu, parameters.cathodeIndices.size(), "cathodeIndices");
-    cathodeIndicesDevice->upload(parameters.cathodeIndices);
-    
-    anodeIndicesDevice = CudaArray::create<int>(*cu, parameters.anodeIndices.size(), "anodeIndices");
-    anodeIndicesDevice->upload(parameters.anodeIndices);
-    
-    std::vector<int> electrodeMask(numParticles, 0);
-    for (int idx : parameters.cathodeIndices)
-        electrodeMask[idx] = 1;
-    for (int idx : parameters.anodeIndices)
-        electrodeMask[idx] = 1;
-    electrodeMaskDevice = CudaArray::create<int>(*cu, numParticles, "electrodeMask");
-    electrodeMaskDevice->upload(electrodeMask);
-    
-    cathodeTargetDevice = CudaArray::create<float>(*cu, 1, "cathodeTarget");
-    anodeTargetDevice = CudaArray::create<float>(*cu, 1, "anodeTarget");
-    chargeSum = CudaArray::create<float>(*cu, 1, "chargeSum");
+double CudaCalcElectrodeChargeKernel::execute(ContextImpl& context, bool includeForces, bool includeEnergy) {
+    ContextSelector selector(*cu);
+
+    if (inInternalEvaluation)
+        return 0.0;
+
+    CudaArray& posqArray = cu->getPosq();
+    CudaArray& forceArray = cu->getForce();
+
+    const double CONV_EV_KJOL_val = 96.487;
+    const double CONV_KJMOL_NM_AU_val = 18.8973 / 2625.5;
+    const double PI_val = 3.14159265358979323846;
+
+    const double cathodeVoltageKj = std::fabs(parameters.cathodeVoltage) * CONV_EV_KJOL_val;
+    const double anodeVoltageKj = std::fabs(parameters.anodeVoltage) * CONV_EV_KJOL_val;
+    const double cathodeAreaAtom = parameters.cathodeIndices.empty() ? 0.0 : parameters.sheetArea / static_cast<double>(parameters.cathodeIndices.size());
+    const double anodeAreaAtom = parameters.anodeIndices.empty() ? 0.0 : parameters.sheetArea / static_cast<double>(parameters.anodeIndices.size());
+    const int numElectrodes = parameters.cathodeIndices.size() + parameters.anodeIndices.size();
+    const int electrodeBlocks = (numElectrodes + 255) / 256;
+    const int numConductorAtoms = conductorIndicesDevice ? conductorIndicesDevice->getSize() : 0;
+    const int condAtomBlocks = (numConductorAtoms + 255) / 256;
+    const int particleBlocks = (numParticles + 255) / 256;
+
+    for (int iter = 0; iter < parameters.numIterations; ++iter) {
+        // Step 1: Get forces from the context for the current iteration.
+        try {
+            inInternalEvaluation = true;
+            context.calcForcesAndEnergy(true, false, 1<<0); // Recalculate NonbondedForce (group 0)
+            inInternalEvaluation = false;
+        } catch (...) {
+            inInternalEvaluation = false;
+            throw;
+        }
+
+        // Step 2: Update flat electrode charges based on current forces.
+        if (electrodeBlocks > 0) {
+            updateFlatElectrodeCharges<<<electrodeBlocks, 256, 0, cu->getCurrentStream()>>>(
+                (const double4*)forceArray.getDevicePointer(),
+                (double4*)posqArray.getDevicePointer(),
+                (const int*)cathodeIndicesDevice->getDevicePointer(), parameters.cathodeIndices.size(),
+                (const int*)anodeIndicesDevice->getDevicePointer(), parameters.anodeIndices.size(),
+                cathodeAreaAtom, anodeAreaAtom, cathodeVoltageKj, anodeVoltageKj,
+                parameters.lGap, parameters.smallThreshold, PI_val, CONV_KJMOL_NM_AU_val);
+        }
+
+        // Step 3: Update conductor charges (two-stage process).
+        if (numConductorAtoms > 0) {
+            // Step 3a: Image charges
+            conductorImageCharges<<<condAtomBlocks, 256, 0, cu->getCurrentStream()>>>(
+                (const double4*)forceArray.getDevicePointer(),
+                (double4*)posqArray.getDevicePointer(),
+                (const int*)conductorIndicesDevice->getDevicePointer(),
+                numConductorAtoms,
+                (const double3*)conductorNormalsDevice->getDevicePointer(),
+                (const double*)conductorAreasDevice->getDevicePointer(),
+                parameters.smallThreshold, PI_val, CONV_KJMOL_NM_AU_val);
+
+            // Physical necessity: image charges changed the field.
+            // Charge transfer MUST use the new field to satisfy constant-potential boundary condition.
+            try {
+                inInternalEvaluation = true;
+                context.calcForcesAndEnergy(true, false, 1<<0);
+                inInternalEvaluation = false;
+            } catch (...) {
+                inInternalEvaluation = false;
+                throw;
+            }
+            
+            // Step 3c: Charge transfer (using the NEW forces)
+            const int numConductors = conductorContactIndicesDevice->getSize();
+            const int condBlocks = (numConductors + 255) / 256;
+            if (condBlocks > 0) {
+                conductorChargeTransfer<<<condBlocks, 256, 0, cu->getCurrentStream()>>>(
+                    (const double4*)forceArray.getDevicePointer(),
+                    (const double4*)posqArray.getDevicePointer(),
+                    (const int*)conductorContactIndicesDevice->getDevicePointer(),
+                    (const double3*)conductorContactNormalsDevice->getDevicePointer(),
+                    (const double*)conductorGeometriesDevice->getDevicePointer(),
+                    (double*)conductorDQDevice->getDevicePointer(),
+                    numConductors, cathodeVoltageKj, parameters.lGap, parameters.smallThreshold, CONV_KJMOL_NM_AU_val);
+
+                applyConductorDQ<<<condAtomBlocks, 256, 0, cu->getCurrentStream()>>>(
+                    (double4*)posqArray.getDevicePointer(),
+                    (const int*)conductorIndicesDevice->getDevicePointer(),
+                    (const int*)conductorAtomCondIdsDevice->getDevicePointer(),
+                    numConductorAtoms,
+                    (const double*)conductorDQDevice->getDevicePointer(),
+                    (const int*)conductorAtomCountsDevice->getDevicePointer());
+            }
+        }
+
+        // Step 4: Final scaling based on all updated charges.
+        cudaMemsetAsync((void*)chargeSumBuffers->getDevicePointer(), 0, chargeSumBuffers->getSize()*sizeof(double), cu->getCurrentStream());
+
+        computeTargetAndNumericSums<<<particleBlocks, 256, 0, cu->getCurrentStream()>>>(
+            (const double4*)posqArray.getDevicePointer(),
+            numParticles,
+            (const int*)electrodeMaskDevice->getDevicePointer(),
+            (const int*)conductorMaskDevice->getDevicePointer(),
+            parameters.anodeZ, parameters.lCell, parameters.sheetArea,
+            cathodeVoltageKj,
+            parameters.lGap,
+            (double*)chargeSumBuffers->getDevicePointer(),
+            PI_val, CONV_KJMOL_NM_AU_val
+        );
+
+        applyScaling<<<particleBlocks, 256, 0, cu->getCurrentStream()>>>(
+            (double4*)posqArray.getDevicePointer(),
+            numParticles,
+            (const int*)electrodeMaskDevice->getDevicePointer(),
+            (const int*)conductorMaskDevice->getDevicePointer(),
+            (const double*)chargeSumBuffers->getDevicePointer(),
+            parameters.smallThreshold
+        );
+    }
+
+    return 0.0;
 }
 
-void CudaCalcElectrodeChargeKernel::copyParametersToContext(
-    ContextImpl& context, 
-    const ElectrodeChargeForce& force
-) {
+void CudaCalcElectrodeChargeKernel::initializeDeviceMemory() {
+    auto createOrResizeInt = [this](CudaArray*& array, int size, const std::string& name) {
+        if (size == 0) { delete array; array = nullptr; return; }
+        if (array == nullptr || array->getSize() != size) {
+            delete array;
+            array = CudaArray::create<int>(*cu, size, name);
+        }
+    };
+    auto createOrResizeDouble = [this](CudaArray*& array, int size, const std::string& name) {
+        if (size == 0) { delete array; array = nullptr; return; }
+        if (array == nullptr || array->getSize() != size) {
+            delete array;
+            array = CudaArray::create<double>(*cu, size, name);
+        }
+    };
+    auto createOrResizeDouble3 = [this](CudaArray*& array, int size, const std::string& name) {
+        if (size == 0) { delete array; array = nullptr; return; }
+        if (array == nullptr || array->getSize() != size) {
+            delete array;
+            array = CudaArray::create<double3>(*cu, size, name);
+        }
+    };
+
+    createOrResizeInt(cathodeIndicesDevice, parameters.cathodeIndices.size(), "cathodeIndices");
+    if(cathodeIndicesDevice) cathodeIndicesDevice->upload(parameters.cathodeIndices);
+    createOrResizeInt(anodeIndicesDevice, parameters.anodeIndices.size(), "anodeIndices");
+    if(anodeIndicesDevice) anodeIndicesDevice->upload(parameters.anodeIndices);
+
+    std::vector<int> electrodeMask(numParticles, 0);
+    for (int idx : parameters.cathodeIndices) electrodeMask[idx] = 1;
+    for (int idx : parameters.anodeIndices) electrodeMask[idx] = 2;
+    createOrResizeInt(electrodeMaskDevice, numParticles, "electrodeMask");
+    electrodeMaskDevice->upload(electrodeMask);
+
+    std::vector<int> conductorMask(numParticles, 0);
+    for (int idx : parameters.conductorIndices) if (idx >= 0 && idx < numParticles) conductorMask[idx] = 1;
+    createOrResizeInt(conductorMaskDevice, numParticles, "conductorMask");
+    conductorMaskDevice->upload(conductorMask);
+
+    createOrResizeInt(conductorIndicesDevice, parameters.conductorIndices.size(), "conductorIndices");
+    if(conductorIndicesDevice) conductorIndicesDevice->upload(parameters.conductorIndices);
+
+    createOrResizeDouble3(conductorNormalsDevice, parameters.conductorIndices.size(), "conductorNormals");
+    if(conductorNormalsDevice) {
+        std::vector<double3> normals3(parameters.conductorIndices.size());
+        for(size_t i=0; i<parameters.conductorIndices.size(); ++i) {
+            normals3[i] = make_double3(parameters.conductorNormals[3*i], parameters.conductorNormals[3*i+1], parameters.conductorNormals[3*i+2]);
+        }
+        conductorNormalsDevice->upload(normals3);
+    }
+
+    createOrResizeDouble(conductorAreasDevice, parameters.conductorAreas.size(), "conductorAreas");
+    if(conductorAreasDevice) conductorAreasDevice->upload(parameters.conductorAreas);
+
+    createOrResizeInt(conductorContactIndicesDevice, parameters.conductorContactIndices.size(), "conductorContactIndices");
+    if(conductorContactIndicesDevice) conductorContactIndicesDevice->upload(parameters.conductorContactIndices);
+
+    createOrResizeDouble3(conductorContactNormalsDevice, parameters.conductorContactIndices.size(), "conductorContactNormals");
+    if(conductorContactNormalsDevice) {
+        std::vector<double> cNormals_flat = parameters.conductorContactNormals;
+        std::vector<double3> cnormals3(parameters.conductorContactIndices.size());
+        for(size_t i=0; i<parameters.conductorContactIndices.size(); ++i) {
+            cnormals3[i] = make_double3(cNormals_flat[3*i], cNormals_flat[3*i+1], cNormals_flat[3*i+2]);
+        }
+        conductorContactNormalsDevice->upload(cnormals3);
+    }
+    
+    createOrResizeDouble(conductorGeometriesDevice, parameters.conductorGeometries.size(), "conductorGeometries");
+    if(conductorGeometriesDevice) conductorGeometriesDevice->upload(parameters.conductorGeometries);
+
+    createOrResizeInt(conductorAtomCondIdsDevice, parameters.conductorAtomCondIds.size(), "conductorAtomCondIds");
+    if(conductorAtomCondIdsDevice) conductorAtomCondIdsDevice->upload(parameters.conductorAtomCondIds);
+
+    createOrResizeInt(conductorAtomCountsDevice, parameters.conductorAtomCounts.size(), "conductorAtomCounts");
+    if(conductorAtomCountsDevice) conductorAtomCountsDevice->upload(parameters.conductorAtomCounts);
+
+    createOrResizeDouble(conductorDQDevice, parameters.conductorAtomCounts.size(), "conductorDQ");
+
+    createOrResizeDouble(chargeSumBuffers, 4, "chargeSumBuffers");
+}
+
+void CudaCalcElectrodeChargeKernel::copyParametersToContext(ContextImpl& context, const ElectrodeChargeForce& force) {
     initialize(context.getSystem(), force);
 }

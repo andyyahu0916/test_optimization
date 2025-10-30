@@ -1,0 +1,6 @@
+/home/andy/miniforge3/envs/cuda/lib/libElectrodeChargePlugin.so
+/home/andy/miniforge3/envs/cuda/include/ElectrodeChargeForce.h
+/home/andy/miniforge3/envs/cuda/include/ElectrodeChargeKernels.h
+/home/andy/miniforge3/envs/cuda/include/internal/ElectrodeChargeForceImpl.h
+/home/andy/miniforge3/envs/cuda/lib/plugins/libElectrodeChargePluginReference.so
+/home/andy/miniforge3/envs/cuda/lib/plugins/libElectrodeChargePluginCUDA.so

@@ -46,17 +46,7 @@ public:
 
     virtual void initialize(const OpenMM::System& system, const ElectrodeChargeForce& force) = 0;
 
-    virtual double execute(OpenMM::ContextImpl& context,
-                           const std::vector<OpenMM::Vec3>& positions,
-                           const std::vector<OpenMM::Vec3>& forces,
-                           const std::vector<double>& allParticleCharges,
-                           double sheetArea,
-                           double cathodeZ,
-                           double anodeZ,
-                           std::vector<double>& cathodeCharges,
-                           std::vector<double>& anodeCharges,
-                           double& cathodeTarget,
-                           double& anodeTarget) = 0;
+    virtual double execute(OpenMM::ContextImpl& context, bool includeForces, bool includeEnergy) = 0;
 
     virtual void copyParametersToContext(OpenMM::ContextImpl& context, const ElectrodeChargeForce& force) = 0;
 };

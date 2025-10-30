@@ -1,0 +1,14 @@
+adding small value to initial charges in initialize_Charge routine for small Voltage input...
+adding small value to initial charges in initialize_Charge routine for small Voltage input...
+575.2289713192041 kJ/mol
+-54883.27658288786 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 4434.232416691203 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 13707.295248618055 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 148.6988635862648 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -559.9567515204685 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -53884.3366436786 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 0.0 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -18729.209490197434 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 0.0 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
