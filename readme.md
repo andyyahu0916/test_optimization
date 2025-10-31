@@ -1,6 +1,6 @@
 # 這是個爆改我老闆code的計畫！
 
-**性能**：原始284ms → CYTHON 76ms (3.76x加速)！加Warm Start總5.15x。
+**性能**：原始284ms → CYTHON 76ms (3.76x加速)！
 
 **關鍵發現**：試了JAX/CuPy都慘敗。只有Cython+聰明算法行。教訓：了解數據流比追GPU重要！
 
@@ -15,9 +15,8 @@
 ## 🔬 亮點
 - NumPy向量化：循環變陣列，快！
 - Cython編譯：Python變C速度，更快!
-- Warm Start：聰明初始猜測，安全加速
 
-## 🚀 未來
+## 🚀 開發中
 計劃GPU插件，總35x加速！詳見Key points Markdown。
 
 **建議**：用CYTHON版本，享受加速！科學準確第一，快點總好😉
