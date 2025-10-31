@@ -65,10 +65,9 @@ class MM(MM_OPTIMIZED):
     # 🔥 CYTHON OPTIMIZED: Fixed-Voltage Poisson Solver
     # 完全遵循 OPTIMIZED 版本的算法，只在關鍵循環使用 Cython
     #************************************************
-    def Poisson_solver_fixed_voltage(self, Niterations=3, use_warmstart_this_step=False, 
-                                      verify_interval=100):
+    def Poisson_solver_fixed_voltage(self, Niterations=3):
         """
-        🔥 Cython 優化版本的 Poisson solver (with Adaptive Warm Start)
+        🔥 Cython 優化版本的 Poisson solver
         
         與 OPTIMIZED 版本算法完全一致:
         1. 提取座標，計算 analytic charges
@@ -82,28 +81,11 @@ class MM(MM_OPTIMIZED):
         - collect_electrode_charges_cython (2.3x)
         - compute_electrode_charges_cython (2.7x)
         - update_openmm_charges_batch (1.5x)
-        
-        🔥 NEW: Adaptive Warm Start optimization (1.3-1.5x additional speedup)
-        - Uses converged charges from previous MD step as initial guess
-        - Reduces number of iterations needed for convergence
-        - Does NOT affect final accuracy (same convergence criterion)
-        
-        ⚠️  SAFETY: Periodic verification mechanism
-        - Every N calls (default: 100), forces cold start to verify accuracy
-        - Can be disabled with verify_interval=0
-        - Automatically disabled on first call or large system changes
-        
+
         Parameters
         ----------
         Niterations : int
             Number of Poisson solver iterations (default: 3)
-        use_warmstart_this_step : bool
-            Whether to use warm start for THIS specific call (default: False)
-            Caller (run_openMM.py) is responsible for determining this based on
-            equilibration time, frame number, etc.
-        verify_interval : int
-            Force cold start every N calls for verification (default: 100)
-            Set to 0 to disable periodic verification
         """
         
         # if QM/MM , make sure we turn off vext_grid calculation to save time with forces... turn back on after converged
@@ -111,51 +93,19 @@ class MM(MM_OPTIMIZED):
             platform=self.simmd.context.getPlatform()
             platform.setPropertyValue( self.simmd.context , 'ReferenceVextGrid' , "false" )
 
-        # 🔥 Linus 重構: 簡化 warm-start 決策邏輯
-        # Initialize counter on first call
-        if not hasattr(self, '_warmstart_call_counter'):
-            self._warmstart_call_counter = 0
-        
-        self._warmstart_call_counter += 1
-        
-        # 🔥 CRITICAL: 只聽調用者的指令，不自作聰明
-        # run_openMM.py 負責判斷是否啟用 warm-start (基於時間、幀數等)
-        # 這個函數只檢查「調用者要求 warm-start 且上次保存的數據存在」
-        use_warmstart = (use_warmstart_this_step and 
-                        hasattr(self, '_warm_start_cathode_charges') and
-                        hasattr(self, '_warm_start_anode_charges'))
-        
-        # Periodic verification: force cold start every N calls
-        force_cold_start = False
-        if verify_interval > 0 and self._warmstart_call_counter % verify_interval == 0:
-            force_cold_start = True
-            if use_warmstart:  # Only print if we're actually overriding warm start
-                print(f"🔄 Periodic cold start verification (call #{self._warmstart_call_counter})")
-        
-        # Apply warm start or cold start
-        if use_warmstart and not force_cold_start:
-            # Warm Start: restore previous charges directly into atom objects
-            for i, atom in enumerate(self.Cathode.electrode_atoms):
-                atom.charge = self._warm_start_cathode_charges[i]
-            for i, atom in enumerate(self.Anode.electrode_atoms):
-                atom.charge = self._warm_start_anode_charges[i]
-            
-            # 🔥 NEW: Also restore Conductor charges if present
-            if self.Conductor_list and hasattr(self, '_warm_start_conductor_charges'):
-                for conductor_idx, Conductor in enumerate(self.Conductor_list):
-                    if conductor_idx < len(self._warm_start_conductor_charges):
-                        for i, atom in enumerate(Conductor.electrode_atoms):
-                            if i < len(self._warm_start_conductor_charges[conductor_idx]):
-                                atom.charge = self._warm_start_conductor_charges[conductor_idx][i]
-        # else: Cold start - will use initialize_Charge below (same as before)
+        # 🔥 OPTIMIZATION: Cache unit checking (avoids repeated hasattr in hot path)
+        if not hasattr(self, '_openmm_uses_units'):
+            state_test = self.simmd.context.getState(getPositions=True)
+            pos_test = state_test.getPositions(asNumpy=True)
+            self._openmm_uses_units = hasattr(pos_test[:, 2], '_value')
 
         #********* Analytic evaluation of total charge on electrodes based on electrolyte coordinates
         state = self.simmd.context.getState(getEnergy=False,getForces=False,getVelocities=False,getPositions=True)
-        
+
         # 🔥 CRITICAL OPTIMIZATION: Get positions as NumPy array directly (100x faster than iterating Vec3!)
         positions_np = state.getPositions(asNumpy=True)
-        # Extract values (remove units) and get z-coordinates
-        z_positions_array = positions_np[:, 2]._value if hasattr(positions_np[:, 2], '_value') else positions_np[:, 2]
+        # Extract values (remove units) - use cached check
+        z_positions_array = positions_np[:, 2]._value if self._openmm_uses_units else positions_np[:, 2]
         
         # compute charge for both anode/cathode
         self.Cathode.compute_Electrode_charge_analytic( self , z_positions_array , self.Conductor_list, z_opposite = self.Anode.z_pos )
@@ -178,16 +128,20 @@ class MM(MM_OPTIMIZED):
             
             # 🔥 CRITICAL OPTIMIZATION: Get forces as NumPy array directly (100x faster than iterating Vec3!)
             forces_np = state.getForces(asNumpy=True)
-            # Extract values (remove units) and get z-component
-            forces_z = forces_np[:, 2]._value if hasattr(forces_np[:, 2], '_value') else forces_np[:, 2]
+            # Extract values (remove units) - use cached check
+            forces_z = forces_np[:, 2]._value if self._openmm_uses_units else forces_np[:, 2]
             
             # Keep original forces object for Conductor (if needed)
             forces = state.getForces() if self.Conductor_list else None
 
             # ============ Cathode (Cython optimized) ============
-            # 🔥 Linus: 直接從 cache 讀！不要重複提取！
-            # OPTIMIZED 版本已經在 loop 外提取了，Cython 應該直接用同樣的邏輯
-            cathode_q_old = numpy.array([atom.charge for atom in self.Cathode.electrode_atoms], dtype=numpy.float64)
+            # 🔥 Use existing Cython function (2-3x faster than list comprehension)
+            if CYTHON_AVAILABLE:
+                cathode_q_old = ec_cython.collect_electrode_charges_cython(
+                    self.Cathode.electrode_atoms, self.nbondedForce
+                )
+            else:
+                cathode_q_old = numpy.array([atom.charge for atom in self.Cathode.electrode_atoms], dtype=numpy.float64)
             
             # 🔥 CYTHON OPTIMIZATION: Compute new charges (2.7x speedup)
             if CYTHON_AVAILABLE:
@@ -228,8 +182,13 @@ class MM(MM_OPTIMIZED):
                     self.nbondedForce.setParticleParameters(atom.atom_index, cathode_q_new[i], 1.0, 0.0)
             
             # ============ Anode (Cython optimized) ============
-            # 🔥 Linus: 同上，直接讀 atom.charge，不繞路！
-            anode_q_old = numpy.array([atom.charge for atom in self.Anode.electrode_atoms], dtype=numpy.float64)
+            # 🔥 Use existing Cython function (2-3x faster than list comprehension)
+            if CYTHON_AVAILABLE:
+                anode_q_old = ec_cython.collect_electrode_charges_cython(
+                    self.Anode.electrode_atoms, self.nbondedForce
+                )
+            else:
+                anode_q_old = numpy.array([atom.charge for atom in self.Anode.electrode_atoms], dtype=numpy.float64)
             
             # 🔥 CYTHON OPTIMIZATION: Compute new charges
             if CYTHON_AVAILABLE:
@@ -301,20 +260,6 @@ class MM(MM_OPTIMIZED):
         #     With freq_charge_update_fs=200, this means 100 lines per trajectory output
         #     If print overhead is a concern, comment out the next line
         self.Scale_charges_analytic_general( print_flag = True )
-
-        # 🔥 Linus 重構: 只在調用者要求時才保存 (不再自作聰明)
-        # 保存收斂的電荷，供下次 warm-start 使用
-        # 這是標準的 continuation method - 使用收斂解作為下次的初始猜測
-        if use_warmstart_this_step:  # 只有當調用者要求使用時，才費力保存
-            self._warm_start_cathode_charges = numpy.array([atom.charge for atom in self.Cathode.electrode_atoms])
-            self._warm_start_anode_charges = numpy.array([atom.charge for atom in self.Anode.electrode_atoms])
-            
-            # 🔥 NEW: Also save Conductor charges to maintain consistency
-            if self.Conductor_list:
-                self._warm_start_conductor_charges = [
-                    numpy.array([atom.charge for atom in Conductor.electrode_atoms])
-                    for Conductor in self.Conductor_list
-                ]
 
         # if QM/MM , turn vext back on ...
         if self.QMMM :

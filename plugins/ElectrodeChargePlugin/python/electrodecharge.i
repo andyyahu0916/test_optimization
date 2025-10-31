@@ -54,6 +54,10 @@ public:
     void setAnodeZ(double z);
     bool usesPeriodicBoundaryConditions() const;
 
+    // Inherit Force base class methods
+    void setForceGroup(int group);
+    int getForceGroup() const;
+
     // Conductor data setters
     // Good taste: geometry factor already encodes conductor type (Buckyball: dr², Nanotube: dr×L/2)
     void setConductorData(const std::vector<int>& indices,

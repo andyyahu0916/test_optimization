@@ -10571,6 +10571,74 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_ElectrodeChargeForce_setForceGroup(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ElectrodeChargePlugin::ElectrodeChargeForce *arg1 = 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ElectrodeChargeForce_setForceGroup", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ElectrodeChargePlugin__ElectrodeChargeForce, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ElectrodeChargeForce_setForceGroup" "', argument " "1"" of type '" "ElectrodeChargePlugin::ElectrodeChargeForce *""'"); 
+  }
+  arg1 = reinterpret_cast< ElectrodeChargePlugin::ElectrodeChargeForce * >(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ElectrodeChargeForce_setForceGroup" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  {
+    try {
+      (arg1)->setForceGroup(arg2);
+    } catch (const std::exception& e) {
+      PyErr_SetString(PyExc_Exception, e.what());
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ElectrodeChargeForce_getForceGroup(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ElectrodeChargePlugin::ElectrodeChargeForce *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ElectrodeChargePlugin__ElectrodeChargeForce, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ElectrodeChargeForce_getForceGroup" "', argument " "1"" of type '" "ElectrodeChargePlugin::ElectrodeChargeForce const *""'"); 
+  }
+  arg1 = reinterpret_cast< ElectrodeChargePlugin::ElectrodeChargeForce * >(argp1);
+  {
+    try {
+      result = (int)((ElectrodeChargePlugin::ElectrodeChargeForce const *)arg1)->getForceGroup();
+    } catch (const std::exception& e) {
+      PyErr_SetString(PyExc_Exception, e.what());
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_ElectrodeChargeForce_setConductorData(PyObject *self, PyObject *args) {
   PyObject *resultobj = 0;
   ElectrodeChargePlugin::ElectrodeChargeForce *arg1 = 0 ;
@@ -10863,6 +10931,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "ElectrodeChargeForce_setCathodeZ", _wrap_ElectrodeChargeForce_setCathodeZ, METH_VARARGS, NULL},
 	 { "ElectrodeChargeForce_setAnodeZ", _wrap_ElectrodeChargeForce_setAnodeZ, METH_VARARGS, NULL},
 	 { "ElectrodeChargeForce_usesPeriodicBoundaryConditions", _wrap_ElectrodeChargeForce_usesPeriodicBoundaryConditions, METH_O, NULL},
+	 { "ElectrodeChargeForce_setForceGroup", _wrap_ElectrodeChargeForce_setForceGroup, METH_VARARGS, NULL},
+	 { "ElectrodeChargeForce_getForceGroup", _wrap_ElectrodeChargeForce_getForceGroup, METH_O, NULL},
 	 { "ElectrodeChargeForce_setConductorData", _wrap_ElectrodeChargeForce_setConductorData, METH_VARARGS, NULL},
 	 { "delete_ElectrodeChargeForce", _wrap_delete_ElectrodeChargeForce, METH_O, NULL},
 	 { "ElectrodeChargeForce_swigregister", ElectrodeChargeForce_swigregister, METH_O, NULL},

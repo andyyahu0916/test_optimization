@@ -375,6 +375,12 @@ class ElectrodeChargeForce(Force):
     def usesPeriodicBoundaryConditions(self):
         return _electrodecharge.ElectrodeChargeForce_usesPeriodicBoundaryConditions(self)
 
+    def setForceGroup(self, group):
+        return _electrodecharge.ElectrodeChargeForce_setForceGroup(self, group)
+
+    def getForceGroup(self):
+        return _electrodecharge.ElectrodeChargeForce_getForceGroup(self)
+
     def setConductorData(self, indices, normals, areas, contactIndices, contactNormals, geometries, atomCondIds, atomCountsPerConductor):
         return _electrodecharge.ElectrodeChargeForce_setConductorData(self, indices, normals, areas, contactIndices, contactNormals, geometries, atomCondIds, atomCountsPerConductor)
     __swig_destroy__ = _electrodecharge.delete_ElectrodeChargeForce
