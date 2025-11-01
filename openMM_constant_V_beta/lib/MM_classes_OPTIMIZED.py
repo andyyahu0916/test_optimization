@@ -404,6 +404,35 @@ class MM(object):
             #print(' property value '  , platform.getPropertyValue( self.simmd.context , 'ReferenceVextGrid') )
             platform.setPropertyValue( self.simmd.context , 'ReferenceVextGrid' , "false" )
 
+        # 🔥 **【P0a - BUG修復 #1】** 🔥
+        # 刷新電解質電荷緩存！這修復了可極化力場中的能量爆炸BUG
+        #
+        # ⚠️  在可極化力場中，Drude振子的電荷會動態變化
+        # ⚠️  我們必須在每次Poisson solver調用時重新讀取電荷
+        #
+        # 這個方案的優勢：
+        # 1. ✅ 修復BUG：緩存永遠是即時的，能量爆炸消失
+        # 2. ✅ 保留性能：仍然可以使用快速的NumPy向量化操作
+        # 3. ✅ 最小代價：只在Poisson solver開始時刷新一次
+        if self.polarization:
+            self._cache_electrolyte_charges()
+
+        # 🔥 **【P0b - BUG修復 #2】** 🔥
+        # 刷新導體電荷緩存！這修復了Q_analytic使用過時導體電荷的BUG
+        #
+        # ⚠️  問題：compute_Electrode_charge_analytic 在迭代開始時被調用
+        # ⚠️  此時使用的是「上一個MD步驟」的導體電荷（過時！）
+        #
+        # 解決方案：在計算 Q_analytic 之前，立即從 Python objects 刷新緩存
+        # 這確保 Q_analytic 基於「即時」的導體電荷
+        if self.Conductor_list and hasattr(self, '_conductor_charges') and self._conductor_charges is not None:
+            # 直接從 Python objects 讀取（快速且即時）
+            idx = 0
+            for Conductor in self.Conductor_list:
+                for atom in Conductor.electrode_atoms:
+                    self._conductor_charges[idx] = atom.charge
+                    idx += 1
+
         #********* Analytic evaluation of total charge on electrodes based on electrolyte coordinates
         state = self.simmd.context.getState(getEnergy=False,getForces=False,getVelocities=False,getPositions=True)
         
@@ -676,48 +705,34 @@ class MM(object):
     # however if we have additional conductors (Buckyballs, nanotubes) at
     # the electrodes, then becomes more complicated ...
     #******************************************
+    #************************************************
+    # 🔥 P3 FIXED: Scale_charges_analytic_general
+    #
+    # ⚠️  P8 錯誤邏輯已移除！
+    #
+    # 正確的物理：每個導體（陰極、陽極、Buckyball、Nanotube）
+    # 都必須**獨立**滿足自己的 Green's reciprocity 正規化條件
+    #************************************************
     def Scale_charges_analytic_general(self , print_flag = False ):
+        """
+        🔥 P3 修復：統一邏輯，不再有 if/else 分裂
 
-        #NOTE:  NEED to Generalize.  Currently, assume Conductors are on Cathode if they are present
+        每個導體都獨立正規化：
+        1. Cathode.Scale_charges_analytic()
+        2. Anode.Scale_charges_analytic()
+        3. For each Conductor: Conductor.Scale_charges_analytic()
 
+        這確保每個導體都滿足自己的邊界條件！
+        """
+
+        # 1. 獨立正規化平坦電極
+        self.Cathode.Scale_charges_analytic( self , print_flag )
+        self.Anode.Scale_charges_analytic( self , print_flag )
+
+        # 2. 獨立正規化每一個學長的導體（Buckyball、Nanotube等）
         if self.Conductor_list:
-           # assume anode is scaled normally...
-           self.Anode.Scale_charges_analytic( self , print_flag )
-           # get analytic correction from anode
-           Q_analytic = -1.0 * self.Anode.Q_analytic
-            
-           # add up total charge on Cathode and all conductors
-           Q_numeric_total = self.Cathode.get_total_charge() 
-
-           # loop over Conductors ...
-           for Conductor in self.Conductor_list:
-               # add charges from 'virtual' atoms
-               Q_numeric_total += Conductor.get_total_charge()
-           
-           if print_flag :
-               print( "Q_numeric , Q_analytic charges on Cathode and extra conductors" , Q_numeric_total , Q_analytic )
-
-           # scale factor, make sure not to divide by zero on rare occasions ...
-           scale_factor = -1
-           if abs(Q_numeric_total) > self.small_threshold:
-               scale_factor = Q_analytic / Q_numeric_total
-
-           # now scale all charges on Cathode and conductors
-           if scale_factor > 0.0:
-               # loop over atoms in Cathode
-               for atom in self.Cathode.electrode_atoms:
-                   atom.charge = atom.charge * scale_factor
-                   self.nbondedForce.setParticleParameters(atom.atom_index, atom.charge, 1.0 , 0.0)
-               # loop over Conductors
-               for Conductor in self.Conductor_list:
-                   for atom in Conductor.electrode_atoms:
-                       atom.charge = atom.charge * scale_factor
-                       self.nbondedForce.setParticleParameters(atom.atom_index, atom.charge, 1.0 , 0.0)
-
-        else:
-            # no extra conductors, scale each electrode to individual Analytic normalization....
-            self.Cathode.Scale_charges_analytic( self , print_flag )
-            self.Anode.Scale_charges_analytic( self , print_flag )
+            for Conductor in self.Conductor_list:
+                Conductor.Scale_charges_analytic( self , print_flag )
 
 
 

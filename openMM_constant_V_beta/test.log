@@ -1,0 +1,1808 @@
+⚡ Attempting to use Cython version...
+✅ Cython module loaded successfully!
+✓ Cython version loaded successfully
+
+============================================================
+Creating MM system
+============================================================
+🔥 Using Cython-accelerated Poisson solver
+Creating Interaction Groups for CustomNonBonded.  These interactions will be computed between water-other, not water-water.
+Creating Exclusions for TFSI
+909.0462679343832 kJ/mol
+-126512.23676882219 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11465.235590748001 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 428.40808350003135 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -11134.159584501696 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -119833.17237152811 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 0.0 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -36249.91898219945 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 405.19990209984826 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28406.170602057562 kJ/mol
+
+============================================================
+Starting Constant_V simulation
+Time: 20.0 ns
+============================================================
+
+0 iteration
+909.0462592895035 kJ/mol
+-126512.23689347692 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11465.235590748001 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 428.40808350003135 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -11134.159584501696 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -119833.17242418975 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 0.0 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -36249.91898219945 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 405.19990209984826 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28406.170602057562 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 0.763441875671575 0.7634418756715761
+Q_numeric , Q_analytic charges on  anode -0.7754418756715183 -0.7754418756715197
+Q_numeric , Q_analytic charges on  cathode 1.1476696014254772 1.1476696014254784
+Q_numeric , Q_analytic charges on  anode -1.15966960142545 -1.1596696014254504
+Q_numeric , Q_analytic charges on  cathode 1.3545779509797888 1.3545779509797895
+Q_numeric , Q_analytic charges on  anode -1.366577950979736 -1.3665779509797331
+Q_numeric , Q_analytic charges on  cathode 1.4693440388342536 1.4693440388342522
+Q_numeric , Q_analytic charges on  anode -1.481344038834224 -1.4813440388342243
+Q_numeric , Q_analytic charges on  cathode 1.5703968234399093 1.5703968234399084
+Q_numeric , Q_analytic charges on  anode -1.5823968234399086 -1.5823968234399088
+Q_numeric , Q_analytic charges on  cathode 1.682306209239456 1.6823062092394578
+Q_numeric , Q_analytic charges on  anode -1.6943062092394316 -1.6943062092394299
+Q_numeric , Q_analytic charges on  cathode 1.7741863868467829 1.7741863868467802
+Q_numeric , Q_analytic charges on  anode -1.786186386846751 -1.7861863868467522
+Q_numeric , Q_analytic charges on  cathode 1.7872293901062208 1.7872293901062206
+Q_numeric , Q_analytic charges on  anode -1.7992293901061387 -1.7992293901061358
+Q_numeric , Q_analytic charges on  cathode 1.7581142732297705 1.7581142732297663
+Q_numeric , Q_analytic charges on  anode -1.770114273229708 -1.77011427322971
+Q_numeric , Q_analytic charges on  cathode 1.7535987278067908 1.7535987278067906
+Q_numeric , Q_analytic charges on  anode -1.7655987278067642 -1.7655987278067626
+Q_numeric , Q_analytic charges on  cathode 1.7990424960488147 1.799042496048814
+Q_numeric , Q_analytic charges on  anode -1.8110424960487288 -1.8110424960487292
+Q_numeric , Q_analytic charges on  cathode 1.7757878496734234 1.775787849673422
+Q_numeric , Q_analytic charges on  anode -1.7877878496733661 -1.7877878496733657
+Q_numeric , Q_analytic charges on  cathode 1.8118810760975785 1.811881076097579
+Q_numeric , Q_analytic charges on  anode -1.8238810760975517 -1.823881076097551
+Q_numeric , Q_analytic charges on  cathode 1.8666266186200338 1.866626618620033
+Q_numeric , Q_analytic charges on  anode -1.8786266186200042 -1.8786266186200051
+Q_numeric , Q_analytic charges on  cathode 1.8874099753063704 1.8874099753063702
+Q_numeric , Q_analytic charges on  anode -1.8994099753063964 -1.899409975306399
+Q_numeric , Q_analytic charges on  cathode 1.9094838226412643 1.9094838226412647
+Q_numeric , Q_analytic charges on  anode -1.9214838226412332 -1.9214838226412367
+Q_numeric , Q_analytic charges on  cathode 1.9486670138846753 1.9486670138846747
+Q_numeric , Q_analytic charges on  anode -1.9606670138846756 -1.9606670138846751
+Q_numeric , Q_analytic charges on  cathode 1.9461359776003233 1.946135977600322
+Q_numeric , Q_analytic charges on  anode -1.9581359776003222 -1.9581359776003224
+Q_numeric , Q_analytic charges on  cathode 1.9519113923673972 1.951911392367394
+Q_numeric , Q_analytic charges on  anode -1.9639113923673932 -1.9639113923673945
+Q_numeric , Q_analytic charges on  cathode 2.024899229519276 2.024899229519279
+Q_numeric , Q_analytic charges on  anode -2.0368992295192516 -2.036899229519251
+Q_numeric , Q_analytic charges on  cathode 1.9208697367251815 1.9208697367251815
+Q_numeric , Q_analytic charges on  anode -1.9328697367251526 -1.9328697367251535
+Q_numeric , Q_analytic charges on  cathode 1.9011893450684079 1.901189345068404
+Q_numeric , Q_analytic charges on  anode -1.9131893450683506 -1.9131893450683477
+Q_numeric , Q_analytic charges on  cathode 1.9244578686363683 1.924457868636368
+Q_numeric , Q_analytic charges on  anode -1.936457868636312 -1.9364578686363116
+Q_numeric , Q_analytic charges on  cathode 1.9130013877148888 1.9130013877148868
+Q_numeric , Q_analytic charges on  anode -1.9250013877148326 -1.9250013877148304
+Q_numeric , Q_analytic charges on  cathode 1.884782999845002 1.8847829998450023
+Q_numeric , Q_analytic charges on  anode -1.8967829998450614 -1.8967829998450596
+Q_numeric , Q_analytic charges on  cathode 1.9392919602413088 1.9392919602413072
+Q_numeric , Q_analytic charges on  anode -1.951291960241248 -1.9512919602412508
+Q_numeric , Q_analytic charges on  cathode 1.8703828228169226 1.8703828228169228
+Q_numeric , Q_analytic charges on  anode -1.882382822816921 -1.8823828228169233
+Q_numeric , Q_analytic charges on  cathode 1.9023066860733158 1.902306686073318
+Q_numeric , Q_analytic charges on  anode -1.9143066860733167 -1.9143066860733184
+Q_numeric , Q_analytic charges on  cathode 1.9392801303418579 1.9392801303418579
+Q_numeric , Q_analytic charges on  anode -1.9512801303417966 -1.9512801303418015
+Q_numeric , Q_analytic charges on  cathode 2.02678120713854 2.026781207138542
+Q_numeric , Q_analytic charges on  anode -2.038781207138487 -2.0387812071384857
+Q_numeric , Q_analytic charges on  cathode 2.042223249933318 2.042223249933316
+Q_numeric , Q_analytic charges on  anode -2.054223249933261 -2.0542232499332598
+Q_numeric , Q_analytic charges on  cathode 2.0621625784270803 2.062162578427079
+Q_numeric , Q_analytic charges on  anode -2.074162578427025 -2.0741625784270226
+Q_numeric , Q_analytic charges on  cathode 2.0466909061553196 2.046690906155321
+Q_numeric , Q_analytic charges on  anode -2.0586909061552943 -2.058690906155293
+Q_numeric , Q_analytic charges on  cathode 2.0540981237940223 2.0540981237940215
+Q_numeric , Q_analytic charges on  anode -2.0660981237939953 -2.0660981237939935
+Q_numeric , Q_analytic charges on  cathode 2.0080167368851276 2.0080167368851263
+Q_numeric , Q_analytic charges on  anode -2.020016736885099 -2.0200167368850983
+Q_numeric , Q_analytic charges on  cathode 2.06845760143183 2.0684576014318323
+Q_numeric , Q_analytic charges on  anode -2.0804576014318044 -2.0804576014318044
+Q_numeric , Q_analytic charges on  cathode 2.1146496305854483 2.1146496305854483
+Q_numeric , Q_analytic charges on  anode -2.1266496305854474 -2.1266496305854488
+Q_numeric , Q_analytic charges on  cathode 2.1412634757837625 2.1412634757837608
+Q_numeric , Q_analytic charges on  anode -2.1532634757837017 -2.1532634757837044
+Q_numeric , Q_analytic charges on  cathode 2.088820956326641 2.088820956326644
+Q_numeric , Q_analytic charges on  anode -2.100820956326587 -2.100820956326588
+Q_numeric , Q_analytic charges on  cathode 2.125863613857962 2.1258636138579603
+Q_numeric , Q_analytic charges on  anode -2.137863613857877 -2.1378636138578755
+Q_numeric , Q_analytic charges on  cathode 2.214934707206524 2.2149347072065253
+Q_numeric , Q_analytic charges on  anode -2.226934707206468 -2.226934707206469
+Q_numeric , Q_analytic charges on  cathode 2.186421810428229 2.18642181042823
+Q_numeric , Q_analytic charges on  anode -2.198421810428173 -2.1984218104281736
+Q_numeric , Q_analytic charges on  cathode 2.238426621973463 2.238426621973461
+Q_numeric , Q_analytic charges on  anode -2.250426621973408 -2.250426621973405
+Q_numeric , Q_analytic charges on  cathode 2.228862273145428 2.2288622731454253
+Q_numeric , Q_analytic charges on  anode -2.2408622731453733 -2.240862273145369
+Q_numeric , Q_analytic charges on  cathode 2.209932345833535 2.2099323458335376
+Q_numeric , Q_analytic charges on  anode -2.221932345833512 -2.2219323458335096
+Q_numeric , Q_analytic charges on  cathode 2.213401608297502 2.2134016082975037
+Q_numeric , Q_analytic charges on  anode -2.2254016082974757 -2.2254016082974757
+Q_numeric , Q_analytic charges on  cathode 2.2424981580277477 2.2424981580277445
+Q_numeric , Q_analytic charges on  anode -2.254498158027691 -2.254498158027688
+Q_numeric , Q_analytic charges on  cathode 2.2920976360565657 2.292097636056569
+Q_numeric , Q_analytic charges on  anode -2.30409763605657 -2.3040976360565693
+Q_numeric , Q_analytic charges on  cathode 2.2864782048036623 2.2864782048036587
+Q_numeric , Q_analytic charges on  anode -2.2984782048036596 -2.298478204803659
+Q_numeric , Q_analytic charges on  cathode 2.2269250174138775 2.2269250174138775
+Q_numeric , Q_analytic charges on  anode -2.238925017413845 -2.2389250174138495
+1 iteration
+52453.76305259777 kJ/mol
+-131981.11932704877 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11725.723321132908 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 426.3882439608883 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -11197.871346425567 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -134832.2443050621 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 8988.316363663238 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -36398.736523821 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 505.2490677538881 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28802.05571044343 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 2.2039219855660006 2.2039219855659993
+Q_numeric , Q_analytic charges on  anode -2.2159219855659145 -2.2159219855659145
+Q_numeric , Q_analytic charges on  cathode 2.2175817373249482 2.21758173732495
+Q_numeric , Q_analytic charges on  anode -2.229581737324924 -2.229581737324922
+Q_numeric , Q_analytic charges on  cathode 2.219186600327582 2.219186600327576
+Q_numeric , Q_analytic charges on  anode -2.231186600327547 -2.2311866003275482
+Q_numeric , Q_analytic charges on  cathode 2.1869084585544125 2.1869084585544143
+Q_numeric , Q_analytic charges on  anode -2.198908458554358 -2.198908458554358
+Q_numeric , Q_analytic charges on  cathode 2.222750045297164 2.2227500452971625
+Q_numeric , Q_analytic charges on  anode -2.2347500452970768 -2.2347500452970777
+Q_numeric , Q_analytic charges on  cathode 2.2496618223543305 2.249661822354328
+Q_numeric , Q_analytic charges on  anode -2.2616618223543035 -2.2616618223543
+Q_numeric , Q_analytic charges on  cathode 2.2950851621744346 2.295085162174432
+Q_numeric , Q_analytic charges on  anode -2.307085162174317 -2.3070851621743187
+Q_numeric , Q_analytic charges on  cathode 2.2360361429035316 2.2360361429035307
+Q_numeric , Q_analytic charges on  anode -2.2480361429035316 -2.248036142903531
+Q_numeric , Q_analytic charges on  cathode 2.311795901023671 2.311795901023673
+Q_numeric , Q_analytic charges on  anode -2.323795901023701 -2.323795901023702
+Q_numeric , Q_analytic charges on  cathode 2.249790593446038 2.2497905934460376
+Q_numeric , Q_analytic charges on  anode -2.261790593445953 -2.261790593445953
+Q_numeric , Q_analytic charges on  cathode 2.2846409100909746 2.2846409100909724
+Q_numeric , Q_analytic charges on  anode -2.296640910090946 -2.2966409100909444
+Q_numeric , Q_analytic charges on  cathode 2.2618033610911144 2.2618033610911126
+Q_numeric , Q_analytic charges on  anode -2.2738033610910873 -2.2738033610910846
+Q_numeric , Q_analytic charges on  cathode 2.266163734805351 2.2661637348053474
+Q_numeric , Q_analytic charges on  anode -2.27816373480532 -2.2781637348053194
+Q_numeric , Q_analytic charges on  cathode 2.2600473534906333 2.2600473534906356
+Q_numeric , Q_analytic charges on  anode -2.2720473534906347 -2.272047353490636
+Q_numeric , Q_analytic charges on  cathode 2.1942369751100044 2.194236975110003
+Q_numeric , Q_analytic charges on  anode -2.2062369751099467 -2.2062369751099467
+Q_numeric , Q_analytic charges on  cathode 2.2056371492464724 2.205637149246472
+Q_numeric , Q_analytic charges on  anode -2.217637149246414 -2.2176371492464155
+Q_numeric , Q_analytic charges on  cathode 2.25837295456124 2.25837295456124
+Q_numeric , Q_analytic charges on  anode -2.2703729545611537 -2.270372954561155
+Q_numeric , Q_analytic charges on  cathode 2.2271286912286037 2.2271286912286015
+Q_numeric , Q_analytic charges on  anode -2.2391286912286317 -2.2391286912286303
+Q_numeric , Q_analytic charges on  cathode 2.1855205077740307 2.1855205077740307
+Q_numeric , Q_analytic charges on  anode -2.1975205077739726 -2.1975205077739743
+Q_numeric , Q_analytic charges on  cathode 2.2408065887048156 2.240806588704815
+Q_numeric , Q_analytic charges on  anode -2.252806588704785 -2.2528065887047872
+Q_numeric , Q_analytic charges on  cathode 2.249451730884195 2.2494517308841906
+Q_numeric , Q_analytic charges on  anode -2.261451730884191 -2.261451730884191
+Q_numeric , Q_analytic charges on  cathode 2.2823030221585614 2.2823030221585596
+Q_numeric , Q_analytic charges on  anode -2.2943030221585015 -2.2943030221585032
+Q_numeric , Q_analytic charges on  cathode 2.2910430498012526 2.2910430498012473
+Q_numeric , Q_analytic charges on  anode -2.303043049801216 -2.3030430498012193
+Q_numeric , Q_analytic charges on  cathode 2.2720847800138833 2.2720847800138855
+Q_numeric , Q_analytic charges on  anode -2.284084780013829 -2.284084780013829
+Q_numeric , Q_analytic charges on  cathode 2.2702157968049828 2.2702157968049774
+Q_numeric , Q_analytic charges on  anode -2.282215796804948 -2.2822157968049495
+Q_numeric , Q_analytic charges on  cathode 2.2718993540653547 2.2718993540653556
+Q_numeric , Q_analytic charges on  anode -2.2838993540653245 -2.2838993540653276
+Q_numeric , Q_analytic charges on  cathode 2.366088954484395 2.366088954484398
+Q_numeric , Q_analytic charges on  anode -2.3780889544844026 -2.3780889544843986
+Q_numeric , Q_analytic charges on  cathode 2.388601846569334 2.388601846569331
+Q_numeric , Q_analytic charges on  anode -2.4006018465692756 -2.4006018465692747
+Q_numeric , Q_analytic charges on  cathode 2.3948439827980645 2.3948439827980663
+Q_numeric , Q_analytic charges on  anode -2.406843982798067 -2.4068439827980668
+Q_numeric , Q_analytic charges on  cathode 2.4316150846913898 2.4316150846913884
+Q_numeric , Q_analytic charges on  anode -2.443615084691364 -2.4436150846913605
+Q_numeric , Q_analytic charges on  cathode 2.3986156625025705 2.3986156625025656
+Q_numeric , Q_analytic charges on  anode -2.4106156625025124 -2.4106156625025092
+Q_numeric , Q_analytic charges on  cathode 2.3070584651658956 2.307058465165896
+Q_numeric , Q_analytic charges on  anode -2.319058465165898 -2.3190584651658965
+Q_numeric , Q_analytic charges on  cathode 2.304864565256495 2.3048645652564956
+Q_numeric , Q_analytic charges on  anode -2.3168645652564672 -2.3168645652564677
+Q_numeric , Q_analytic charges on  cathode 2.316906717297816 2.316906717297813
+Q_numeric , Q_analytic charges on  anode -2.3289067172977593 -2.3289067172977567
+Q_numeric , Q_analytic charges on  cathode 2.350488547327064 2.350488547327062
+Q_numeric , Q_analytic charges on  anode -2.3624885473270285 -2.362488547327034
+Q_numeric , Q_analytic charges on  cathode 2.3264962790403985 2.3264962790404
+Q_numeric , Q_analytic charges on  anode -2.338496279040344 -2.3384962790403434
+Q_numeric , Q_analytic charges on  cathode 2.332943642934068 2.33294364293407
+Q_numeric , Q_analytic charges on  anode -2.3449436429340444 -2.3449436429340422
+Q_numeric , Q_analytic charges on  cathode 2.3367627697304423 2.3367627697304427
+Q_numeric , Q_analytic charges on  anode -2.348762769730414 -2.3487627697304148
+Q_numeric , Q_analytic charges on  cathode 2.368641745060575 2.368641745060573
+Q_numeric , Q_analytic charges on  anode -2.3806417450605477 -2.380641745060545
+Q_numeric , Q_analytic charges on  cathode 2.4296056425751362 2.4296056425751416
+Q_numeric , Q_analytic charges on  anode -2.441605642575055 -2.4416056425750567
+Q_numeric , Q_analytic charges on  cathode 2.4884959507751154 2.488495950775119
+Q_numeric , Q_analytic charges on  anode -2.500495950775087 -2.500495950775091
+Q_numeric , Q_analytic charges on  cathode 2.5082439522517315 2.5082439522517332
+Q_numeric , Q_analytic charges on  anode -2.5202439522516764 -2.520243952251677
+Q_numeric , Q_analytic charges on  cathode 2.467844708113503 2.4678447081135046
+Q_numeric , Q_analytic charges on  anode -2.479844708113507 -2.479844708113505
+Q_numeric , Q_analytic charges on  cathode 2.46917223372189 2.4691722337218933
+Q_numeric , Q_analytic charges on  anode -2.481172233721863 -2.4811722337218654
+Q_numeric , Q_analytic charges on  cathode 2.4439134043747344 2.4439134043747273
+Q_numeric , Q_analytic charges on  anode -2.4559134043746953 -2.4559134043746993
+Q_numeric , Q_analytic charges on  cathode 2.4683169732666492 2.468316973266654
+Q_numeric , Q_analytic charges on  anode -2.480316973266658 -2.4803169732666546
+Q_numeric , Q_analytic charges on  cathode 2.4376796598856325 2.437679659885633
+Q_numeric , Q_analytic charges on  anode -2.4496796598856054 -2.449679659885605
+Q_numeric , Q_analytic charges on  cathode 2.445492214976088 2.445492214976086
+Q_numeric , Q_analytic charges on  anode -2.4574922149760554 -2.457492214976058
+Q_numeric , Q_analytic charges on  cathode 2.4988004001046593 2.4988004001046575
+Q_numeric , Q_analytic charges on  anode -2.5108004001046558 -2.510800400104658
+Q_numeric , Q_analytic charges on  cathode 2.447378977285942 2.4473789772859376
+Q_numeric , Q_analytic charges on  anode -2.4593789772859673 -2.4593789772859664
+2 iteration
+51975.83518114475 kJ/mol
+-132227.8190488671 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11246.03879209175 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 427.6013542189686 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -10764.51470562086 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -135042.79605959775 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9010.215403969632 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -35989.59306583932 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 444.91921948979143 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28440.310166212155 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 2.4711323844340005 2.4711323844340014
+Q_numeric , Q_analytic charges on  anode -2.4831323844339703 -2.4831323844339734
+Q_numeric , Q_analytic charges on  cathode 2.4824434957463573 2.4824434957463537
+Q_numeric , Q_analytic charges on  anode -2.49444349574636 -2.494443495746354
+Q_numeric , Q_analytic charges on  cathode 2.469725927332452 2.469725927332449
+Q_numeric , Q_analytic charges on  anode -2.4817259273323664 -2.481725927332364
+Q_numeric , Q_analytic charges on  cathode 2.515687105029522 2.5156871050295293
+Q_numeric , Q_analytic charges on  anode -2.5276871050295027 -2.5276871050295013
+Q_numeric , Q_analytic charges on  cathode 2.542482419099078 2.5424824190990747
+Q_numeric , Q_analytic charges on  anode -2.5544824190989943 -2.55448241909899
+Q_numeric , Q_analytic charges on  cathode 2.5097472766458537 2.509747276645855
+Q_numeric , Q_analytic charges on  anode -2.5217472766457405 -2.521747276645742
+Q_numeric , Q_analytic charges on  cathode 2.4658119038272894 2.4658119038272885
+Q_numeric , Q_analytic charges on  anode -2.4778119038272632 -2.4778119038272606
+Q_numeric , Q_analytic charges on  cathode 2.4747424761003347 2.474742476100333
+Q_numeric , Q_analytic charges on  anode -2.486742476100302 -2.486742476100305
+Q_numeric , Q_analytic charges on  cathode 2.526816200926713 2.5268162009267185
+Q_numeric , Q_analytic charges on  anode -2.5388162009266315 -2.5388162009266337
+Q_numeric , Q_analytic charges on  cathode 2.536702994769102 2.536702994769102
+Q_numeric , Q_analytic charges on  anode -2.5487029947691315 -2.548702994769131
+Q_numeric , Q_analytic charges on  cathode 2.5171011647955353 2.5171011647955353
+Q_numeric , Q_analytic charges on  anode -2.529101164795479 -2.529101164795479
+Q_numeric , Q_analytic charges on  cathode 2.4912151721157056 2.491215172115703
+Q_numeric , Q_analytic charges on  anode -2.5032151721156746 -2.503215172115675
+Q_numeric , Q_analytic charges on  cathode 2.491365923457111 2.4913659234571113
+Q_numeric , Q_analytic charges on  anode -2.503365923457104 -2.5033659234571117
+Q_numeric , Q_analytic charges on  cathode 2.521961333426745 2.5219613334267463
+Q_numeric , Q_analytic charges on  anode -2.5339613334267197 -2.5339613334267184
+Q_numeric , Q_analytic charges on  cathode 2.4804796226459165 2.4804796226459174
+Q_numeric , Q_analytic charges on  anode -2.492479622645835 -2.4924796226458326
+Q_numeric , Q_analytic charges on  cathode 2.518820404946199 2.5188204049461986
+Q_numeric , Q_analytic charges on  anode -2.5308204049461733 -2.5308204049461707
+Q_numeric , Q_analytic charges on  cathode 2.5290709713628843 2.5290709713628856
+Q_numeric , Q_analytic charges on  anode -2.5410709713628243 -2.5410709713628292
+Q_numeric , Q_analytic charges on  cathode 2.56197989309787 2.5619798930978717
+Q_numeric , Q_analytic charges on  anode -2.573979893097815 -2.5739798930978153
+Q_numeric , Q_analytic charges on  cathode 2.5028371784146835 2.5028371784146812
+Q_numeric , Q_analytic charges on  anode -2.514837178414599 -2.5148371784145964
+Q_numeric , Q_analytic charges on  cathode 2.506610814136724 2.5066108141367223
+Q_numeric , Q_analytic charges on  anode -2.518610814136726 -2.5186108141367227
+Q_numeric , Q_analytic charges on  cathode 2.455679028081407 2.455679028081407
+Q_numeric , Q_analytic charges on  anode -2.467679028081354 -2.4676790280813505
+Q_numeric , Q_analytic charges on  cathode 2.4565045164807042 2.4565045164807073
+Q_numeric , Q_analytic charges on  anode -2.468504516480652 -2.468504516480651
+Q_numeric , Q_analytic charges on  cathode 2.5283017466033058 2.5283017466033058
+Q_numeric , Q_analytic charges on  anode -2.54030174660325 -2.5403017466032494
+Q_numeric , Q_analytic charges on  cathode 2.541238645094366 2.5412386450943685
+Q_numeric , Q_analytic charges on  anode -2.5532386450943094 -2.553238645094312
+Q_numeric , Q_analytic charges on  cathode 2.512421067533081 2.5124210675330843
+Q_numeric , Q_analytic charges on  anode -2.5244210675330283 -2.524421067533028
+Q_numeric , Q_analytic charges on  cathode 2.5266160337054258 2.5266160337054244
+Q_numeric , Q_analytic charges on  anode -2.5386160337053636 -2.538616033705368
+Q_numeric , Q_analytic charges on  cathode 2.551642090618302 2.551642090618303
+Q_numeric , Q_analytic charges on  anode -2.5636420906183313 -2.5636420906183317
+Q_numeric , Q_analytic charges on  cathode 2.4755686245136834 2.4755686245136856
+Q_numeric , Q_analytic charges on  anode -2.4875686245137203 -2.4875686245137145
+Q_numeric , Q_analytic charges on  cathode 2.4510797292379185 2.4510797292379194
+Q_numeric , Q_analytic charges on  anode -2.4630797292378954 -2.4630797292378914
+Q_numeric , Q_analytic charges on  cathode 2.4830442781264037 2.483044278126401
+Q_numeric , Q_analytic charges on  anode -2.495044278126377 -2.495044278126373
+Q_numeric , Q_analytic charges on  cathode 2.5359041726693365 2.5359041726693348
+Q_numeric , Q_analytic charges on  anode -2.547904172669309 -2.547904172669307
+Q_numeric , Q_analytic charges on  cathode 2.574840651647111 2.574840651647109
+Q_numeric , Q_analytic charges on  anode -2.5868406516471043 -2.5868406516471096
+Q_numeric , Q_analytic charges on  cathode 2.617396241835947 2.6173962418359493
+Q_numeric , Q_analytic charges on  anode -2.6293962418359196 -2.6293962418359214
+Q_numeric , Q_analytic charges on  cathode 2.564835428958943 2.564835428958945
+Q_numeric , Q_analytic charges on  anode -2.576835428958917 -2.576835428958917
+Q_numeric , Q_analytic charges on  cathode 2.605793220740866 2.6057932207408654
+Q_numeric , Q_analytic charges on  anode -2.6177932207408086 -2.617793220740809
+Q_numeric , Q_analytic charges on  cathode 2.632227396073817 2.632227396073817
+Q_numeric , Q_analytic charges on  anode -2.6442273960737874 -2.644227396073789
+Q_numeric , Q_analytic charges on  cathode 2.60549790105647 2.605497901056468
+Q_numeric , Q_analytic charges on  anode -2.6174979010564403 -2.61749790105644
+Q_numeric , Q_analytic charges on  cathode 2.547030187232325 2.5470301872323247
+Q_numeric , Q_analytic charges on  anode -2.5590301872322403 -2.55903018723224
+Q_numeric , Q_analytic charges on  cathode 2.594180760577801 2.594180760577801
+Q_numeric , Q_analytic charges on  anode -2.606180760577747 -2.6061807605777445
+Q_numeric , Q_analytic charges on  cathode 2.581066366294538 2.5810663662945372
+Q_numeric , Q_analytic charges on  anode -2.5930663662944786 -2.593066366294481
+Q_numeric , Q_analytic charges on  cathode 2.599578390987814 2.599578390987817
+Q_numeric , Q_analytic charges on  anode -2.6115783909877335 -2.611578390987732
+Q_numeric , Q_analytic charges on  cathode 2.63402912967517 2.6340291296751714
+Q_numeric , Q_analytic charges on  anode -2.646029129675143 -2.6460291296751435
+Q_numeric , Q_analytic charges on  cathode 2.616008066744748 2.616008066744756
+Q_numeric , Q_analytic charges on  anode -2.6280080667447807 -2.6280080667447847
+Q_numeric , Q_analytic charges on  cathode 2.600195475914758 2.6001954759147607
+Q_numeric , Q_analytic charges on  anode -2.6121954759147057 -2.6121954759147044
+Q_numeric , Q_analytic charges on  cathode 2.6069605602850916 2.60696056028509
+Q_numeric , Q_analytic charges on  anode -2.618960560285058 -2.618960560285062
+Q_numeric , Q_analytic charges on  cathode 2.6250599572373265 2.6250599572373274
+Q_numeric , Q_analytic charges on  anode -2.6370599572373288 -2.637059957237328
+Q_numeric , Q_analytic charges on  cathode 2.6389853416980733 2.6389853416980755
+Q_numeric , Q_analytic charges on  anode -2.6509853416980755 -2.650985341698076
+Q_numeric , Q_analytic charges on  cathode 2.6747148353695014 2.674714835369501
+Q_numeric , Q_analytic charges on  anode -2.6867148353695 -2.6867148353695014
+Q_numeric , Q_analytic charges on  cathode 2.6463716536228357 2.6463716536228374
+Q_numeric , Q_analytic charges on  anode -2.658371653622808 -2.6583716536228095
+Q_numeric , Q_analytic charges on  cathode 2.642609870463008 2.6426098704630063
+Q_numeric , Q_analytic charges on  anode -2.654609870462923 -2.6546098704629215
+3 iteration
+52645.73717275188 kJ/mol
+-131929.353229383 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11494.052441139966 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 451.6583024691081 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -10879.223501078488 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -134887.9290418527 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9014.366655840538 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -36337.75140066299 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 423.4208296352299 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28792.052565667273 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 2.682762848266449 2.6827628482664507
+Q_numeric , Q_analytic charges on  anode -2.6947628482663974 -2.6947628482663943
+Q_numeric , Q_analytic charges on  cathode 2.7267610847712724 2.72676108477127
+Q_numeric , Q_analytic charges on  anode -2.7387610847712964 -2.738761084771299
+Q_numeric , Q_analytic charges on  cathode 2.7833716677118203 2.7833716677118203
+Q_numeric , Q_analytic charges on  anode -2.795371667711765 -2.795371667711764
+Q_numeric , Q_analytic charges on  cathode 2.7989237064977837 2.7989237064977757
+Q_numeric , Q_analytic charges on  anode -2.810923706497666 -2.8109237064976624
+Q_numeric , Q_analytic charges on  cathode 2.7944158972664046 2.7944158972664055
+Q_numeric , Q_analytic charges on  anode -2.806415897266382 -2.8064158972663775
+Q_numeric , Q_analytic charges on  cathode 2.7905147068048746 2.790514706804872
+Q_numeric , Q_analytic charges on  anode -2.80251470680484 -2.802514706804844
+Q_numeric , Q_analytic charges on  cathode 2.8036438661788576 2.8036438661788607
+Q_numeric , Q_analytic charges on  anode -2.8156438661788306 -2.8156438661788328
+Q_numeric , Q_analytic charges on  cathode 2.8312631375352613 2.831263137535261
+Q_numeric , Q_analytic charges on  anode -2.8432631375351782 -2.843263137535176
+Q_numeric , Q_analytic charges on  cathode 2.8236372635359523 2.8236372635359586
+Q_numeric , Q_analytic charges on  anode -2.8356372635359324 -2.8356372635359306
+Q_numeric , Q_analytic charges on  cathode 2.8067911838080506 2.806791183808046
+Q_numeric , Q_analytic charges on  anode -2.818791183808045 -2.8187911838080466
+Q_numeric , Q_analytic charges on  cathode 2.806962618719395 2.8069626187193975
+Q_numeric , Q_analytic charges on  anode -2.818962618719373 -2.8189626187193695
+Q_numeric , Q_analytic charges on  cathode 2.7875277305161474 2.7875277305161474
+Q_numeric , Q_analytic charges on  anode -2.7995277305161217 -2.7995277305161195
+Q_numeric , Q_analytic charges on  cathode 2.768038769358999 2.7680387693589963
+Q_numeric , Q_analytic charges on  anode -2.7800387693589683 -2.7800387693589683
+Q_numeric , Q_analytic charges on  cathode 2.7984392852050517 2.7984392852050504
+Q_numeric , Q_analytic charges on  anode -2.8104392852049616 -2.8104392852049656
+Q_numeric , Q_analytic charges on  cathode 2.755889069500693 2.755889069500698
+Q_numeric , Q_analytic charges on  anode -2.767889069500674 -2.76788906950067
+Q_numeric , Q_analytic charges on  cathode 2.7236868682519617 2.7236868682519613
+Q_numeric , Q_analytic charges on  anode -2.7356868682519613 -2.7356868682519617
+Q_numeric , Q_analytic charges on  cathode 2.716904307331491 2.716904307331491
+Q_numeric , Q_analytic charges on  anode -2.728904307331405 -2.728904307331406
+Q_numeric , Q_analytic charges on  cathode 2.713749115264262 2.713749115264265
+Q_numeric , Q_analytic charges on  anode -2.725749115264155 -2.725749115264152
+Q_numeric , Q_analytic charges on  cathode 2.762807692274795 2.762807692274792
+Q_numeric , Q_analytic charges on  anode -2.7748076922747065 -2.7748076922747074
+Q_numeric , Q_analytic charges on  cathode 2.7838047130921257 2.7838047130921253
+Q_numeric , Q_analytic charges on  anode -2.7958047130920987 -2.7958047130920973
+Q_numeric , Q_analytic charges on  cathode 2.7546760376591375 2.7546760376591393
+Q_numeric , Q_analytic charges on  anode -2.7666760376590824 -2.766676037659083
+Q_numeric , Q_analytic charges on  cathode 2.8262060884997444 2.8262060884997466
+Q_numeric , Q_analytic charges on  anode -2.8382060884997222 -2.8382060884997187
+Q_numeric , Q_analytic charges on  cathode 2.7911208018214952 2.7911208018214935
+Q_numeric , Q_analytic charges on  anode -2.803120801821464 -2.8031208018214655
+Q_numeric , Q_analytic charges on  cathode 2.742606465641461 2.7426064656414595
+Q_numeric , Q_analytic charges on  anode -2.7546064656413773 -2.7546064656413747
+Q_numeric , Q_analytic charges on  cathode 2.689858646993272 2.6898586469932737
+Q_numeric , Q_analytic charges on  anode -2.701858646993304 -2.7018586469933026
+Q_numeric , Q_analytic charges on  cathode 2.752214508175163 2.752214508175159
+Q_numeric , Q_analytic charges on  anode -2.7642145081751286 -2.764214508175131
+Q_numeric , Q_analytic charges on  cathode 2.7631847374007776 2.763184737400779
+Q_numeric , Q_analytic charges on  anode -2.775184737400752 -2.775184737400751
+Q_numeric , Q_analytic charges on  cathode 2.8037975598844413 2.8037975598844453
+Q_numeric , Q_analytic charges on  anode -2.8157975598843588 -2.8157975598843605
+Q_numeric , Q_analytic charges on  cathode 2.8483107143282345 2.8483107143282367
+Q_numeric , Q_analytic charges on  anode -2.8603107143282087 -2.8603107143282087
+Q_numeric , Q_analytic charges on  cathode 2.835187453302256 2.835187453302255
+Q_numeric , Q_analytic charges on  anode -2.847187453302228 -2.8471874533022272
+Q_numeric , Q_analytic charges on  cathode 2.8599190164406036 2.859919016440601
+Q_numeric , Q_analytic charges on  anode -2.871919016440573 -2.871919016440573
+Q_numeric , Q_analytic charges on  cathode 2.8963712075372006 2.8963712075372015
+Q_numeric , Q_analytic charges on  anode -2.908371207537088 -2.908371207537088
+Q_numeric , Q_analytic charges on  cathode 2.880241590478441 2.8802415904784353
+Q_numeric , Q_analytic charges on  anode -2.8922415904784105 -2.8922415904784073
+Q_numeric , Q_analytic charges on  cathode 2.87658910103669 2.876589101036687
+Q_numeric , Q_analytic charges on  anode -2.8885891010366365 -2.8885891010366307
+Q_numeric , Q_analytic charges on  cathode 2.895620199900595 2.8956201999005926
+Q_numeric , Q_analytic charges on  anode -2.9076201999005953 -2.907620199900593
+Q_numeric , Q_analytic charges on  cathode 2.88245984295837 2.88245984295837
+Q_numeric , Q_analytic charges on  anode -2.8944598429583994 -2.894459842958399
+Q_numeric , Q_analytic charges on  cathode 2.930206237753239 2.9302062377532407
+Q_numeric , Q_analytic charges on  anode -2.9422062377532434 -2.942206237753241
+Q_numeric , Q_analytic charges on  cathode 2.9812574971617956 2.9812574971617933
+Q_numeric , Q_analytic charges on  anode -2.993257497161764 -2.9932574971617654
+Q_numeric , Q_analytic charges on  cathode 3.0461923031599976 3.0461923031599993
+Q_numeric , Q_analytic charges on  anode -3.0581923031599705 -3.0581923031599714
+Q_numeric , Q_analytic charges on  cathode 2.9568383201767166 2.956838320176716
+Q_numeric , Q_analytic charges on  anode -2.9688383201766833 -2.968838320176688
+Q_numeric , Q_analytic charges on  cathode 2.8989403740053676 2.8989403740053645
+Q_numeric , Q_analytic charges on  anode -2.9109403740053916 -2.9109403740053934
+Q_numeric , Q_analytic charges on  cathode 2.897615695281114 2.8976156952811194
+Q_numeric , Q_analytic charges on  anode -2.909615695281091 -2.9096156952810914
+Q_numeric , Q_analytic charges on  cathode 2.9553617357200763 2.9553617357200763
+Q_numeric , Q_analytic charges on  anode -2.967361735720047 -2.9673617357200484
+Q_numeric , Q_analytic charges on  cathode 2.9743506780422013 2.974350678042201
+Q_numeric , Q_analytic charges on  anode -2.9863506780422022 -2.9863506780422013
+Q_numeric , Q_analytic charges on  cathode 2.994867223255242 2.9948672232552425
+Q_numeric , Q_analytic charges on  anode -3.00686722325522 -3.0068672232552145
+Q_numeric , Q_analytic charges on  cathode 2.9870732483434352 2.9870732483434366
+Q_numeric , Q_analytic charges on  anode -2.9990732483433806 -2.99907324834338
+Q_numeric , Q_analytic charges on  cathode 3.0132739668398267 3.0132739668398343
+Q_numeric , Q_analytic charges on  anode -3.025273966839749 -3.0252739668397495
+Q_numeric , Q_analytic charges on  cathode 2.958181187336164 2.958181187336167
+Q_numeric , Q_analytic charges on  anode -2.970181187336135 -2.9701811873361392
+Q_numeric , Q_analytic charges on  cathode 3.0114821202667907 3.0114821202667925
+Q_numeric , Q_analytic charges on  anode -3.023482120266771 -3.0234821202667646
+Q_numeric , Q_analytic charges on  cathode 3.0021465237671947 3.002146523767196
+Q_numeric , Q_analytic charges on  anode -3.014146523767138 -3.0141465237671397
+4 iteration
+53028.16325896322 kJ/mol
+-132021.51889035106 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11593.279583429914 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 427.1853045997484 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -10674.042008295504 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -134929.9280415601 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9003.561430552625 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -36558.207442250554 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 376.27459217543947 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28740.35767871104 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 3.006083329231746 3.006083329231744
+Q_numeric , Q_analytic charges on  anode -3.0180833292317413 -3.0180833292317444
+Q_numeric , Q_analytic charges on  cathode 2.970915592048233 2.97091559204823
+Q_numeric , Q_analytic charges on  anode -2.982915592048198 -2.9829155920482022
+Q_numeric , Q_analytic charges on  cathode 2.9592652670367086 2.9592652670367143
+Q_numeric , Q_analytic charges on  anode -2.971265267036656 -2.971265267036658
+Q_numeric , Q_analytic charges on  cathode 3.0142507862795083 3.0142507862795056
+Q_numeric , Q_analytic charges on  anode -3.0262507862794457 -3.026250786279449
+Q_numeric , Q_analytic charges on  cathode 3.0080482843303162 3.008048284330316
+Q_numeric , Q_analytic charges on  anode -3.0200482843302896 -3.020048284330288
+Q_numeric , Q_analytic charges on  cathode 3.0106101848060547 3.010610184806056
+Q_numeric , Q_analytic charges on  anode -3.0226101848060276 -3.022610184806028
+Q_numeric , Q_analytic charges on  cathode 2.9463105287732585 2.9463105287732545
+Q_numeric , Q_analytic charges on  anode -2.9583105287732296 -2.9583105287732265
+Q_numeric , Q_analytic charges on  cathode 3.0023753347831956 3.002375334783197
+Q_numeric , Q_analytic charges on  anode -3.0143753347831437 -3.0143753347831406
+Q_numeric , Q_analytic charges on  cathode 2.9968713553950432 2.996871355395045
+Q_numeric , Q_analytic charges on  anode -3.008871355395022 -3.008871355395017
+Q_numeric , Q_analytic charges on  cathode 2.990986517177265 2.9909865171772636
+Q_numeric , Q_analytic charges on  anode -3.002986517177149 -3.0029865171771504
+Q_numeric , Q_analytic charges on  cathode 2.9615621802307075 2.9615621802307017
+Q_numeric , Q_analytic charges on  anode -2.973562180230705 -2.973562180230702
+Q_numeric , Q_analytic charges on  cathode 2.948125215911108 2.9481252159111064
+Q_numeric , Q_analytic charges on  anode -2.960125215911107 -2.960125215911107
+Q_numeric , Q_analytic charges on  cathode 2.9798588448951047 2.9798588448951064
+Q_numeric , Q_analytic charges on  anode -2.991858844895112 -2.991858844895107
+Q_numeric , Q_analytic charges on  cathode 2.987772192148798 2.9877721921487974
+Q_numeric , Q_analytic charges on  anode -2.9997721921487672 -2.9997721921487694
+Q_numeric , Q_analytic charges on  cathode 2.9349295788611167 2.934929578861117
+Q_numeric , Q_analytic charges on  anode -2.9469295788610896 -2.946929578861089
+Q_numeric , Q_analytic charges on  cathode 2.9928580624701784 2.992858062470178
+Q_numeric , Q_analytic charges on  anode -3.0048580624701478 -3.00485806247015
+Q_numeric , Q_analytic charges on  cathode 2.990456799042178 2.9904567990421795
+Q_numeric , Q_analytic charges on  anode -3.002456799042126 -3.002456799042123
+Q_numeric , Q_analytic charges on  cathode 2.972843957751667 2.972843957751665
+Q_numeric , Q_analytic charges on  anode -2.9848439577515835 -2.9848439577515804
+Q_numeric , Q_analytic charges on  cathode 3.0656494447951466 3.065649444795143
+Q_numeric , Q_analytic charges on  anode -3.077649444795117 -3.077649444795115
+Q_numeric , Q_analytic charges on  cathode 3.042377442290465 3.04237744229046
+Q_numeric , Q_analytic charges on  anode -3.0543774422904586 -3.0543774422904604
+Q_numeric , Q_analytic charges on  cathode 3.038993295438061 3.0389932954380625
+Q_numeric , Q_analytic charges on  anode -3.0509932954380656 -3.050993295438063
+Q_numeric , Q_analytic charges on  cathode 3.036136995689802 3.036136995689803
+Q_numeric , Q_analytic charges on  anode -3.0481369956898003 -3.0481369956898035
+Q_numeric , Q_analytic charges on  cathode 3.0319505802396063 3.0319505802396107
+Q_numeric , Q_analytic charges on  anode -3.043950580239584 -3.0439505802395828
+Q_numeric , Q_analytic charges on  cathode 3.0784122766921604 3.078412276692164
+Q_numeric , Q_analytic charges on  anode -3.090412276692107 -3.0904122766921076
+Q_numeric , Q_analytic charges on  cathode 3.067678031730638 3.067678031730638
+Q_numeric , Q_analytic charges on  anode -3.0796780317305252 -3.079678031730525
+Q_numeric , Q_analytic charges on  cathode 3.0544595494242994 3.0544595494242954
+Q_numeric , Q_analytic charges on  anode -3.066459549424236 -3.066459549424239
+Q_numeric , Q_analytic charges on  cathode 3.060688736799943 3.0606887367999476
+Q_numeric , Q_analytic charges on  anode -3.072688736799921 -3.0726887367999196
+Q_numeric , Q_analytic charges on  cathode 3.1184180022533385 3.1184180022533368
+Q_numeric , Q_analytic charges on  anode -3.1304180022533368 -3.130418002253337
+Q_numeric , Q_analytic charges on  cathode 3.1565225673607977 3.156522567360797
+Q_numeric , Q_analytic charges on  anode -3.1685225673607738 -3.168522567360769
+Q_numeric , Q_analytic charges on  cathode 3.1883274575501876 3.1883274575501885
+Q_numeric , Q_analytic charges on  anode -3.20032745755022 -3.2003274575502174
+Q_numeric , Q_analytic charges on  cathode 3.1591687067826912 3.1591687067826952
+Q_numeric , Q_analytic charges on  anode -3.171168706782668 -3.1711687067826673
+Q_numeric , Q_analytic charges on  cathode 3.150467763075906 3.150467763075896
+Q_numeric , Q_analytic charges on  anode -3.1624677630758993 -3.1624677630758966
+Q_numeric , Q_analytic charges on  cathode 3.1456439185269995 3.1456439185270013
+Q_numeric , Q_analytic charges on  anode -3.1576439185268903 -3.157643918526888
+Q_numeric , Q_analytic charges on  cathode 3.1311580802314323 3.131158080231431
+Q_numeric , Q_analytic charges on  anode -3.1431580802314087 -3.143158080231403
+Q_numeric , Q_analytic charges on  cathode 3.163521009356391 3.1635210093563884
+Q_numeric , Q_analytic charges on  anode -3.175521009356356 -3.1755210093563604
+Q_numeric , Q_analytic charges on  cathode 3.1400678489160496 3.1400678489160483
+Q_numeric , Q_analytic charges on  anode -3.1520678489160208 -3.1520678489160203
+Q_numeric , Q_analytic charges on  cathode 3.1665083580128224 3.166508358012821
+Q_numeric , Q_analytic charges on  anode -3.178508358012732 -3.1785083580127362
+Q_numeric , Q_analytic charges on  cathode 3.0888695268283675 3.0888695268283626
+Q_numeric , Q_analytic charges on  anode -3.1008695268283386 -3.1008695268283346
+Q_numeric , Q_analytic charges on  cathode 3.071797732148206 3.0717977321481995
+Q_numeric , Q_analytic charges on  anode -3.083797732148145 -3.083797732148143
+Q_numeric , Q_analytic charges on  cathode 3.035386643346256 3.0353866433462584
+Q_numeric , Q_analytic charges on  anode -3.047386643346202 -3.047386643346202
+Q_numeric , Q_analytic charges on  cathode 3.048630697132936 3.048630697132937
+Q_numeric , Q_analytic charges on  anode -3.0606306971329365 -3.0606306971329373
+Q_numeric , Q_analytic charges on  cathode 3.030208610772562 3.0302086107725628
+Q_numeric , Q_analytic charges on  anode -3.0422086107725037 -3.0422086107725064
+Q_numeric , Q_analytic charges on  cathode 3.0495100139657008 3.0495100139657025
+Q_numeric , Q_analytic charges on  anode -3.06151001396564 -3.061510013965646
+Q_numeric , Q_analytic charges on  cathode 3.0836217219813795 3.0836217219813746
+Q_numeric , Q_analytic charges on  anode -3.095621721981346 -3.0956217219813467
+Q_numeric , Q_analytic charges on  cathode 3.0559917069941376 3.0559917069941362
+Q_numeric , Q_analytic charges on  anode -3.067991706994109 -3.0679917069941083
+Q_numeric , Q_analytic charges on  cathode 3.0194213074080833 3.019421307408082
+Q_numeric , Q_analytic charges on  anode -3.031421307408004 -3.031421307407997
+Q_numeric , Q_analytic charges on  cathode 3.0025105899539306 3.0025105899539297
+Q_numeric , Q_analytic charges on  anode -3.0145105899539053 -3.0145105899539018
+Q_numeric , Q_analytic charges on  cathode 3.028131977537967 3.0281319775379685
+Q_numeric , Q_analytic charges on  anode -3.040131977537855 -3.0401319775378552
+Q_numeric , Q_analytic charges on  cathode 2.9860264976027686 2.9860264976027664
+Q_numeric , Q_analytic charges on  anode -2.9980264976027966 -2.9980264976027953
+Q_numeric , Q_analytic charges on  cathode 2.9777375592146718 2.9777375592146753
+Q_numeric , Q_analytic charges on  anode -2.9897375592146185 -2.989737559214619
+5 iteration
+52426.15722692944 kJ/mol
+-132023.26430402463 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11533.26201666023 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 418.76313898989076 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -11417.259771666892 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -135195.96559825353 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9090.28100091929 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -35967.868320090034 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 374.7921752140537 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 29140.730633802814 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 3.0096254969625575 3.0096254969625575
+Q_numeric , Q_analytic charges on  anode -3.021625496962501 -3.021625496962501
+Q_numeric , Q_analytic charges on  cathode 2.99783767818867 2.997837678188675
+Q_numeric , Q_analytic charges on  anode -3.0098376781886182 -3.0098376781886187
+Q_numeric , Q_analytic charges on  cathode 2.998011807934567 2.9980118079345615
+Q_numeric , Q_analytic charges on  anode -3.0100118079344984 -3.010011807934505
+Q_numeric , Q_analytic charges on  cathode 3.0153083000146985 3.0153083000146963
+Q_numeric , Q_analytic charges on  anode -3.0273083000146968 -3.0273083000146968
+Q_numeric , Q_analytic charges on  cathode 3.0636614243826363 3.0636614243826314
+Q_numeric , Q_analytic charges on  anode -3.075661424382549 -3.0756614243825466
+Q_numeric , Q_analytic charges on  cathode 3.061512643932203 3.0615126439322053
+Q_numeric , Q_analytic charges on  anode -3.0735126439321827 -3.0735126439321774
+Q_numeric , Q_analytic charges on  cathode 3.063627563823688 3.063627563823688
+Q_numeric , Q_analytic charges on  anode -3.075627563823694 -3.0756275638236885
+Q_numeric , Q_analytic charges on  cathode 3.1176591206883733 3.117659120688374
+Q_numeric , Q_analytic charges on  anode -3.1296591206882605 -3.129659120688261
+Q_numeric , Q_analytic charges on  cathode 3.0915736341532782 3.091573634153279
+Q_numeric , Q_analytic charges on  anode -3.103573634153248 -3.103573634153251
+Q_numeric , Q_analytic charges on  cathode 3.148359393996924 3.148359393996928
+Q_numeric , Q_analytic charges on  anode -3.1603593939969303 -3.1603593939969286
+Q_numeric , Q_analytic charges on  cathode 3.126736794365525 3.1267367943655286
+Q_numeric , Q_analytic charges on  anode -3.138736794365526 -3.138736794365529
+Q_numeric , Q_analytic charges on  cathode 3.072760589223447 3.0727605892234506
+Q_numeric , Q_analytic charges on  anode -3.084760589223417 -3.0847605892234227
+Q_numeric , Q_analytic charges on  cathode 3.0461372238810447 3.0461372238810482
+Q_numeric , Q_analytic charges on  anode -3.0581372238809905 -3.058137223880992
+Q_numeric , Q_analytic charges on  cathode 3.072654146804197 3.0726541468041986
+Q_numeric , Q_analytic charges on  anode -3.084654146804176 -3.0846541468041706
+Q_numeric , Q_analytic charges on  cathode 3.1470475534971087 3.1470475534971043
+Q_numeric , Q_analytic charges on  anode -3.159047553497102 -3.1590475534971048
+Q_numeric , Q_analytic charges on  cathode 3.0888657078989623 3.0888657078989623
+Q_numeric , Q_analytic charges on  anode -3.100865707898934 -3.1008657078989343
+Q_numeric , Q_analytic charges on  cathode 3.107436654973801 3.1074366549737973
+Q_numeric , Q_analytic charges on  anode -3.1194366549737103 -3.1194366549737125
+Q_numeric , Q_analytic charges on  cathode 3.081420166834008 3.081420166834009
+Q_numeric , Q_analytic charges on  anode -3.093420166834012 -3.0934201668340093
+Q_numeric , Q_analytic charges on  cathode 3.091263037824019 3.0912630378240222
+Q_numeric , Q_analytic charges on  anode -3.1032630378240267 -3.1032630378240227
+Q_numeric , Q_analytic charges on  cathode 3.111722102020574 3.1117221020205803
+Q_numeric , Q_analytic charges on  anode -3.1237221020205856 -3.1237221020205808
+Q_numeric , Q_analytic charges on  cathode 3.0943772905882407 3.0943772905882425
+Q_numeric , Q_analytic charges on  anode -3.106377290588241 -3.106377290588243
+Q_numeric , Q_analytic charges on  cathode 3.148167870310195 3.1481678703101905
+Q_numeric , Q_analytic charges on  anode -3.1601678703101634 -3.1601678703101626
+Q_numeric , Q_analytic charges on  cathode 3.146267588035602 3.1462675880356
+Q_numeric , Q_analytic charges on  anode -3.158267588035609 -3.1582675880356006
+Q_numeric , Q_analytic charges on  cathode 3.170314325659193 3.170314325659193
+Q_numeric , Q_analytic charges on  anode -3.182314325659165 -3.182314325659165
+Q_numeric , Q_analytic charges on  cathode 3.1368243280243364 3.1368243280243333
+Q_numeric , Q_analytic charges on  anode -3.1488243280243364 -3.1488243280243338
+Q_numeric , Q_analytic charges on  cathode 3.125128736884522 3.125128736884521
+Q_numeric , Q_analytic charges on  anode -3.1371287368844314 -3.1371287368844363
+Q_numeric , Q_analytic charges on  cathode 3.142449963620848 3.1424499636208494
+Q_numeric , Q_analytic charges on  anode -3.1544499636208485 -3.15444996362085
+Q_numeric , Q_analytic charges on  cathode 3.1288669179096056 3.128866917909606
+Q_numeric , Q_analytic charges on  anode -3.140866917909581 -3.140866917909578
+Q_numeric , Q_analytic charges on  cathode 3.11413481198123 3.114134811981232
+Q_numeric , Q_analytic charges on  anode -3.126134811981174 -3.1261348119811756
+Q_numeric , Q_analytic charges on  cathode 3.1054929280991046 3.1054929280991117
+Q_numeric , Q_analytic charges on  anode -3.1174929280990282 -3.117492928099027
+Q_numeric , Q_analytic charges on  cathode 3.088004674515949 3.0880046745159446
+Q_numeric , Q_analytic charges on  anode -3.100004674515939 -3.100004674515945
+Q_numeric , Q_analytic charges on  cathode 3.062686756661051 3.0626867566610527
+Q_numeric , Q_analytic charges on  anode -3.074686756661021 -3.0746867566610248
+Q_numeric , Q_analytic charges on  cathode 3.0901087130376603 3.0901087130376523
+Q_numeric , Q_analytic charges on  anode -3.1021087130375617 -3.1021087130375675
+Q_numeric , Q_analytic charges on  cathode 3.111858735007488 3.111858735007489
+Q_numeric , Q_analytic charges on  anode -3.1238587350074596 -3.123858735007461
+Q_numeric , Q_analytic charges on  cathode 3.0867752508085453 3.0867752508085444
+Q_numeric , Q_analytic charges on  anode -3.0987752508085395 -3.098775250808545
+Q_numeric , Q_analytic charges on  cathode 3.154132116198965 3.154132116198967
+Q_numeric , Q_analytic charges on  anode -3.166132116198938 -3.166132116198939
+Q_numeric , Q_analytic charges on  cathode 3.080972182711189 3.080972182711194
+Q_numeric , Q_analytic charges on  anode -3.0929721827111005 -3.0929721827111094
+Q_numeric , Q_analytic charges on  cathode 3.159628626823675 3.1596286268236766
+Q_numeric , Q_analytic charges on  anode -3.171628626823624 -3.1716286268236202
+Q_numeric , Q_analytic charges on  cathode 3.108016238477873 3.1080162384778744
+Q_numeric , Q_analytic charges on  anode -3.1200162384777905 -3.1200162384777896
+Q_numeric , Q_analytic charges on  cathode 3.1534755167241326 3.15347551672413
+Q_numeric , Q_analytic charges on  anode -3.1654755167241024 -3.165475516724102
+Q_numeric , Q_analytic charges on  cathode 3.22392342694074 3.2239234269407446
+Q_numeric , Q_analytic charges on  anode -3.2359234269407198 -3.2359234269407167
+Q_numeric , Q_analytic charges on  cathode 3.186191791719853 3.186191791719851
+Q_numeric , Q_analytic charges on  anode -3.1981917917197618 -3.198191791719766
+Q_numeric , Q_analytic charges on  cathode 3.146042160771471 3.1460421607714735
+Q_numeric , Q_analytic charges on  anode -3.158042160771442 -3.1580421607714455
+Q_numeric , Q_analytic charges on  cathode 3.1160293052098673 3.116029305209865
+Q_numeric , Q_analytic charges on  anode -3.128029305209811 -3.1280293052098087
+Q_numeric , Q_analytic charges on  cathode 3.1561040847005706 3.156104084700574
+Q_numeric , Q_analytic charges on  anode -3.1681040847005204 -3.1681040847005177
+Q_numeric , Q_analytic charges on  cathode 3.1605846670295072 3.160584667029512
+Q_numeric , Q_analytic charges on  anode -3.172584667029513 -3.1725846670295126
+Q_numeric , Q_analytic charges on  cathode 3.1289286420277342 3.128928642027732
+Q_numeric , Q_analytic charges on  anode -3.1409286420277027 -3.140928642027704
+Q_numeric , Q_analytic charges on  cathode 3.1674314987048593 3.167431498704859
+Q_numeric , Q_analytic charges on  anode -3.1794314987048327 -3.179431498704831
+Q_numeric , Q_analytic charges on  cathode 3.1812514538088528 3.1812514538088563
+Q_numeric , Q_analytic charges on  anode -3.1932514538087706 -3.1932514538087715
+Q_numeric , Q_analytic charges on  cathode 3.1729258761880206 3.172925876188019
+Q_numeric , Q_analytic charges on  anode -3.1849258761880157 -3.1849258761880193
+6 iteration
+52571.2582224833 kJ/mol
+-132190.86741023464 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11751.28429632011 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 436.61346089692734 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -10631.523025635819 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -135403.51535937004 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9143.790596923092 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -36268.307394333526 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 431.6668344705831 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28349.123314312194 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 3.1963409371920077 3.1963409371920064
+Q_numeric , Q_analytic charges on  anode -3.2083409371919815 -3.2083409371919784
+Q_numeric , Q_analytic charges on  cathode 3.188680561201852 3.1886805612018505
+Q_numeric , Q_analytic charges on  anode -3.2006805612018536 -3.200680561201851
+Q_numeric , Q_analytic charges on  cathode 3.1907154311775683 3.190715431177567
+Q_numeric , Q_analytic charges on  anode -3.202715431177482 -3.202715431177482
+Q_numeric , Q_analytic charges on  cathode 3.2222794219241426 3.2222794219241435
+Q_numeric , Q_analytic charges on  anode -3.2342794219240867 -3.234279421924087
+Q_numeric , Q_analytic charges on  cathode 3.2201690400649885 3.2201690400649894
+Q_numeric , Q_analytic charges on  anode -3.2321690400649015 -3.2321690400649046
+Q_numeric , Q_analytic charges on  cathode 3.212988654981664 3.212988654981659
+Q_numeric , Q_analytic charges on  anode -3.224988654981693 -3.2249886549816877
+Q_numeric , Q_analytic charges on  cathode 3.2486696419459937 3.248669641945996
+Q_numeric , Q_analytic charges on  anode -3.2606696419459347 -3.2606696419459396
+Q_numeric , Q_analytic charges on  cathode 3.2101232687226844 3.210123268722684
+Q_numeric , Q_analytic charges on  anode -3.222123268722598 -3.222123268722599
+Q_numeric , Q_analytic charges on  cathode 3.2681063830704424 3.2681063830704473
+Q_numeric , Q_analytic charges on  anode -3.2801063830703945 -3.280106383070391
+Q_numeric , Q_analytic charges on  cathode 3.252346828420815 3.2523468284208135
+Q_numeric , Q_analytic charges on  anode -3.2643468284207855 -3.2643468284207855
+Q_numeric , Q_analytic charges on  cathode 3.3045167763755976 3.304516776375594
+Q_numeric , Q_analytic charges on  anode -3.316516776375507 -3.3165167763755092
+Q_numeric , Q_analytic charges on  cathode 3.257768110285146 3.257768110285143
+Q_numeric , Q_analytic charges on  anode -3.2697681102850815 -3.2697681102850864
+Q_numeric , Q_analytic charges on  cathode 3.227925109590518 3.2279251095905166
+Q_numeric , Q_analytic charges on  anode -3.2399251095904584 -3.23992510959046
+Q_numeric , Q_analytic charges on  cathode 3.1890016453973993 3.1890016453973984
+Q_numeric , Q_analytic charges on  anode -3.201001645397345 -3.201001645397342
+Q_numeric , Q_analytic charges on  cathode 3.1436328199920234 3.1436328199920225
+Q_numeric , Q_analytic charges on  anode -3.1556328199919963 -3.1556328199919945
+Q_numeric , Q_analytic charges on  cathode 3.2206765531289427 3.2206765531289405
+Q_numeric , Q_analytic charges on  anode -3.2326765531289094 -3.2326765531289126
+Q_numeric , Q_analytic charges on  cathode 3.2054042934310436 3.205404293431046
+Q_numeric , Q_analytic charges on  anode -3.2174042934310183 -3.217404293431018
+Q_numeric , Q_analytic charges on  cathode 3.2124811544723437 3.212481154472344
+Q_numeric , Q_analytic charges on  anode -3.224481154472256 -3.2244811544722594
+Q_numeric , Q_analytic charges on  cathode 3.231320596147037 3.23132059614703
+Q_numeric , Q_analytic charges on  anode -3.2433205961470004 -3.243320596147002
+Q_numeric , Q_analytic charges on  cathode 3.219497831314772 3.21949783131477
+Q_numeric , Q_analytic charges on  anode -3.2314978313147376 -3.231497831314742
+Q_numeric , Q_analytic charges on  cathode 3.1885993749664174 3.1885993749664165
+Q_numeric , Q_analytic charges on  anode -3.200599374966363 -3.20059937496636
+Q_numeric , Q_analytic charges on  cathode 3.1735118425091993 3.173511842509201
+Q_numeric , Q_analytic charges on  anode -3.1855118425091473 -3.1855118425091447
+Q_numeric , Q_analytic charges on  cathode 3.216908660915343 3.216908660915338
+Q_numeric , Q_analytic charges on  anode -3.228908660915338 -3.2289086609153386
+Q_numeric , Q_analytic charges on  cathode 3.237078630172581 3.237078630172577
+Q_numeric , Q_analytic charges on  anode -3.2490786301725203 -3.2490786301725207
+Q_numeric , Q_analytic charges on  cathode 3.2624677189065916 3.2624677189065934
+Q_numeric , Q_analytic charges on  anode -3.2744677189065956 -3.274467718906594
+Q_numeric , Q_analytic charges on  cathode 3.2821314631320497 3.2821314631320475
+Q_numeric , Q_analytic charges on  anode -3.2941314631319907 -3.294131463131991
+Q_numeric , Q_analytic charges on  cathode 3.233164693650693 3.233164693650694
+Q_numeric , Q_analytic charges on  anode -3.2451646936506333 -3.2451646936506378
+Q_numeric , Q_analytic charges on  cathode 3.3034849135323903 3.303484913532388
+Q_numeric , Q_analytic charges on  anode -3.315484913532361 -3.31548491353236
+Q_numeric , Q_analytic charges on  cathode 3.3142654102383777 3.3142654102383786
+Q_numeric , Q_analytic charges on  anode -3.32626541023832 -3.3262654102383222
+Q_numeric , Q_analytic charges on  cathode 3.2838185818399817 3.283818581839982
+Q_numeric , Q_analytic charges on  anode -3.2958185818399524 -3.295818581839954
+Q_numeric , Q_analytic charges on  cathode 3.2902498823834936 3.290249882383493
+Q_numeric , Q_analytic charges on  anode -3.302249882383436 -3.3022498823834368
+Q_numeric , Q_analytic charges on  cathode 3.288539810449391 3.2885398104493944
+Q_numeric , Q_analytic charges on  anode -3.3005398104493935 -3.300539810449395
+Q_numeric , Q_analytic charges on  cathode 3.308184587240407 3.308184587240406
+Q_numeric , Q_analytic charges on  anode -3.320184587240383 -3.320184587240378
+Q_numeric , Q_analytic charges on  cathode 3.323204404418807 3.3232044044188043
+Q_numeric , Q_analytic charges on  anode -3.3352044044187537 -3.335204404418748
+Q_numeric , Q_analytic charges on  cathode 3.3137587490786435 3.3137587490786458
+Q_numeric , Q_analytic charges on  anode -3.3257587490786165 -3.325758749078618
+Q_numeric , Q_analytic charges on  cathode 3.3334094752736565 3.333409475273656
+Q_numeric , Q_analytic charges on  anode -3.345409475273598 -3.3454094752735997
+Q_numeric , Q_analytic charges on  cathode 3.3350024437559282 3.335002443755927
+Q_numeric , Q_analytic charges on  anode -3.3470024437558727 -3.3470024437558705
+Q_numeric , Q_analytic charges on  cathode 3.3416784452960973 3.341678445296098
+Q_numeric , Q_analytic charges on  anode -3.3536784452960666 -3.35367844529607
+Q_numeric , Q_analytic charges on  cathode 3.350223653108047 3.350223653108047
+Q_numeric , Q_analytic charges on  anode -3.3622236531079874 -3.3622236531079905
+Q_numeric , Q_analytic charges on  cathode 3.3086298998118937 3.308629899811892
+Q_numeric , Q_analytic charges on  anode -3.3206298998118355 -3.3206298998118355
+Q_numeric , Q_analytic charges on  cathode 3.3256300692599305 3.325630069259931
+Q_numeric , Q_analytic charges on  anode -3.337630069259874 -3.3376300692598746
+Q_numeric , Q_analytic charges on  cathode 3.271913739471343 3.2719137394713456
+Q_numeric , Q_analytic charges on  anode -3.2839137394713416 -3.283913739471346
+Q_numeric , Q_analytic charges on  cathode 3.278845827469511 3.2788458274695116
+Q_numeric , Q_analytic charges on  anode -3.2908458274694654 -3.290845827469455
+Q_numeric , Q_analytic charges on  cathode 3.2659017011213956 3.2659017011213947
+Q_numeric , Q_analytic charges on  anode -3.277901701121333 -3.2779017011213383
+Q_numeric , Q_analytic charges on  cathode 3.245214018440793 3.2452140184407923
+Q_numeric , Q_analytic charges on  anode -3.257214018440764 -3.2572140184407643
+Q_numeric , Q_analytic charges on  cathode 3.273947000986073 3.273947000986071
+Q_numeric , Q_analytic charges on  anode -3.285947000986042 -3.285947000986043
+Q_numeric , Q_analytic charges on  cathode 3.2869081615727005 3.2869081615726983
+Q_numeric , Q_analytic charges on  anode -3.298908161572698 -3.2989081615726987
+Q_numeric , Q_analytic charges on  cathode 3.2504904327577804 3.2504904327577875
+Q_numeric , Q_analytic charges on  anode -3.262490432757757 -3.2624904327577595
+Q_numeric , Q_analytic charges on  cathode 3.272035610862205 3.2720356108622055
+Q_numeric , Q_analytic charges on  anode -3.2840356108621274 -3.2840356108621207
+Q_numeric , Q_analytic charges on  cathode 3.3252566462622446 3.325256646262248
+Q_numeric , Q_analytic charges on  anode -3.3372566462622784 -3.337256646262277
+7 iteration
+52845.92288297023 kJ/mol
+-132109.6786627099 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11737.381683274847 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 426.6399280854487 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -11080.453072905084 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -135319.65223838342 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9099.898065094429 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -36146.679930602906 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 388.19266286387574 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28784.994562856096 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 3.3023060366856023 3.3023060366856085
+Q_numeric , Q_analytic charges on  anode -3.3143060366855814 -3.3143060366855805
+Q_numeric , Q_analytic charges on  cathode 3.2947278662518147 3.29472786625182
+Q_numeric , Q_analytic charges on  anode -3.3067278662518205 -3.3067278662518205
+Q_numeric , Q_analytic charges on  cathode 3.2500577034135616 3.2500577034135616
+Q_numeric , Q_analytic charges on  anode -3.262057703413561 -3.262057703413562
+Q_numeric , Q_analytic charges on  cathode 3.349615140296593 3.3496151402965935
+Q_numeric , Q_analytic charges on  anode -3.361615140296619 -3.3616151402966223
+Q_numeric , Q_analytic charges on  cathode 3.3628126954379085 3.362812695437911
+Q_numeric , Q_analytic charges on  anode -3.3748126954379094 -3.3748126954379116
+Q_numeric , Q_analytic charges on  cathode 3.399003695049621 3.399003695049616
+Q_numeric , Q_analytic charges on  anode -3.411003695049618 -3.4110036950496165
+Q_numeric , Q_analytic charges on  cathode 3.41789003683426 3.4178900368342666
+Q_numeric , Q_analytic charges on  anode -3.429890036834272 -3.429890036834267
+Q_numeric , Q_analytic charges on  cathode 3.3886321753456823 3.3886321753456783
+Q_numeric , Q_analytic charges on  anode -3.400632175345681 -3.4006321753456787
+Q_numeric , Q_analytic charges on  cathode 3.3434779589083963 3.343477958908396
+Q_numeric , Q_analytic charges on  anode -3.3554779589083483 -3.3554779589083394
+Q_numeric , Q_analytic charges on  cathode 3.3710752922078604 3.371075292207864
+Q_numeric , Q_analytic charges on  anode -3.3830752922078027 -3.3830752922078076
+Q_numeric , Q_analytic charges on  cathode 3.384109677046824 3.384109677046824
+Q_numeric , Q_analytic charges on  anode -3.3961096770468227 -3.3961096770468244
+Q_numeric , Q_analytic charges on  cathode 3.4130813282046897 3.4130813282046844
+Q_numeric , Q_analytic charges on  anode -3.4250813282047194 -3.4250813282047132
+Q_numeric , Q_analytic charges on  cathode 3.538336626294283 3.538336626294283
+Q_numeric , Q_analytic charges on  anode -3.5503366262942215 -3.5503366262942264
+Q_numeric , Q_analytic charges on  cathode 3.5033613490182485 3.5033613490182502
+Q_numeric , Q_analytic charges on  anode -3.5153613490181943 -3.515361349018194
+Q_numeric , Q_analytic charges on  cathode 3.4768026877681724 3.476802687768172
+Q_numeric , Q_analytic charges on  anode -3.488802687768143 -3.488802687768144
+Q_numeric , Q_analytic charges on  cathode 3.537811426327107 3.5378114263271114
+Q_numeric , Q_analytic charges on  anode -3.5498114263270875 -3.5498114263270835
+Q_numeric , Q_analytic charges on  cathode 3.5398446868057896 3.5398446868057802
+Q_numeric , Q_analytic charges on  anode -3.551844686805724 -3.551844686805724
+Q_numeric , Q_analytic charges on  cathode 3.475290110293273 3.475290110293274
+Q_numeric , Q_analytic charges on  anode -3.487290110293217 -3.4872901102932174
+Q_numeric , Q_analytic charges on  cathode 3.455047637437888 3.4550476374378873
+Q_numeric , Q_analytic charges on  anode -3.4670476374378856 -3.467047637437888
+Q_numeric , Q_analytic charges on  cathode 3.425052898043574 3.425052898043576
+Q_numeric , Q_analytic charges on  anode -3.437052898043552 -3.437052898043548
+Q_numeric , Q_analytic charges on  cathode 3.4448492856693154 3.444849285669322
+Q_numeric , Q_analytic charges on  anode -3.4568492856692323 -3.456849285669237
+Q_numeric , Q_analytic charges on  cathode 3.4475063626801576 3.44750636268016
+Q_numeric , Q_analytic charges on  anode -3.4595063626801044 -3.4595063626801035
+Q_numeric , Q_analytic charges on  cathode 3.4574499844021824 3.4574499844021758
+Q_numeric , Q_analytic charges on  anode -3.46944998440212 -3.4694499844021194
+Q_numeric , Q_analytic charges on  cathode 3.436649004511299 3.4366490045112967
+Q_numeric , Q_analytic charges on  anode -3.44864900451127 -3.4486490045112688
+Q_numeric , Q_analytic charges on  cathode 3.4507038513808794 3.4507038513808808
+Q_numeric , Q_analytic charges on  anode -3.462703851380793 -3.462703851380796
+Q_numeric , Q_analytic charges on  cathode 3.4430604248962475 3.4430604248962466
+Q_numeric , Q_analytic charges on  anode -3.455060424896164 -3.455060424896162
+Q_numeric , Q_analytic charges on  cathode 3.5236913822474047 3.523691382247408
+Q_numeric , Q_analytic charges on  anode -3.535691382247349 -3.5356913822473515
+Q_numeric , Q_analytic charges on  cathode 3.4923529637400876 3.4923529637400903
+Q_numeric , Q_analytic charges on  anode -3.504352963740004 -3.5043529637400055
+Q_numeric , Q_analytic charges on  cathode 3.5096326217512455 3.5096326217512384
+Q_numeric , Q_analytic charges on  anode -3.5216326217512166 -3.5216326217512104
+Q_numeric , Q_analytic charges on  cathode 3.45881675890148 3.4588167589014787
+Q_numeric , Q_analytic charges on  anode -3.470816758901422 -3.4708167589014223
+Q_numeric , Q_analytic charges on  cathode 3.3736991680607855 3.373699168060783
+Q_numeric , Q_analytic charges on  anode -3.385699168060754 -3.385699168060755
+Q_numeric , Q_analytic charges on  cathode 3.3758986226148884 3.375898622614885
+Q_numeric , Q_analytic charges on  anode -3.3878986226148813 -3.3878986226148853
+Q_numeric , Q_analytic charges on  cathode 3.391388901612353 3.3913889016123604
+Q_numeric , Q_analytic charges on  anode -3.403388901612302 -3.403388901612304
+Q_numeric , Q_analytic charges on  cathode 3.413397495239695 3.413397495239694
+Q_numeric , Q_analytic charges on  anode -3.4253974952396042 -3.425397495239609
+Q_numeric , Q_analytic charges on  cathode 3.4292005487220814 3.4292005487220805
+Q_numeric , Q_analytic charges on  anode -3.4412005487220796 -3.441200548722081
+Q_numeric , Q_analytic charges on  cathode 3.4670866269099907 3.4670866269099903
+Q_numeric , Q_analytic charges on  anode -3.4790866269099654 -3.4790866269099623
+Q_numeric , Q_analytic charges on  cathode 3.4653835273144193 3.4653835273144167
+Q_numeric , Q_analytic charges on  anode -3.477383527314388 -3.4773835273143887
+Q_numeric , Q_analytic charges on  cathode 3.462858656752943 3.462858656752944
+Q_numeric , Q_analytic charges on  anode -3.474858656752835 -3.4748586567528306
+Q_numeric , Q_analytic charges on  cathode 3.427510073954458 3.4275100739544526
+Q_numeric , Q_analytic charges on  anode -3.439510073954428 -3.4395100739544247
+Q_numeric , Q_analytic charges on  cathode 3.380588499904311 3.380588499904307
+Q_numeric , Q_analytic charges on  anode -3.3925884999042797 -3.3925884999042792
+Q_numeric , Q_analytic charges on  cathode 3.359260285479498 3.3592602854794946
+Q_numeric , Q_analytic charges on  anode -3.3712602854794174 -3.37126028547941
+Q_numeric , Q_analytic charges on  cathode 3.4042640673219076 3.4042640673219053
+Q_numeric , Q_analytic charges on  anode -3.416264067321881 -3.4162640673218774
+Q_numeric , Q_analytic charges on  cathode 3.481395446034974 3.4813954460349676
+Q_numeric , Q_analytic charges on  anode -3.493395446034945 -3.4933954460349397
+Q_numeric , Q_analytic charges on  cathode 3.4578972293448844 3.4578972293448813
+Q_numeric , Q_analytic charges on  anode -3.4698972293447996 -3.4698972293447965
+Q_numeric , Q_analytic charges on  cathode 3.4060529301398903 3.4060529301398943
+Q_numeric , Q_analytic charges on  anode -3.4180529301398725 -3.4180529301398663
+Q_numeric , Q_analytic charges on  cathode 3.345474706699936 3.345474706699933
+Q_numeric , Q_analytic charges on  anode -3.3574747066998962 -3.357474706699905
+Q_numeric , Q_analytic charges on  cathode 3.2983178810639124 3.29831788106391
+Q_numeric , Q_analytic charges on  anode -3.310317881063856 -3.310317881063854
+Q_numeric , Q_analytic charges on  cathode 3.296302306263086 3.296302306263088
+Q_numeric , Q_analytic charges on  anode -3.308302306263088 -3.3083023062630885
+Q_numeric , Q_analytic charges on  cathode 3.343812457861494 3.3438124578614903
+Q_numeric , Q_analytic charges on  anode -3.3558124578614263 -3.355812457861434
+Q_numeric , Q_analytic charges on  cathode 3.3928675972768367 3.3928675972768345
+Q_numeric , Q_analytic charges on  anode -3.404867597276838 -3.404867597276835
+8 iteration
+52406.32419886312 kJ/mol
+-132106.43064549984 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 12039.361034677233 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 405.7037419464913 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -11585.675582218517 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -135525.99155578716 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9128.510543703393 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -36012.44359779016 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 458.47477031010203 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28985.630030324886 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 3.4026240932677045 3.4026240932677054
+Q_numeric , Q_analytic charges on  anode -3.4146240932676775 -3.4146240932676775
+Q_numeric , Q_analytic charges on  cathode 3.408902464659956 3.408902464659961
+Q_numeric , Q_analytic charges on  anode -3.420902464659929 -3.420902464659933
+Q_numeric , Q_analytic charges on  cathode 3.468697596164181 3.4686975961641777
+Q_numeric , Q_analytic charges on  anode -3.4806975961641773 -3.480697596164178
+Q_numeric , Q_analytic charges on  cathode 3.4456087594772504 3.445608759477254
+Q_numeric , Q_analytic charges on  anode -3.4576087594772553 -3.4576087594772544
+Q_numeric , Q_analytic charges on  cathode 3.4460760969379733 3.4460760969379733
+Q_numeric , Q_analytic charges on  anode -3.4580760969379085 -3.458076096937917
+Q_numeric , Q_analytic charges on  cathode 3.4199698625781227 3.4199698625781294
+Q_numeric , Q_analytic charges on  anode -3.4319698625780126 -3.431969862578016
+Q_numeric , Q_analytic charges on  cathode 3.4432095294728406 3.4432095294728398
+Q_numeric , Q_analytic charges on  anode -3.4552095294728087 -3.455209529472812
+Q_numeric , Q_analytic charges on  cathode 3.423295003313699 3.4232950033136986
+Q_numeric , Q_analytic charges on  anode -3.4352950033136684 -3.4352950033136707
+Q_numeric , Q_analytic charges on  cathode 3.430279276476355 3.4302792764763566
+Q_numeric , Q_analytic charges on  anode -3.4422792764763037 -3.4422792764763
+Q_numeric , Q_analytic charges on  cathode 3.407358307080621 3.4073583070806293
+Q_numeric , Q_analytic charges on  anode -3.4193583070806026 -3.4193583070806013
+Q_numeric , Q_analytic charges on  cathode 3.433780727830414 3.433780727830411
+Q_numeric , Q_analytic charges on  anode -3.445780727830386 -3.445780727830383
+Q_numeric , Q_analytic charges on  cathode 3.498799673980852 3.4987996739808565
+Q_numeric , Q_analytic charges on  anode -3.510799673980855 -3.510799673980857
+Q_numeric , Q_analytic charges on  cathode 3.5060206185693126 3.5060206185693104
+Q_numeric , Q_analytic charges on  anode -3.5180206185693104 -3.518020618569311
+Q_numeric , Q_analytic charges on  cathode 3.521931599923464 3.5219315999234637
+Q_numeric , Q_analytic charges on  anode -3.5339315999234597 -3.533931599923464
+Q_numeric , Q_analytic charges on  cathode 3.4963473348252463 3.4963473348252463
+Q_numeric , Q_analytic charges on  anode -3.508347334825254 -3.5083473348252467
+Q_numeric , Q_analytic charges on  cathode 3.4924369913594164 3.4924369913594133
+Q_numeric , Q_analytic charges on  anode -3.504436991359361 -3.504436991359357
+Q_numeric , Q_analytic charges on  cathode 3.5081992710289422 3.508199271028944
+Q_numeric , Q_analytic charges on  anode -3.5201992710289183 -3.520199271028916
+Q_numeric , Q_analytic charges on  cathode 3.503109061537163 3.503109061537161
+Q_numeric , Q_analytic charges on  anode -3.515109061537128 -3.515109061537133
+Q_numeric , Q_analytic charges on  cathode 3.5579968757732443 3.557996875773243
+Q_numeric , Q_analytic charges on  anode -3.5699968757731546 -3.569996875773158
+Q_numeric , Q_analytic charges on  cathode 3.5151413805892737 3.5151413805892715
+Q_numeric , Q_analytic charges on  anode -3.527141380589237 -3.5271413805892435
+Q_numeric , Q_analytic charges on  cathode 3.5800042005823944 3.5800042005823953
+Q_numeric , Q_analytic charges on  anode -3.592004200582334 -3.592004200582339
+Q_numeric , Q_analytic charges on  cathode 3.5762006995016 3.5762006995015994
+Q_numeric , Q_analytic charges on  anode -3.588200699501571 -3.5882006995015714
+Q_numeric , Q_analytic charges on  cathode 3.555536451012691 3.5555364510126863
+Q_numeric , Q_analytic charges on  anode -3.5675364510126606 -3.5675364510126584
+Q_numeric , Q_analytic charges on  cathode 3.583215904188094 3.5832159041880955
+Q_numeric , Q_analytic charges on  anode -3.595215904188093 -3.595215904188096
+Q_numeric , Q_analytic charges on  cathode 3.5802843195228466 3.5802843195228475
+Q_numeric , Q_analytic charges on  anode -3.5922843195227956 -3.592284319522791
+Q_numeric , Q_analytic charges on  cathode 3.5947776355852814 3.5947776355852894
+Q_numeric , Q_analytic charges on  anode -3.6067776355852597 -3.6067776355852614
+Q_numeric , Q_analytic charges on  cathode 3.6149661513380127 3.614966151338011
+Q_numeric , Q_analytic charges on  anode -3.6269661513380043 -3.6269661513380114
+Q_numeric , Q_analytic charges on  cathode 3.6675637070822957 3.6675637070822957
+Q_numeric , Q_analytic charges on  anode -3.6795637070822345 -3.6795637070822393
+Q_numeric , Q_analytic charges on  cathode 3.7224577470397704 3.7224577470397704
+Q_numeric , Q_analytic charges on  anode -3.734457747039712 -3.734457747039714
+Q_numeric , Q_analytic charges on  cathode 3.703719043336676 3.7037190433366773
+Q_numeric , Q_analytic charges on  anode -3.715719043336645 -3.7157190433366494
+Q_numeric , Q_analytic charges on  cathode 3.660432758365623 3.660432758365617
+Q_numeric , Q_analytic charges on  anode -3.67243275836556 -3.6724327583655607
+Q_numeric , Q_analytic charges on  cathode 3.6440944699741507 3.6440944699741507
+Q_numeric , Q_analytic charges on  anode -3.656094469974067 -3.656094469974066
+Q_numeric , Q_analytic charges on  cathode 3.595777856886581 3.595777856886586
+Q_numeric , Q_analytic charges on  anode -3.607777856886532 -3.6077778568865297
+Q_numeric , Q_analytic charges on  cathode 3.5930825809838796 3.5930825809838765
+Q_numeric , Q_analytic charges on  anode -3.605082580983794 -3.6050825809837916
+Q_numeric , Q_analytic charges on  cathode 3.626500933413738 3.626500933413739
+Q_numeric , Q_analytic charges on  anode -3.6385009334136886 -3.6385009334136824
+Q_numeric , Q_analytic charges on  cathode 3.645600854252244 3.6456008542522382
+Q_numeric , Q_analytic charges on  anode -3.657600854252211 -3.6576008542522103
+Q_numeric , Q_analytic charges on  cathode 3.6462994942336158 3.646299494233618
+Q_numeric , Q_analytic charges on  anode -3.6582994942335283 -3.658299494233533
+Q_numeric , Q_analytic charges on  cathode 3.583748667371181 3.5837486673711836
+Q_numeric , Q_analytic charges on  anode -3.5957486673711574 -3.5957486673711556
+Q_numeric , Q_analytic charges on  cathode 3.6174555960420967 3.617455596042093
+Q_numeric , Q_analytic charges on  anode -3.629455596042124 -3.629455596042122
+Q_numeric , Q_analytic charges on  cathode 3.63036756018404 3.6303675601840424
+Q_numeric , Q_analytic charges on  anode -3.6423675601840464 -3.642367560184043
+Q_numeric , Q_analytic charges on  cathode 3.5898952105819855 3.5898952105819872
+Q_numeric , Q_analytic charges on  anode -3.6018952105819597 -3.6018952105819593
+Q_numeric , Q_analytic charges on  cathode 3.609566627266695 3.609566627266689
+Q_numeric , Q_analytic charges on  anode -3.6215666272666 -3.621566627266604
+Q_numeric , Q_analytic charges on  cathode 3.657990710149602 3.657990710149606
+Q_numeric , Q_analytic charges on  anode -3.66999071014961 -3.6699907101496065
+Q_numeric , Q_analytic charges on  cathode 3.5936164424485226 3.5936164424485226
+Q_numeric , Q_analytic charges on  anode -3.605616442448493 -3.6056164424484947
+Q_numeric , Q_analytic charges on  cathode 3.603936250345739 3.603936250345741
+Q_numeric , Q_analytic charges on  anode -3.615936250345712 -3.615936250345713
+Q_numeric , Q_analytic charges on  cathode 3.6356693866522574 3.6356693866522547
+Q_numeric , Q_analytic charges on  anode -3.6476693866521415 -3.6476693866521415
+Q_numeric , Q_analytic charges on  cathode 3.662505528719277 3.6625055287192807
+Q_numeric , Q_analytic charges on  anode -3.674505528719249 -3.6745055287192527
+Q_numeric , Q_analytic charges on  cathode 3.609747925394532 3.609747925394531
+Q_numeric , Q_analytic charges on  anode -3.6217479253945326 -3.6217479253945313
+Q_numeric , Q_analytic charges on  cathode 3.5499698947758866 3.5499698947758858
+Q_numeric , Q_analytic charges on  anode -3.561969894775888 -3.561969894775886
+Q_numeric , Q_analytic charges on  cathode 3.515001436127923 3.515001436127919
+Q_numeric , Q_analytic charges on  anode -3.5270014361279203 -3.5270014361279194
+9 iteration
+53212.00854776102 kJ/mol
+-131869.06265756954 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11766.072941462684 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 433.3397911917457 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -10933.516082863274 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -135712.9256589166 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9229.496953719121 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -35893.97741774851 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 489.502260822308 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28752.944644361738 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 3.576863329474934 3.5768633294749335
+Q_numeric , Q_analytic charges on  anode -3.5888633294748447 -3.5888633294748487
+Q_numeric , Q_analytic charges on  cathode 3.580873367387984 3.5808733673879813
+Q_numeric , Q_analytic charges on  anode -3.5928733673879 -3.5928733673878965
+Q_numeric , Q_analytic charges on  cathode 3.6155514232571737 3.6155514232571746
+Q_numeric , Q_analytic charges on  anode -3.627551423257117 -3.627551423257118
+Q_numeric , Q_analytic charges on  cathode 3.5714592551046707 3.571459255104672
+Q_numeric , Q_analytic charges on  anode -3.5834592551046365 -3.583459255104644
+Q_numeric , Q_analytic charges on  cathode 3.586730367785169 3.5867303677851665
+Q_numeric , Q_analytic charges on  anode -3.598730367785163 -3.598730367785167
+Q_numeric , Q_analytic charges on  cathode 3.604108887981331 3.6041088879813272
+Q_numeric , Q_analytic charges on  anode -3.616108887981333 -3.6161088879813277
+Q_numeric , Q_analytic charges on  cathode 3.6001193680444974 3.600119368044504
+Q_numeric , Q_analytic charges on  anode -3.612119368044451 -3.6121193680444477
+Q_numeric , Q_analytic charges on  cathode 3.6281763507407536 3.6281763507407603
+Q_numeric , Q_analytic charges on  anode -3.640176350740782 -3.640176350740789
+Q_numeric , Q_analytic charges on  cathode 3.6304650015220714 3.63046500152207
+Q_numeric , Q_analytic charges on  anode -3.6424650015220745 -3.6424650015220705
+Q_numeric , Q_analytic charges on  cathode 3.5740117924249413 3.5740117924249417
+Q_numeric , Q_analytic charges on  anode -3.586011792424854 -3.586011792424857
+Q_numeric , Q_analytic charges on  cathode 3.6221158741702317 3.6221158741702353
+Q_numeric , Q_analytic charges on  anode -3.6341158741702393 -3.6341158741702357
+Q_numeric , Q_analytic charges on  cathode 3.6270238962717527 3.6270238962717527
+Q_numeric , Q_analytic charges on  anode -3.639023896271665 -3.639023896271668
+Q_numeric , Q_analytic charges on  cathode 3.6408995487874942 3.640899548787489
+Q_numeric , Q_analytic charges on  anode -3.65289954878749 -3.6528995487874893
+Q_numeric , Q_analytic charges on  cathode 3.689439252736277 3.6894392527362796
+Q_numeric , Q_analytic charges on  anode -3.701439252736228 -3.701439252736223
+Q_numeric , Q_analytic charges on  cathode 3.671084361292242 3.671084361292246
+Q_numeric , Q_analytic charges on  anode -3.6830843612922126 -3.683084361292218
+Q_numeric , Q_analytic charges on  cathode 3.608663950802495 3.608663950802496
+Q_numeric , Q_analytic charges on  anode -3.620663950802499 -3.6206639508024963
+Q_numeric , Q_analytic charges on  cathode 3.6642647302102422 3.664264730210236
+Q_numeric , Q_analytic charges on  anode -3.6762647302102076 -3.676264730210208
+Q_numeric , Q_analytic charges on  cathode 3.663203134436418 3.6632031344364164
+Q_numeric , Q_analytic charges on  anode -3.675203134436388 -3.6752031344363885
+Q_numeric , Q_analytic charges on  cathode 3.7199370409016277 3.719937040901628
+Q_numeric , Q_analytic charges on  anode -3.731937040901577 -3.7319370409015717
+Q_numeric , Q_analytic charges on  cathode 3.7979831698655335 3.797983169865533
+Q_numeric , Q_analytic charges on  anode -3.809983169865478 -3.8099831698654767
+Q_numeric , Q_analytic charges on  cathode 3.80936393265528 3.8093639326552746
+Q_numeric , Q_analytic charges on  anode -3.8213639326552475 -3.8213639326552467
+Q_numeric , Q_analytic charges on  cathode 3.7835268539810594 3.78352685398106
+Q_numeric , Q_analytic charges on  anode -3.7955268539810056 -3.7955268539810034
+Q_numeric , Q_analytic charges on  cathode 3.70824397409651 3.7082439740965056
+Q_numeric , Q_analytic charges on  anode -3.7202439740965008 -3.720243974096506
+Q_numeric , Q_analytic charges on  cathode 3.716725108381507 3.7167251083815116
+Q_numeric , Q_analytic charges on  anode -3.7287251083815103 -3.728725108381512
+Q_numeric , Q_analytic charges on  cathode 3.7387273242588765 3.738727324258876
+Q_numeric , Q_analytic charges on  anode -3.750727324258818 -3.7507273242588197
+Q_numeric , Q_analytic charges on  cathode 3.7643088040050725 3.76430880400507
+Q_numeric , Q_analytic charges on  anode -3.7763088040050405 -3.776308804005042
+Q_numeric , Q_analytic charges on  cathode 3.74410011614508 3.7441001161450784
+Q_numeric , Q_analytic charges on  anode -3.7561001161450487 -3.7561001161450505
+Q_numeric , Q_analytic charges on  cathode 3.7286698244426586 3.728669824442663
+Q_numeric , Q_analytic charges on  anode -3.7406698244426337 -3.740669824442635
+Q_numeric , Q_analytic charges on  cathode 3.6694861598679056 3.6694861598679025
+Q_numeric , Q_analytic charges on  anode -3.6814861598678386 -3.681486159867846
+Q_numeric , Q_analytic charges on  cathode 3.725684828233303 3.7256848282332995
+Q_numeric , Q_analytic charges on  anode -3.737684828233327 -3.7376848282333284
+Q_numeric , Q_analytic charges on  cathode 3.7519514001590504 3.7519514001590593
+Q_numeric , Q_analytic charges on  anode -3.763951400158999 -3.763951400159003
+Q_numeric , Q_analytic charges on  cathode 3.6965611649276133 3.696561164927617
+Q_numeric , Q_analytic charges on  anode -3.7085611649276204 -3.7085611649276173
+Q_numeric , Q_analytic charges on  cathode 3.666809747440361 3.666809747440355
+Q_numeric , Q_analytic charges on  anode -3.6788097474403214 -3.678809747440327
+Q_numeric , Q_analytic charges on  cathode 3.7200866034460365 3.720086603446036
+Q_numeric , Q_analytic charges on  anode -3.7320866034460005 -3.732086603446008
+Q_numeric , Q_analytic charges on  cathode 3.7067120983749766 3.70671209837498
+Q_numeric , Q_analytic charges on  anode -3.718712098374985 -3.7187120983749806
+Q_numeric , Q_analytic charges on  cathode 3.6581171787806452 3.658117178780644
+Q_numeric , Q_analytic charges on  anode -3.670117178780654 -3.6701171787806444
+Q_numeric , Q_analytic charges on  cathode 3.69883845808222 3.6988384580822227
+Q_numeric , Q_analytic charges on  anode -3.7108384580821645 -3.7108384580821663
+Q_numeric , Q_analytic charges on  cathode 3.674851323708917 3.6748513237089226
+Q_numeric , Q_analytic charges on  anode -3.686851323708872 -3.6868513237088663
+Q_numeric , Q_analytic charges on  cathode 3.6149342815530923 3.6149342815530914
+Q_numeric , Q_analytic charges on  anode -3.6269342815530896 -3.626934281553092
+Q_numeric , Q_analytic charges on  cathode 3.616770276162401 3.6167702761624
+Q_numeric , Q_analytic charges on  anode -3.6287702761623977 -3.6287702761624003
+Q_numeric , Q_analytic charges on  cathode 3.6093952835170886 3.6093952835170895
+Q_numeric , Q_analytic charges on  anode -3.6213952835170597 -3.6213952835170615
+Q_numeric , Q_analytic charges on  cathode 3.626498180599482 3.626498180599485
+Q_numeric , Q_analytic charges on  anode -3.6384981805994014 -3.6384981805994
+Q_numeric , Q_analytic charges on  cathode 3.6693624770497983 3.6693624770498032
+Q_numeric , Q_analytic charges on  anode -3.681362477049777 -3.6813624770497753
+Q_numeric , Q_analytic charges on  cathode 3.6958445731999245 3.695844573199922
+Q_numeric , Q_analytic charges on  anode -3.7078445731998952 -3.707844573199894
+Q_numeric , Q_analytic charges on  cathode 3.6823043302215863 3.682304330221585
+Q_numeric , Q_analytic charges on  anode -3.6943043302215233 -3.6943043302215286
+Q_numeric , Q_analytic charges on  cathode 3.7008528523753856 3.700852852375378
+Q_numeric , Q_analytic charges on  anode -3.712852852375351 -3.71285285237535
+Q_numeric , Q_analytic charges on  cathode 3.7282733489685054 3.7282733489685014
+Q_numeric , Q_analytic charges on  anode -3.740273348968443 -3.740273348968445
+Q_numeric , Q_analytic charges on  cathode 3.7058309824027007 3.7058309824027034
+Q_numeric , Q_analytic charges on  anode -3.7178309824026505 -3.717830982402647
+Q_numeric , Q_analytic charges on  cathode 3.7423958921046263 3.7423958921046263
+Q_numeric , Q_analytic charges on  anode -3.75439589210454 -3.7543958921045415
+Q_numeric , Q_analytic charges on  cathode 3.716702538342912 3.716702538342916
+Q_numeric , Q_analytic charges on  anode -3.7287025383428585 -3.72870253834286
+10 iteration
+52610.22347633353 kJ/mol
+-132078.01312359888 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11781.2244250092 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 410.45992063867186 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -10836.827663010785 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -136034.00483015506 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9139.269119254517 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -35811.81327854717 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 372.1760151591261 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28901.50324010056 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 3.7431903398690607 3.7431903398690607
+Q_numeric , Q_analytic charges on  anode -3.755190339869033 -3.7551903398690327
+Q_numeric , Q_analytic charges on  cathode 3.7058962615810604 3.7058962615810613
+Q_numeric , Q_analytic charges on  anode -3.717896261581033 -3.7178962615810334
+Q_numeric , Q_analytic charges on  cathode 3.745759166621336 3.7457591666213417
+Q_numeric , Q_analytic charges on  anode -3.7577591666212835 -3.7577591666212853
+Q_numeric , Q_analytic charges on  cathode 3.714182997342801 3.7141829973428044
+Q_numeric , Q_analytic charges on  anode -3.7261829973427716 -3.7261829973427765
+Q_numeric , Q_analytic charges on  cathode 3.720296273021673 3.7202962730216753
+Q_numeric , Q_analytic charges on  anode -3.7322962730216194 -3.732296273021619
+Q_numeric , Q_analytic charges on  cathode 3.7973412763449126 3.7973412763449104
+Q_numeric , Q_analytic charges on  anode -3.8093412763448598 -3.809341276344854
+Q_numeric , Q_analytic charges on  cathode 3.799907746002751 3.7999077460027464
+Q_numeric , Q_analytic charges on  anode -3.8119077460026887 -3.81190774600269
+Q_numeric , Q_analytic charges on  cathode 3.7964925118804835 3.7964925118804884
+Q_numeric , Q_analytic charges on  anode -3.8084925118804587 -3.8084925118804605
+Q_numeric , Q_analytic charges on  cathode 3.7947832997852653 3.794783299785267
+Q_numeric , Q_analytic charges on  anode -3.806783299785236 -3.806783299785239
+Q_numeric , Q_analytic charges on  cathode 3.786456625402781 3.786456625402779
+Q_numeric , Q_analytic charges on  anode -3.798456625402752 -3.798456625402751
+Q_numeric , Q_analytic charges on  cathode 3.7658146161163164 3.7658146161163173
+Q_numeric , Q_analytic charges on  anode -3.777814616116317 -3.7778146161163177
+Q_numeric , Q_analytic charges on  cathode 3.7284094045595504 3.7284094045595437
+Q_numeric , Q_analytic charges on  anode -3.7404094045595055 -3.7404094045595158
+Q_numeric , Q_analytic charges on  cathode 3.7523737764935166 3.752373776493515
+Q_numeric , Q_analytic charges on  anode -3.7643737764934873 -3.764373776493487
+Q_numeric , Q_analytic charges on  cathode 3.780165304068348 3.780165304068349
+Q_numeric , Q_analytic charges on  anode -3.792165304068324 -3.792165304068321
+Q_numeric , Q_analytic charges on  cathode 3.7484308130316446 3.7484308130316477
+Q_numeric , Q_analytic charges on  anode -3.760430813031559 -3.760430813031563
+Q_numeric , Q_analytic charges on  cathode 3.7160470559795327 3.7160470559795313
+Q_numeric , Q_analytic charges on  anode -3.728047055979446 -3.7280470559794465
+Q_numeric , Q_analytic charges on  cathode 3.7499863480517988 3.749986348051793
+Q_numeric , Q_analytic charges on  anode -3.761986348051796 -3.7619863480517934
+Q_numeric , Q_analytic charges on  cathode 3.771134278776869 3.7711342787768714
+Q_numeric , Q_analytic charges on  anode -3.7831342787767825 -3.7831342787767865
+Q_numeric , Q_analytic charges on  cathode 3.809096009911955 3.8090960099119555
+Q_numeric , Q_analytic charges on  anode -3.8210960099119546 -3.821096009911956
+Q_numeric , Q_analytic charges on  cathode 3.743536496388873 3.7435364963888715
+Q_numeric , Q_analytic charges on  anode -3.755536496388869 -3.755536496388872
+Q_numeric , Q_analytic charges on  cathode 3.77681110621107 3.776811106211072
+Q_numeric , Q_analytic charges on  anode -3.788811106211045 -3.788811106211044
+Q_numeric , Q_analytic charges on  cathode 3.71237399558184 3.7123739955818436
+Q_numeric , Q_analytic charges on  anode -3.7243739955817894 -3.724373995581787
+Q_numeric , Q_analytic charges on  cathode 3.6588189988385778 3.658818998838585
+Q_numeric , Q_analytic charges on  anode -3.6708189988385858 -3.6708189988385853
+Q_numeric , Q_analytic charges on  cathode 3.7285959215474644 3.7285959215474676
+Q_numeric , Q_analytic charges on  anode -3.740595921547437 -3.7405959215474396
+Q_numeric , Q_analytic charges on  cathode 3.7590546111067815 3.759054611106778
+Q_numeric , Q_analytic charges on  anode -3.7710546111067464 -3.77105461110675
+Q_numeric , Q_analytic charges on  cathode 3.709888273185856 3.709888273185855
+Q_numeric , Q_analytic charges on  anode -3.7218882731858245 -3.721888273185827
+Q_numeric , Q_analytic charges on  cathode 3.7359058146848114 3.735905814684814
+Q_numeric , Q_analytic charges on  anode -3.7479058146847963 -3.747905814684786
+Q_numeric , Q_analytic charges on  cathode 3.729890280454886 3.729890280454883
+Q_numeric , Q_analytic charges on  anode -3.741890280454797 -3.741890280454798
+Q_numeric , Q_analytic charges on  cathode 3.71513923140158 3.7151392314015808
+Q_numeric , Q_analytic charges on  anode -3.727139231401527 -3.7271392314015244
+Q_numeric , Q_analytic charges on  cathode 3.7369410119548747 3.7369410119548703
+Q_numeric , Q_analytic charges on  anode -3.7489410119547846 -3.7489410119547855
+Q_numeric , Q_analytic charges on  cathode 3.7863522965288503 3.786352296528848
+Q_numeric , Q_analytic charges on  anode -3.7983522965288476 -3.7983522965288485
+Q_numeric , Q_analytic charges on  cathode 3.785401856045428 3.7854018560454263
+Q_numeric , Q_analytic charges on  anode -3.7974018560453344 -3.7974018560453415
+Q_numeric , Q_analytic charges on  cathode 3.7482236932288724 3.748223693228867
+Q_numeric , Q_analytic charges on  anode -3.760223693228811 -3.7602236932288107
+Q_numeric , Q_analytic charges on  cathode 3.717426782530615 3.71742678253061
+Q_numeric , Q_analytic charges on  anode -3.7294267825305774 -3.7294267825305822
+Q_numeric , Q_analytic charges on  cathode 3.7248237452708577 3.724823745270855
+Q_numeric , Q_analytic charges on  anode -3.736823745270828 -3.736823745270827
+Q_numeric , Q_analytic charges on  cathode 3.627472605761299 3.6274726057612994
+Q_numeric , Q_analytic charges on  anode -3.639472605761243 -3.639472605761243
+Q_numeric , Q_analytic charges on  cathode 3.6155188037966655 3.6155188037966624
+Q_numeric , Q_analytic charges on  anode -3.6275188037966313 -3.6275188037966344
+Q_numeric , Q_analytic charges on  cathode 3.7039908280129508 3.7039908280129494
+Q_numeric , Q_analytic charges on  anode -3.7159908280129823 -3.7159908280129783
+Q_numeric , Q_analytic charges on  cathode 3.7015364494930174 3.701536449493021
+Q_numeric , Q_analytic charges on  anode -3.7135364494929943 -3.713536449492993
+Q_numeric , Q_analytic charges on  cathode 3.676474367846183 3.676474367846184
+Q_numeric , Q_analytic charges on  anode -3.688474367846098 -3.688474367846099
+Q_numeric , Q_analytic charges on  cathode 3.738766713577625 3.7387667135776197
+Q_numeric , Q_analytic charges on  anode -3.7507667135776153 -3.75076671357762
+Q_numeric , Q_analytic charges on  cathode 3.798840999899325 3.7988409998993276
+Q_numeric , Q_analytic charges on  anode -3.8108409998992445 -3.8108409998992427
+Q_numeric , Q_analytic charges on  cathode 3.7819904532384907 3.781990453238494
+Q_numeric , Q_analytic charges on  anode -3.7939904532384707 -3.793990453238466
+Q_numeric , Q_analytic charges on  cathode 3.779082880444252 3.779082880444251
+Q_numeric , Q_analytic charges on  anode -3.79108288044419 -3.7910828804441947
+Q_numeric , Q_analytic charges on  cathode 3.785803072513731 3.785803072513731
+Q_numeric , Q_analytic charges on  anode -3.797803072513702 -3.797803072513703
+Q_numeric , Q_analytic charges on  cathode 3.787176543282369 3.787176543282372
+Q_numeric , Q_analytic charges on  anode -3.7991765432823494 -3.799176543282344
+Q_numeric , Q_analytic charges on  cathode 3.7804095440605607 3.780409544060562
+Q_numeric , Q_analytic charges on  anode -3.792409544060557 -3.7924095440605625
+Q_numeric , Q_analytic charges on  cathode 3.7600251930693527 3.7600251930693545
+Q_numeric , Q_analytic charges on  anode -3.7720251930693482 -3.772025193069355
+Q_numeric , Q_analytic charges on  cathode 3.7947853070082167 3.794785307008213
+Q_numeric , Q_analytic charges on  anode -3.8067853070081257 -3.8067853070081283
+Q_numeric , Q_analytic charges on  cathode 3.793144180103794 3.793144180103796
+Q_numeric , Q_analytic charges on  anode -3.8051441801037673 -3.805144180103768
+11 iteration
+53342.4786362378 kJ/mol
+-132506.52274164 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11457.96410423303 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 436.4182186632635 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -11012.741623689937 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -135502.0964972931 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9176.153947925166 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -36079.919187260784 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 498.1927663879469 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28519.505405631597 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 3.7859980298181415 3.785998029818147
+Q_numeric , Q_analytic charges on  anode -3.7979980298180647 -3.797998029818062
+Q_numeric , Q_analytic charges on  cathode 3.711417675822719 3.7114176758227173
+Q_numeric , Q_analytic charges on  anode -3.7234176758226885 -3.7234176758226893
+Q_numeric , Q_analytic charges on  cathode 3.6772793392482526 3.6772793392482455
+Q_numeric , Q_analytic charges on  anode -3.6892793392482184 -3.6892793392482175
+Q_numeric , Q_analytic charges on  cathode 3.679157628679931 3.6791576286799326
+Q_numeric , Q_analytic charges on  anode -3.6911576286798717 -3.691157628679876
+Q_numeric , Q_analytic charges on  cathode 3.688597349843819 3.688597349843819
+Q_numeric , Q_analytic charges on  anode -3.7005973498437332 -3.700597349843734
+Q_numeric , Q_analytic charges on  cathode 3.691178801458432 3.691178801458436
+Q_numeric , Q_analytic charges on  anode -3.703178801458348 -3.703178801458351
+Q_numeric , Q_analytic charges on  cathode 3.7324932738337306 3.7324932738337266
+Q_numeric , Q_analytic charges on  anode -3.74449327383367 -3.7444932738336703
+Q_numeric , Q_analytic charges on  cathode 3.703044282664493 3.7030442826644943
+Q_numeric , Q_analytic charges on  anode -3.715044282664461 -3.7150442826644663
+Q_numeric , Q_analytic charges on  cathode 3.7291497083397096 3.729149708339706
+Q_numeric , Q_analytic charges on  anode -3.7411497083396723 -3.741149708339678
+Q_numeric , Q_analytic charges on  cathode 3.7276404578209883 3.7276404578209834
+Q_numeric , Q_analytic charges on  anode -3.7396404578209306 -3.739640457820927
+Q_numeric , Q_analytic charges on  cathode 3.706032352524022 3.7060323525240206
+Q_numeric , Q_analytic charges on  anode -3.718032352523963 -3.7180323525239642
+Q_numeric , Q_analytic charges on  cathode 3.7839043569553197 3.7839043569553197
+Q_numeric , Q_analytic charges on  anode -3.7959043569552704 -3.7959043569552633
+Q_numeric , Q_analytic charges on  cathode 3.810416073341189 3.8104160733411887
+Q_numeric , Q_analytic charges on  anode -3.822416073341136 -3.8224160733411323
+Q_numeric , Q_analytic charges on  cathode 3.790349520987335 3.7903495209873355
+Q_numeric , Q_analytic charges on  anode -3.8023495209873404 -3.802349520987336
+Q_numeric , Q_analytic charges on  cathode 3.770964618773134 3.7709646187731365
+Q_numeric , Q_analytic charges on  anode -3.7829646187731374 -3.782964618773137
+Q_numeric , Q_analytic charges on  cathode 3.7795566738082162 3.779556673808217
+Q_numeric , Q_analytic charges on  anode -3.791556673808163 -3.7915566738081607
+Q_numeric , Q_analytic charges on  cathode 3.789669879873785 3.789669879873786
+Q_numeric , Q_analytic charges on  anode -3.8016698798737316 -3.8016698798737294
+Q_numeric , Q_analytic charges on  cathode 3.769835010987965 3.7698350109879626
+Q_numeric , Q_analytic charges on  anode -3.7818350109879346 -3.7818350109879346
+Q_numeric , Q_analytic charges on  cathode 3.8001887132716266 3.8001887132716248
+Q_numeric , Q_analytic charges on  anode -3.812188713271593 -3.812188713271597
+Q_numeric , Q_analytic charges on  cathode 3.876724739931596 3.8767247399315905
+Q_numeric , Q_analytic charges on  anode -3.888724739931511 -3.8887247399315057
+Q_numeric , Q_analytic charges on  cathode 3.886016056546355 3.8860160565463544
+Q_numeric , Q_analytic charges on  anode -3.898016056546242 -3.898016056546241
+Q_numeric , Q_analytic charges on  cathode 3.909021143592657 3.9090211435926547
+Q_numeric , Q_analytic charges on  anode -3.9210211435926516 -3.921021143592655
+Q_numeric , Q_analytic charges on  cathode 3.906496859862489 3.906496859862487
+Q_numeric , Q_analytic charges on  anode -3.9184968598624033 -3.9184968598624024
+Q_numeric , Q_analytic charges on  cathode 3.9255865428081185 3.9255865428081207
+Q_numeric , Q_analytic charges on  anode -3.9375865428080608 -3.9375865428080643
+Q_numeric , Q_analytic charges on  cathode 3.9664303986521805 3.96643039865218
+Q_numeric , Q_analytic charges on  anode -3.9784303986520957 -3.9784303986520952
+Q_numeric , Q_analytic charges on  cathode 3.959209700554692 3.959209700554696
+Q_numeric , Q_analytic charges on  anode -3.971209700554701 -3.9712097005546965
+Q_numeric , Q_analytic charges on  cathode 3.957819794248775 3.957819794248779
+Q_numeric , Q_analytic charges on  anode -3.969819794248724 -3.9698197942487226
+Q_numeric , Q_analytic charges on  cathode 3.9450539632571964 3.945053963257196
+Q_numeric , Q_analytic charges on  anode -3.9570539632571133 -3.957053963257111
+Q_numeric , Q_analytic charges on  cathode 3.9940725502938914 3.9940725502938945
+Q_numeric , Q_analytic charges on  anode -4.0060725502938075 -4.00607255029381
+Q_numeric , Q_analytic charges on  cathode 3.9578518178494613 3.9578518178494604
+Q_numeric , Q_analytic charges on  anode -3.969851817849372 -3.9698518178493756
+Q_numeric , Q_analytic charges on  cathode 3.954974133815333 3.954974133815328
+Q_numeric , Q_analytic charges on  anode -3.9669741338152966 -3.9669741338153
+Q_numeric , Q_analytic charges on  cathode 3.911522456211079 3.9115224562110753
+Q_numeric , Q_analytic charges on  anode -3.923522456211052 -3.9235224562110473
+Q_numeric , Q_analytic charges on  cathode 3.927309486425105 3.9273094864251035
+Q_numeric , Q_analytic charges on  anode -3.9393094864250773 -3.9393094864250755
+Q_numeric , Q_analytic charges on  cathode 3.943210672094168 3.943210672094169
+Q_numeric , Q_analytic charges on  anode -3.955210672094175 -3.9552106720941693
+Q_numeric , Q_analytic charges on  cathode 3.9008746321653267 3.9008746321653276
+Q_numeric , Q_analytic charges on  anode -3.912874632165272 -3.912874632165271
+Q_numeric , Q_analytic charges on  cathode 3.879687691928512 3.879687691928511
+Q_numeric , Q_analytic charges on  anode -3.8916876919285412 -3.89168769192854
+Q_numeric , Q_analytic charges on  cathode 3.848040740810135 3.8480407408101356
+Q_numeric , Q_analytic charges on  anode -3.860040740810109 -3.8600407408101076
+Q_numeric , Q_analytic charges on  cathode 3.9010005613459544 3.901000561345954
+Q_numeric , Q_analytic charges on  anode -3.913000561345871 -3.913000561345869
+Q_numeric , Q_analytic charges on  cathode 3.8203264118161906 3.820326411816198
+Q_numeric , Q_analytic charges on  anode -3.8323264118161964 -3.8323264118161986
+Q_numeric , Q_analytic charges on  cathode 3.8223209255869683 3.822320925586966
+Q_numeric , Q_analytic charges on  anode -3.8343209255869413 -3.834320925586938
+Q_numeric , Q_analytic charges on  cathode 3.892706196242149 3.892706196242146
+Q_numeric , Q_analytic charges on  anode -3.904706196242119 -3.904706196242118
+Q_numeric , Q_analytic charges on  cathode 3.8698824866447907 3.869882486644785
+Q_numeric , Q_analytic charges on  anode -3.8818824866447788 -3.8818824866447854
+Q_numeric , Q_analytic charges on  cathode 3.869857000623388 3.869857000623385
+Q_numeric , Q_analytic charges on  anode -3.8818570006233317 -3.8818570006233286
+Q_numeric , Q_analytic charges on  cathode 3.8484055790539027 3.8484055790539045
+Q_numeric , Q_analytic charges on  anode -3.860405579053878 -3.8604055790538765
+Q_numeric , Q_analytic charges on  cathode 3.8712497955495593 3.8712497955495606
+Q_numeric , Q_analytic charges on  anode -3.8832497955495557 -3.883249795549561
+Q_numeric , Q_analytic charges on  cathode 3.909028590146264 3.909028590146265
+Q_numeric , Q_analytic charges on  anode -3.9210285901462614 -3.9210285901462654
+Q_numeric , Q_analytic charges on  cathode 3.9684491811051057 3.9684491811051017
+Q_numeric , Q_analytic charges on  anode -3.98044918110504 -3.9804491811050453
+Q_numeric , Q_analytic charges on  cathode 4.000717792985101 4.000717792985101
+Q_numeric , Q_analytic charges on  anode -4.012717792985074 -4.0127177929850735
+Q_numeric , Q_analytic charges on  cathode 3.9943642641278965 3.994364264127897
+Q_numeric , Q_analytic charges on  anode -4.0063642641278685 -4.006364264127869
+Q_numeric , Q_analytic charges on  cathode 3.987251412914655 3.987251412914661
+Q_numeric , Q_analytic charges on  anode -3.999251412914631 -3.999251412914633
+12 iteration
+53033.48492827488 kJ/mol
+-132507.67713428382 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11642.578554532936 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 445.49973498489703 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -10960.873011909436 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -135802.3201334714 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9136.540152633796 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -35753.00737492815 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 494.1576670545037 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28289.747406156035 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 4.043740810861794 4.043740810861793
+Q_numeric , Q_analytic charges on  anode -4.055740810861793 -4.055740810861794
+Q_numeric , Q_analytic charges on  cathode 3.984529150394062 3.9845291503940685
+Q_numeric , Q_analytic charges on  anode -3.9965291503940397 -3.9965291503940406
+Q_numeric , Q_analytic charges on  cathode 4.018355328710765 4.01835532871077
+Q_numeric , Q_analytic charges on  anode -4.030355328710689 -4.0303553287106855
+Q_numeric , Q_analytic charges on  cathode 4.014148667464732 4.01414866746474
+Q_numeric , Q_analytic charges on  anode -4.026148667464689 -4.026148667464684
+Q_numeric , Q_analytic charges on  cathode 3.977834683762677 3.9778346837626812
+Q_numeric , Q_analytic charges on  anode -3.989834683762712 -3.98983468376271
+Q_numeric , Q_analytic charges on  cathode 3.8986306265674764 3.8986306265674826
+Q_numeric , Q_analytic charges on  anode -3.9106306265674777 -3.910630626567483
+Q_numeric , Q_analytic charges on  cathode 3.8884889520963246 3.8884889520963255
+Q_numeric , Q_analytic charges on  anode -3.9004889520963024 -3.9004889520962975
+Q_numeric , Q_analytic charges on  cathode 3.9781818046992186 3.97818180469922
+Q_numeric , Q_analytic charges on  anode -3.9901818046992172 -3.9901818046992203
+Q_numeric , Q_analytic charges on  cathode 3.9920379817800296 3.992037981780031
+Q_numeric , Q_analytic charges on  anode -4.004037981779939 -4.0040379817799465
+Q_numeric , Q_analytic charges on  cathode 3.9496383392103542 3.949638339210354
+Q_numeric , Q_analytic charges on  anode -3.9616383392103534 -3.9616383392103542
+Q_numeric , Q_analytic charges on  cathode 3.989079122199839 3.989079122199841
+Q_numeric , Q_analytic charges on  anode -4.001079122199755 -4.001079122199757
+Q_numeric , Q_analytic charges on  cathode 3.961000460751237 3.961000460751238
+Q_numeric , Q_analytic charges on  anode -3.9730004607512392 -3.9730004607512384
+Q_numeric , Q_analytic charges on  cathode 3.972756127418664 3.972756127418664
+Q_numeric , Q_analytic charges on  anode -3.9847561274186347 -3.984756127418636
+Q_numeric , Q_analytic charges on  cathode 3.992584899475808 3.9925848994758026
+Q_numeric , Q_analytic charges on  anode -4.004584899475745 -4.004584899475747
+Q_numeric , Q_analytic charges on  cathode 3.995915739012005 3.995915739012007
+Q_numeric , Q_analytic charges on  anode -4.00791573901195 -4.007915739011951
+Q_numeric , Q_analytic charges on  cathode 3.960159013240959 3.9601590132409554
+Q_numeric , Q_analytic charges on  anode -3.9721590132409306 -3.9721590132409275
+Q_numeric , Q_analytic charges on  cathode 3.985449725919995 3.985449725919993
+Q_numeric , Q_analytic charges on  anode -3.9974497259199335 -3.9974497259199366
+Q_numeric , Q_analytic charges on  cathode 3.975230661121331 3.9752306611213313
+Q_numeric , Q_analytic charges on  anode -3.9872306611213273 -3.9872306611213317
+Q_numeric , Q_analytic charges on  cathode 3.987414709521933 3.98741470952193
+Q_numeric , Q_analytic charges on  anode -3.9994147095219614 -3.9994147095219588
+Q_numeric , Q_analytic charges on  cathode 4.006572131076344 4.006572131076341
+Q_numeric , Q_analytic charges on  anode -4.018572131076254 -4.018572131076256
+Q_numeric , Q_analytic charges on  cathode 4.048811944825426 4.048811944825433
+Q_numeric , Q_analytic charges on  anode -4.060811944825402 -4.060811944825405
+Q_numeric , Q_analytic charges on  cathode 4.021720989050003 4.021720989049998
+Q_numeric , Q_analytic charges on  anode -4.033720989049946 -4.033720989049941
+Q_numeric , Q_analytic charges on  cathode 4.061583566575182 4.061583566575182
+Q_numeric , Q_analytic charges on  anode -4.073583566575177 -4.0735835665751825
+Q_numeric , Q_analytic charges on  cathode 4.06601805637214 4.0660180563721315
+Q_numeric , Q_analytic charges on  anode -4.07801805637208 -4.078018056372075
+Q_numeric , Q_analytic charges on  cathode 3.9729806965422503 3.9729806965422525
+Q_numeric , Q_analytic charges on  anode -3.9849806965422236 -3.9849806965422245
+Q_numeric , Q_analytic charges on  cathode 3.9486230426242175 3.9486230426242215
+Q_numeric , Q_analytic charges on  anode -3.960623042624192 -3.9606230426241935
+Q_numeric , Q_analytic charges on  cathode 3.9418650467859915 3.9418650467859933
+Q_numeric , Q_analytic charges on  anode -3.953865046785965 -3.9538650467859653
+Q_numeric , Q_analytic charges on  cathode 3.984510517460266 3.9845105174602664
+Q_numeric , Q_analytic charges on  anode -3.996510517460213 -3.99651051746021
+Q_numeric , Q_analytic charges on  cathode 3.951671415380005 3.9516714153800065
+Q_numeric , Q_analytic charges on  anode -3.9636714153799733 -3.9636714153799786
+Q_numeric , Q_analytic charges on  cathode 3.957569150101608 3.9575691501016066
+Q_numeric , Q_analytic charges on  anode -3.9695691501016137 -3.969569150101607
+Q_numeric , Q_analytic charges on  cathode 4.021614283055829 4.021614283055827
+Q_numeric , Q_analytic charges on  anode -4.033614283055801 -4.033614283055799
+Q_numeric , Q_analytic charges on  cathode 4.029468576174263 4.029468576174269
+Q_numeric , Q_analytic charges on  anode -4.041468576174184 -4.041468576174184
+Q_numeric , Q_analytic charges on  cathode 4.048469647732811 4.048469647732803
+Q_numeric , Q_analytic charges on  anode -4.060469647732811 -4.060469647732804
+Q_numeric , Q_analytic charges on  cathode 4.003009523713087 4.003009523713091
+Q_numeric , Q_analytic charges on  anode -4.015009523713062 -4.015009523713063
+Q_numeric , Q_analytic charges on  cathode 3.993584785758989 3.993584785758985
+Q_numeric , Q_analytic charges on  anode -4.005584785758978 -4.005584785758986
+Q_numeric , Q_analytic charges on  cathode 3.96518445534913 3.965184455349133
+Q_numeric , Q_analytic charges on  anode -3.977184455349114 -3.977184455349105
+Q_numeric , Q_analytic charges on  cathode 3.9517437794670616 3.951743779467067
+Q_numeric , Q_analytic charges on  anode -3.963743779467013 -3.9637437794670105
+Q_numeric , Q_analytic charges on  cathode 3.9575939136306224 3.957593913630619
+Q_numeric , Q_analytic charges on  anode -3.9695939136305607 -3.9695939136305625
+Q_numeric , Q_analytic charges on  cathode 3.93314517274123 3.9331451727412214
+Q_numeric , Q_analytic charges on  anode -3.945145172741195 -3.9451451727411935
+Q_numeric , Q_analytic charges on  cathode 3.9299042867755944 3.929904286775597
+Q_numeric , Q_analytic charges on  anode -3.9419042867755425 -3.9419042867755407
+Q_numeric , Q_analytic charges on  cathode 3.919086773763715 3.9190867737637105
+Q_numeric , Q_analytic charges on  anode -3.9310867737636777 -3.9310867737636825
+Q_numeric , Q_analytic charges on  cathode 3.918724555056589 3.918724555056586
+Q_numeric , Q_analytic charges on  anode -3.9307245550565058 -3.9307245550565013
+Q_numeric , Q_analytic charges on  cathode 3.971327171130684 3.971327171130683
+Q_numeric , Q_analytic charges on  anode -3.9833271711306306 -3.9833271711306266
+Q_numeric , Q_analytic charges on  cathode 4.004109906884745 4.004109906884752
+Q_numeric , Q_analytic charges on  anode -4.016109906884725 -4.016109906884724
+Q_numeric , Q_analytic charges on  cathode 4.014262966818379 4.0142629668183805
+Q_numeric , Q_analytic charges on  anode -4.026262966818384 -4.026262966818381
+Q_numeric , Q_analytic charges on  cathode 3.9903905425384374 3.9903905425384365
+Q_numeric , Q_analytic charges on  anode -4.002390542538407 -4.002390542538409
+Q_numeric , Q_analytic charges on  cathode 4.013562036668201 4.0135620366682065
+Q_numeric , Q_analytic charges on  anode -4.025562036668203 -4.025562036668207
+Q_numeric , Q_analytic charges on  cathode 3.994822713731692 3.9948227137316947
+Q_numeric , Q_analytic charges on  anode -4.0068227137316414 -4.006822713731639
+Q_numeric , Q_analytic charges on  cathode 4.075716973714536 4.0757169737145365
+Q_numeric , Q_analytic charges on  anode -4.08771697371451 -4.0877169737145085
+Q_numeric , Q_analytic charges on  cathode 4.045579994492797 4.045579994492799
+Q_numeric , Q_analytic charges on  anode -4.057579994492766 -4.057579994492771
+13 iteration
+52631.264984539535 kJ/mol
+-132655.06345523195 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11481.413037736513 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 440.29511288682363 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -10892.451104515838 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -135802.46843514033 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9175.33904650656 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -36242.266547636544 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 455.6601235665439 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 28729.415604086942 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 4.08269178129824 4.082691781298239
+Q_numeric , Q_analytic charges on  anode -4.094691781298215 -4.094691781298211
+Q_numeric , Q_analytic charges on  cathode 4.050565918924679 4.050565918924677
+Q_numeric , Q_analytic charges on  anode -4.062565918924589 -4.062565918924593
+Q_numeric , Q_analytic charges on  cathode 3.975410162728926 3.9754101627289216
+Q_numeric , Q_analytic charges on  anode -3.9874101627288936 -3.9874101627288936
+Q_numeric , Q_analytic charges on  cathode 3.9646823232176454 3.964682323217646
+Q_numeric , Q_analytic charges on  anode -3.976682323217645 -3.9766823232176463
+Q_numeric , Q_analytic charges on  cathode 3.9974261875036823 3.9974261875036787
+Q_numeric , Q_analytic charges on  anode -4.009426187503622 -4.009426187503623
+Q_numeric , Q_analytic charges on  cathode 3.9809664686959723 3.980966468695969
+Q_numeric , Q_analytic charges on  anode -3.992966468695948 -3.992966468695941
+Q_numeric , Q_analytic charges on  cathode 4.0367065108449625 4.036706510844953
+Q_numeric , Q_analytic charges on  anode -4.04870651084493 -4.048706510844925
+Q_numeric , Q_analytic charges on  cathode 4.0146684044589325 4.0146684044589325
+Q_numeric , Q_analytic charges on  anode -4.026668404458904 -4.0266684044589045
+Q_numeric , Q_analytic charges on  cathode 4.038277132961035 4.03827713296103
+Q_numeric , Q_analytic charges on  anode -4.050277132961 -4.050277132961002
+Q_numeric , Q_analytic charges on  cathode 4.0343287431239965 4.034328743123995
+Q_numeric , Q_analytic charges on  anode -4.046328743124017 -4.046328743124024
+Q_numeric , Q_analytic charges on  cathode 4.101173124270517 4.1011731242705185
+Q_numeric , Q_analytic charges on  anode -4.113173124270467 -4.113173124270462
+Q_numeric , Q_analytic charges on  cathode 4.164813191362991 4.164813191362997
+Q_numeric , Q_analytic charges on  anode -4.176813191362912 -4.176813191362912
+Q_numeric , Q_analytic charges on  cathode 4.095561003819529 4.095561003819528
+Q_numeric , Q_analytic charges on  anode -4.107561003819467 -4.107561003819471
+Q_numeric , Q_analytic charges on  cathode 4.052079023594151 4.052079023594148
+Q_numeric , Q_analytic charges on  anode -4.064079023594086 -4.064079023594092
+Q_numeric , Q_analytic charges on  cathode 4.024890291366397 4.0248902913663915
+Q_numeric , Q_analytic charges on  anode -4.0368902913663645 -4.036890291366364
+Q_numeric , Q_analytic charges on  cathode 4.027993461571973 4.027993461571969
+Q_numeric , Q_analytic charges on  anode -4.039993461571967 -4.039993461571969
+Q_numeric , Q_analytic charges on  cathode 4.069252745290266 4.0692527452902585
+Q_numeric , Q_analytic charges on  anode -4.081252745290206 -4.081252745290202
+Q_numeric , Q_analytic charges on  cathode 4.0578893949779475 4.05788939497795
+Q_numeric , Q_analytic charges on  anode -4.069889394977892 -4.069889394977894
+Q_numeric , Q_analytic charges on  cathode 4.007652581068972 4.007652581068969
+Q_numeric , Q_analytic charges on  anode -4.0196525810689465 -4.019652581068941
+Q_numeric , Q_analytic charges on  cathode 4.0439971225793725 4.043997122579372
+Q_numeric , Q_analytic charges on  anode -4.055997122579304 -4.055997122579315
+Q_numeric , Q_analytic charges on  cathode 4.014096419427922 4.014096419427931
+Q_numeric , Q_analytic charges on  anode -4.026096419427871 -4.0260964194278746
+Q_numeric , Q_analytic charges on  cathode 4.06491022500366 4.0649102250036595
+Q_numeric , Q_analytic charges on  anode -4.076910225003658 -4.07691022500366
+Q_numeric , Q_analytic charges on  cathode 4.055834794242618 4.055834794242616
+Q_numeric , Q_analytic charges on  anode -4.06783479424259 -4.067834794242588
+Q_numeric , Q_analytic charges on  cathode 4.025581566768742 4.025581566768738
+Q_numeric , Q_analytic charges on  anode -4.037581566768645 -4.037581566768653
+Q_numeric , Q_analytic charges on  cathode 4.070870083380573 4.070870083380571
+Q_numeric , Q_analytic charges on  anode -4.082870083380517 -4.082870083380515
+Q_numeric , Q_analytic charges on  cathode 4.0276096129423795 4.027609612942387
+Q_numeric , Q_analytic charges on  anode -4.039609612942298 -4.039609612942302
+Q_numeric , Q_analytic charges on  cathode 4.005808345670107 4.005808345670106
+Q_numeric , Q_analytic charges on  anode -4.017808345670049 -4.0178083456700495
+Q_numeric , Q_analytic charges on  cathode 4.012048879129633 4.0120488791296385
+Q_numeric , Q_analytic charges on  anode -4.024048879129584 -4.024048879129582
+Q_numeric , Q_analytic charges on  cathode 3.9437428237696506 3.943742823769655
+Q_numeric , Q_analytic charges on  anode -3.955742823769631 -3.955742823769627
+Q_numeric , Q_analytic charges on  cathode 3.949513669007827 3.9495136690078296
+Q_numeric , Q_analytic charges on  anode -3.961513669007744 -3.961513669007745
+Q_numeric , Q_analytic charges on  cathode 3.9247770140380176 3.9247770140380154
+Q_numeric , Q_analytic charges on  anode -3.936777014037985 -3.9367770140379874
+Q_numeric , Q_analytic charges on  cathode 3.9020104390650836 3.9020104390650814
+Q_numeric , Q_analytic charges on  anode -3.914010439065105 -3.9140104390651103
+Q_numeric , Q_analytic charges on  cathode 3.9184554072938753 3.918455407293878
+Q_numeric , Q_analytic charges on  anode -3.930455407293814 -3.9304554072938216
+Q_numeric , Q_analytic charges on  cathode 3.9436856725459646 3.943685672545955
+Q_numeric , Q_analytic charges on  anode -3.9556856725459193 -3.955685672545927
+Q_numeric , Q_analytic charges on  cathode 4.003810767445075 4.003810767445076
+Q_numeric , Q_analytic charges on  anode -4.015810767445046 -4.015810767445048
+Q_numeric , Q_analytic charges on  cathode 3.9448295557961788 3.944829555796177
+Q_numeric , Q_analytic charges on  anode -3.9568295557961455 -3.956829555796149
+Q_numeric , Q_analytic charges on  cathode 3.9201220656921287 3.920122065692128
+Q_numeric , Q_analytic charges on  anode -3.9321220656921225 -3.9321220656921283
+Q_numeric , Q_analytic charges on  cathode 3.985655202057175 3.9856552020571754
+Q_numeric , Q_analytic charges on  anode -3.9976552020571754 -3.997655202057176
+Q_numeric , Q_analytic charges on  cathode 3.9938121734164604 3.9938121734164596
+Q_numeric , Q_analytic charges on  anode -4.005812173416434 -4.005812173416432
+Q_numeric , Q_analytic charges on  cathode 3.9818864588378022 3.9818864588377934
+Q_numeric , Q_analytic charges on  anode -3.9938864588377396 -3.993886458837737
+Q_numeric , Q_analytic charges on  cathode 3.9848521411191355 3.9848521411191355
+Q_numeric , Q_analytic charges on  anode -3.996852141119103 -3.9968521411191076
+Q_numeric , Q_analytic charges on  cathode 3.9865010572923847 3.986501057292388
+Q_numeric , Q_analytic charges on  anode -3.9985010572923327 -3.9985010572923314
+Q_numeric , Q_analytic charges on  cathode 3.9643530861201666 3.964353086120171
+Q_numeric , Q_analytic charges on  anode -3.9763530861201963 -3.9763530861202
+Q_numeric , Q_analytic charges on  cathode 3.9848999517091843 3.9848999517091825
+Q_numeric , Q_analytic charges on  anode -3.996899951709129 -3.996899951709126
+Q_numeric , Q_analytic charges on  cathode 3.987529836904755 3.987529836904757
+Q_numeric , Q_analytic charges on  anode -3.9995298369047583 -3.9995298369047574
+Q_numeric , Q_analytic charges on  cathode 3.9186403993650636 3.9186403993650614
+Q_numeric , Q_analytic charges on  anode -3.930640399365061 -3.930640399365062
+Q_numeric , Q_analytic charges on  cathode 3.895613329402142 3.89561332940214
+Q_numeric , Q_analytic charges on  anode -3.9076133294021447 -3.9076133294021402
+Q_numeric , Q_analytic charges on  cathode 3.9301043391002293 3.9301043391002266
+Q_numeric , Q_analytic charges on  anode -3.9421043391001973 -3.9421043391001986
+Q_numeric , Q_analytic charges on  cathode 3.88647505256531 3.8864750525653036
+Q_numeric , Q_analytic charges on  anode -3.898475052565246 -3.898475052565247
+Q_numeric , Q_analytic charges on  cathode 3.8722306474884793 3.8722306474884802
+Q_numeric , Q_analytic charges on  anode -3.8842306474884283 -3.884230647488424
+14 iteration
+53031.083291736155 kJ/mol
+-131958.39943095902 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11473.164467468761 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 432.2563085803838 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -11067.484227037288 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -135334.7108436278 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 8905.586242070189 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -36127.15003354526 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 397.9996396598872 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 29361.93918251486 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 3.963718442878432 3.9637184428784322
+Q_numeric , Q_analytic charges on  anode -3.975718442878432 -3.9757184428784327
+Q_numeric , Q_analytic charges on  cathode 4.013607315431341 4.013607315431345
+Q_numeric , Q_analytic charges on  anode -4.025607315431342 -4.025607315431346
+Q_numeric , Q_analytic charges on  cathode 4.03509579655712 4.035095796557117
+Q_numeric , Q_analytic charges on  anode -4.047095796557118 -4.047095796557118
+Q_numeric , Q_analytic charges on  cathode 4.026434039512265 4.026434039512269
+Q_numeric , Q_analytic charges on  anode -4.038434039512215 -4.038434039512213
+Q_numeric , Q_analytic charges on  cathode 4.021346066955958 4.021346066955958
+Q_numeric , Q_analytic charges on  anode -4.033346066955848 -4.033346066955845
+Q_numeric , Q_analytic charges on  cathode 4.0027709775648805 4.0027709775648805
+Q_numeric , Q_analytic charges on  anode -4.014770977564884 -4.014770977564881
+Q_numeric , Q_analytic charges on  cathode 4.062415417943569 4.062415417943571
+Q_numeric , Q_analytic charges on  anode -4.074415417943487 -4.074415417943486
+Q_numeric , Q_analytic charges on  cathode 4.018675974616106 4.018675974616103
+Q_numeric , Q_analytic charges on  anode -4.030675974616075 -4.030675974616075
+Q_numeric , Q_analytic charges on  cathode 4.004272808552901 4.0042728085529
+Q_numeric , Q_analytic charges on  anode -4.016272808552839 -4.016272808552843
+Q_numeric , Q_analytic charges on  cathode 4.010172670842187 4.0101726708421825
+Q_numeric , Q_analytic charges on  anode -4.022172670842067 -4.022172670842069
+Q_numeric , Q_analytic charges on  cathode 3.990834218500664 3.9908342185006673
+Q_numeric , Q_analytic charges on  anode -4.002834218500674 -4.002834218500668
+Q_numeric , Q_analytic charges on  cathode 3.971367275672765 3.971367275672763
+Q_numeric , Q_analytic charges on  anode -3.9833672756727356 -3.983367275672735
+Q_numeric , Q_analytic charges on  cathode 4.001483605697001 4.001483605697006
+Q_numeric , Q_analytic charges on  anode -4.013483605696948 -4.013483605696949
+Q_numeric , Q_analytic charges on  cathode 3.9840552707205568 3.9840552707205616
+Q_numeric , Q_analytic charges on  anode -3.996055270720563 -3.996055270720562
+Q_numeric , Q_analytic charges on  cathode 3.9652774859624857 3.9652774859624897
+Q_numeric , Q_analytic charges on  anode -3.9772774859624564 -3.977277485962462
+Q_numeric , Q_analytic charges on  cathode 3.976412803199158 3.9764128031991546
+Q_numeric , Q_analytic charges on  anode -3.9884128031991 -3.988412803199098
+Q_numeric , Q_analytic charges on  cathode 3.98236044241067 3.9823604424106676
+Q_numeric , Q_analytic charges on  anode -3.994360442410607 -3.994360442410611
+Q_numeric , Q_analytic charges on  cathode 3.9243103607885668 3.9243103607885685
+Q_numeric , Q_analytic charges on  anode -3.9363103607885073 -3.936310360788512
+Q_numeric , Q_analytic charges on  cathode 3.9461579820981165 3.9461579820981156
+Q_numeric , Q_analytic charges on  anode -3.958157982098166 -3.958157982098173
+Q_numeric , Q_analytic charges on  cathode 3.9841210292748963 3.984121029274904
+Q_numeric , Q_analytic charges on  anode -3.9961210292748475 -3.9961210292748475
+Q_numeric , Q_analytic charges on  cathode 4.001545773644774 4.001545773644766
+Q_numeric , Q_analytic charges on  anode -4.013545773644735 -4.013545773644738
+Q_numeric , Q_analytic charges on  cathode 4.061987533589516 4.061987533589518
+Q_numeric , Q_analytic charges on  anode -4.073987533589499 -4.07398753358949
+Q_numeric , Q_analytic charges on  cathode 4.038968407932784 4.038968407932787
+Q_numeric , Q_analytic charges on  anode -4.050968407932754 -4.050968407932759
+Q_numeric , Q_analytic charges on  cathode 4.028382003365448 4.0283820033654525
+Q_numeric , Q_analytic charges on  anode -4.040382003365306 -4.040382003365311
+Q_numeric , Q_analytic charges on  cathode 4.070754110059465 4.07075411005947
+Q_numeric , Q_analytic charges on  anode -4.082754110059385 -4.082754110059385
+Q_numeric , Q_analytic charges on  cathode 4.081887989050399 4.0818879890504025
+Q_numeric , Q_analytic charges on  anode -4.093887989050409 -4.093887989050403
+Q_numeric , Q_analytic charges on  cathode 4.023248861495761 4.023248861495761
+Q_numeric , Q_analytic charges on  anode -4.035248861495701 -4.035248861495704
+Q_numeric , Q_analytic charges on  cathode 4.054296595677054 4.0542965956770605
+Q_numeric , Q_analytic charges on  anode -4.0662965956770645 -4.066296595677061
+Q_numeric , Q_analytic charges on  cathode 4.037622525120999 4.037622525120996
+Q_numeric , Q_analytic charges on  anode -4.049622525120974 -4.049622525120968
+Q_numeric , Q_analytic charges on  cathode 4.0471098414507045 4.047109841450707
+Q_numeric , Q_analytic charges on  anode -4.059109841450712 -4.059109841450708
+Q_numeric , Q_analytic charges on  cathode 3.988625384450373 3.988625384450374
+Q_numeric , Q_analytic charges on  anode -4.0006253844503785 -4.000625384450375
+Q_numeric , Q_analytic charges on  cathode 4.001478437125978 4.001478437125984
+Q_numeric , Q_analytic charges on  anode -4.013478437125927 -4.013478437125928
+Q_numeric , Q_analytic charges on  cathode 3.996889764934889 3.996889764934893
+Q_numeric , Q_analytic charges on  anode -4.00888976493483 -4.008889764934837
+Q_numeric , Q_analytic charges on  cathode 3.9714298239558956 3.9714298239558885
+Q_numeric , Q_analytic charges on  anode -3.983429823955884 -3.983429823955889
+Q_numeric , Q_analytic charges on  cathode 4.029606308422666 4.029606308422659
+Q_numeric , Q_analytic charges on  anode -4.0416063084226135 -4.041606308422603
+Q_numeric , Q_analytic charges on  cathode 4.037045574840441 4.037045574840436
+Q_numeric , Q_analytic charges on  anode -4.0490455748403775 -4.049045574840379
+Q_numeric , Q_analytic charges on  cathode 3.998328231826813 3.9983282318268194
+Q_numeric , Q_analytic charges on  anode -4.01032823182682 -4.01032823182682
+Q_numeric , Q_analytic charges on  cathode 3.956480722729896 3.956480722729894
+Q_numeric , Q_analytic charges on  anode -3.9684807227298653 -3.968480722729866
+Q_numeric , Q_analytic charges on  cathode 3.98518002766174 3.9851800276617424
+Q_numeric , Q_analytic charges on  anode -3.997180027661683 -3.997180027661686
+Q_numeric , Q_analytic charges on  cathode 4.038685270258653 4.0386852702586555
+Q_numeric , Q_analytic charges on  anode -4.050685270258596 -4.050685270258599
+Q_numeric , Q_analytic charges on  cathode 4.078333836832698 4.0783338368327
+Q_numeric , Q_analytic charges on  anode -4.09033383683267 -4.090333836832672
+Q_numeric , Q_analytic charges on  cathode 4.062573489555336 4.062573489555335
+Q_numeric , Q_analytic charges on  anode -4.074573489555305 -4.074573489555307
+Q_numeric , Q_analytic charges on  cathode 4.071691414866978 4.071691414866978
+Q_numeric , Q_analytic charges on  anode -4.083691414866968 -4.083691414866978
+Q_numeric , Q_analytic charges on  cathode 4.040919437439453 4.040919437439458
+Q_numeric , Q_analytic charges on  anode -4.052919437439432 -4.05291943743943
+Q_numeric , Q_analytic charges on  cathode 4.0675728668383435 4.067572866838349
+Q_numeric , Q_analytic charges on  anode -4.079572866838297 -4.0795728668382925
+Q_numeric , Q_analytic charges on  cathode 4.07200425706479 4.072004257064792
+Q_numeric , Q_analytic charges on  anode -4.084004257064738 -4.084004257064736
+Q_numeric , Q_analytic charges on  cathode 4.141904772516472 4.141904772516471
+Q_numeric , Q_analytic charges on  anode -4.153904772516478 -4.153904772516471
+Q_numeric , Q_analytic charges on  cathode 4.121460971764686 4.121460971764678
+Q_numeric , Q_analytic charges on  anode -4.133460971764624 -4.133460971764622
+Q_numeric , Q_analytic charges on  cathode 4.111102919661236 4.111102919661237
+Q_numeric , Q_analytic charges on  anode -4.1231029196612115 -4.123102919661209
+Q_numeric , Q_analytic charges on  cathode 4.092933587495811 4.092933587495809
+Q_numeric , Q_analytic charges on  anode -4.104933587495777 -4.104933587495781
+15 iteration
+52849.587178485956 kJ/mol
+-132192.6790174544 kJ/mol
+<class 'openmm.openmm.HarmonicBondForce'> 11474.8700304007 kJ/mol
+<class 'openmm.openmm.PeriodicTorsionForce'> 412.73541876153945 kJ/mol
+<class 'openmm.openmm.RBTorsionForce'> -10944.380951702928 kJ/mol
+<class 'openmm.openmm.CustomTorsionForce'> 0.0 kJ/mol
+<class 'openmm.openmm.NonbondedForce'> -136058.53581091994 kJ/mol
+<class 'openmm.openmm.DrudeForce'> 9313.65138233159 kJ/mol
+<class 'openmm.openmm.CustomNonbondedForce'> -36036.261304547945 kJ/mol
+<class 'openmm.openmm.CustomBondForce'> 381.8295566545339 kJ/mol
+<class 'openmm.openmm.CMMotionRemover'> 0.0 kJ/mol
+<class 'openmm.openmm.HarmonicAngleForce'> 29263.412521773073 kJ/mol
+Q_numeric , Q_analytic charges on  cathode 4.090639756054583 4.090639756054587
+Q_numeric , Q_analytic charges on  anode -4.102639756054562 -4.102639756054559
+Q_numeric , Q_analytic charges on  cathode 4.036119371395059 4.036119371395062
+Q_numeric , Q_analytic charges on  anode -4.048119371395065 -4.048119371395062
+Q_numeric , Q_analytic charges on  cathode 4.016420904645795 4.016420904645786
+Q_numeric , Q_analytic charges on  anode -4.028420904645725 -4.0284209046457295
+Q_numeric , Q_analytic charges on  cathode 4.021298323202033 4.021298323202034
+Q_numeric , Q_analytic charges on  anode -4.0332983232020325 -4.033298323202034
+Q_numeric , Q_analytic charges on  cathode 4.044596918973492 4.044596918973484
+Q_numeric , Q_analytic charges on  anode -4.0565969189734234 -4.056596918973428
+Q_numeric , Q_analytic charges on  cathode 4.0175623032740395 4.017562303274035
+Q_numeric , Q_analytic charges on  anode -4.029562303273951 -4.02956230327395
+Q_numeric , Q_analytic charges on  cathode 3.9403641570627777 3.9403641570627754
+Q_numeric , Q_analytic charges on  anode -3.952364157062744 -3.9523641570627475
+Q_numeric , Q_analytic charges on  cathode 3.956120971294826 3.956120971294824
+Q_numeric , Q_analytic charges on  anode -3.9681209712947396 -3.968120971294739
+Q_numeric , Q_analytic charges on  cathode 3.9321425486450727 3.9321425486450763
+Q_numeric , Q_analytic charges on  anode -3.944142548645047 -3.9441425486450483
+Q_numeric , Q_analytic charges on  cathode 3.944178217513122 3.9441782175131137
+Q_numeric , Q_analytic charges on  anode -3.9561782175130524 -3.9561782175130573
+Q_numeric , Q_analytic charges on  cathode 3.9826026677525177 3.9826026677525177
+Q_numeric , Q_analytic charges on  anode -3.994602667752495 -3.9946026677524897
+Q_numeric , Q_analytic charges on  cathode 4.04961924592804 4.049619245928044
+Q_numeric , Q_analytic charges on  anode -4.061619245927988 -4.061619245927988
+Q_numeric , Q_analytic charges on  cathode 4.031852103094895 4.031852103094893
+Q_numeric , Q_analytic charges on  anode -4.043852103094862 -4.043852103094865
+Q_numeric , Q_analytic charges on  cathode 4.02162199532673 4.021621995326727
+Q_numeric , Q_analytic charges on  anode -4.033621995326667 -4.033621995326671
+Q_numeric , Q_analytic charges on  cathode 4.027265607912869 4.027265607912868
+Q_numeric , Q_analytic charges on  anode -4.039265607912812 -4.039265607912812
+Q_numeric , Q_analytic charges on  cathode 4.0407456983688945 4.040745698368896
+Q_numeric , Q_analytic charges on  anode -4.052745698368838 -4.05274569836884
+Q_numeric , Q_analytic charges on  cathode 4.043416300261802 4.043416300261798
+Q_numeric , Q_analytic charges on  anode -4.055416300261828 -4.055416300261827
+Q_numeric , Q_analytic charges on  cathode 4.091677203033773 4.09167720303377
+Q_numeric , Q_analytic charges on  anode -4.103677203033746 -4.103677203033742
+Q_numeric , Q_analytic charges on  cathode 4.078616799106253 4.078616799106259
+Q_numeric , Q_analytic charges on  anode -4.090616799106231 -4.090616799106231
+Q_numeric , Q_analytic charges on  cathode 4.137188042899718 4.137188042899725
+Q_numeric , Q_analytic charges on  anode -4.149188042899721 -4.149188042899725
+Q_numeric , Q_analytic charges on  cathode 4.148393672771066 4.148393672771066
+Q_numeric , Q_analytic charges on  anode -4.160393672771042 -4.160393672771038
+Q_numeric , Q_analytic charges on  cathode 4.1297472767339345 4.129747276733939
+Q_numeric , Q_analytic charges on  anode -4.141747276733912 -4.141747276733911
+Q_numeric , Q_analytic charges on  cathode 4.090251893183665 4.090251893183664
+Q_numeric , Q_analytic charges on  anode -4.102251893183604 -4.102251893183608
+Q_numeric , Q_analytic charges on  cathode 4.091109418543273 4.091109418543271
+Q_numeric , Q_analytic charges on  anode -4.103109418543183 -4.103109418543186
+Q_numeric , Q_analytic charges on  cathode 4.139022696370619 4.139022696370619
+Q_numeric , Q_analytic charges on  anode -4.151022696370617 -4.151022696370619
+Q_numeric , Q_analytic charges on  cathode 4.188150255681036 4.188150255681039
+Q_numeric , Q_analytic charges on  anode -4.20015025568104 -4.20015025568104
+Q_numeric , Q_analytic charges on  cathode 4.1622682289938 4.162268228993797
+Q_numeric , Q_analytic charges on  anode -4.174268228993804 -4.174268228993798
+Q_numeric , Q_analytic charges on  cathode 4.147336908471078 4.147336908471077
+Q_numeric , Q_analytic charges on  anode -4.159336908471051 -4.159336908471049
+Q_numeric , Q_analytic charges on  cathode 4.1710503684705165 4.171050368470519
+Q_numeric , Q_analytic charges on  anode -4.183050368470433 -4.183050368470434
+Q_numeric , Q_analytic charges on  cathode 4.225934035871134 4.225934035871136
+Q_numeric , Q_analytic charges on  anode -4.237934035871104 -4.237934035871108
+Q_numeric , Q_analytic charges on  cathode 4.220841554342442 4.220841554342444
+Q_numeric , Q_analytic charges on  anode -4.232841554342501 -4.232841554342501
+Q_numeric , Q_analytic charges on  cathode 4.167690156166846 4.167690156166843
+Q_numeric , Q_analytic charges on  anode -4.179690156166851 -4.179690156166844
+Q_numeric , Q_analytic charges on  cathode 4.159208388534363 4.159208388534369
+Q_numeric , Q_analytic charges on  anode -4.171208388534338 -4.171208388534341
+Q_numeric , Q_analytic charges on  cathode 4.142209072987252 4.142209072987258
+Q_numeric , Q_analytic charges on  anode -4.154209072987228 -4.15420907298723
+Q_numeric , Q_analytic charges on  cathode 4.166264619589997 4.166264619589997
+Q_numeric , Q_analytic charges on  anode -4.178264619589885 -4.178264619589884
+Q_numeric , Q_analytic charges on  cathode 4.214495349871049 4.21449534987106
+Q_numeric , Q_analytic charges on  anode -4.22649534987103 -4.226495349871032

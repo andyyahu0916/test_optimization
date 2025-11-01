@@ -93,6 +93,35 @@ class MM(MM_OPTIMIZED):
             platform=self.simmd.context.getPlatform()
             platform.setPropertyValue( self.simmd.context , 'ReferenceVextGrid' , "false" )
 
+        # 🔥 **【P0a - BUG修復 #1】** 🔥
+        # 刷新電解質電荷緩存！這修復了可極化力場中的能量爆炸BUG
+        #
+        # ⚠️  在可極化力場中，Drude振子的電荷會動態變化
+        # ⚠️  我們必須在每次Poisson solver調用時重新讀取電荷
+        #
+        # 這個方案的優勢：
+        # 1. ✅ 修復BUG：緩存永遠是即時的，能量爆炸消失
+        # 2. ✅ 保留性能：仍然可以使用快速的NumPy/Cython向量化操作
+        # 3. ✅ 最小代價：只在Poisson solver開始時刷新一次
+        if self.polarization:
+            self._cache_electrolyte_charges()
+
+        # 🔥 **【P0b - BUG修復 #2】** 🔥
+        # 刷新導體電荷緩存！這修復了Q_analytic使用過時導體電荷的BUG
+        #
+        # ⚠️  問題：compute_Electrode_charge_analytic 在迭代開始時被調用
+        # ⚠️  此時使用的是「上一個MD步驟」的導體電荷（過時！）
+        #
+        # 解決方案：在計算 Q_analytic 之前，立即從 Python objects 刷新緩存
+        # 這確保 Q_analytic 基於「即時」的導體電荷
+        if self.Conductor_list and hasattr(self, '_conductor_charges') and self._conductor_charges is not None:
+            # 直接從 Python objects 讀取（快速且即時）
+            idx = 0
+            for Conductor in self.Conductor_list:
+                for atom in Conductor.electrode_atoms:
+                    self._conductor_charges[idx] = atom.charge
+                    idx += 1
+
         # 🔥 OPTIMIZATION: Cache unit checking (avoids repeated hasattr in hot path)
         if not hasattr(self, '_openmm_uses_units'):
             state_test = self.simmd.context.getState(getPositions=True)
@@ -267,78 +296,33 @@ class MM(MM_OPTIMIZED):
 
 
     #************************************************
-    # 🔥 CYTHON OPTIMIZED: Scale_charges_analytic_general
-    # 替換 Python 循環為 Cython 批次操作 (~5-10x faster)
+    # 🔥 P3 FIXED: Scale_charges_analytic_general
+    #
+    # ⚠️  P8 錯誤邏輯已移除！
+    #
+    # 正確的物理：每個導體（陰極、陽極、Buckyball、Nanotube）
+    # 都必須**獨立**滿足自己的 Green's reciprocity 正規化條件
     #************************************************
     def Scale_charges_analytic_general(self, print_flag=False):
         """
-        🔥 Cython 優化版本: 縮放電荷到 analytic normalization
-        
-        替換關鍵的 Python 循環:
-        - self.Cathode/Anode.electrode_atoms 循環 → scale_electrode_charges_cython
-        - get_total_charge() → get_total_charge_cython (optional, sum() 已經很快)
-        
-        預期加速: ~5-10x (0.5ms → 0.05-0.1ms)
+        🔥 P3 修復：統一邏輯，不再有 if/else 分裂
+
+        每個導體都獨立正規化：
+        1. Cathode.Scale_charges_analytic()
+        2. Anode.Scale_charges_analytic()
+        3. For each Conductor: Conductor.Scale_charges_analytic()
+
+        這確保每個導體都滿足自己的邊界條件！
         """
-        
-        # NOTE: Currently assume Conductors are on Cathode if present
-        
+
+        # 1. 獨立正規化平坦電極
+        self.Cathode.Scale_charges_analytic(self, print_flag)
+        self.Anode.Scale_charges_analytic(self, print_flag)
+
+        # 2. 獨立正規化每一個學長的導體（Buckyball、Nanotube等）
         if self.Conductor_list:
-            # Anode is scaled normally
-            self.Anode.Scale_charges_analytic(self, print_flag)
-            # Get analytic correction from anode
-            Q_analytic = -1.0 * self.Anode.Q_analytic
-            
-            # 🔥 OPTIMIZATION: Use Cython for total charge calculation (optional - sum is fast)
-            if CYTHON_AVAILABLE:
-                Q_numeric_total = ec_cython.get_total_charge_cython(self.Cathode.electrode_atoms)
-                # Add charges from conductors
-                for Conductor in self.Conductor_list:
-                    Q_numeric_total += ec_cython.get_total_charge_cython(Conductor.electrode_atoms)
-            else:
-                # Fallback to Python sum
-                Q_numeric_total = self.Cathode.get_total_charge()
-                for Conductor in self.Conductor_list:
-                    Q_numeric_total += Conductor.get_total_charge()
-            
-            if print_flag:
-                print("Q_numeric , Q_analytic charges on Cathode and extra conductors", Q_numeric_total, Q_analytic)
-            
-            # Scale factor
-            scale_factor = -1
-            if abs(Q_numeric_total) > self.small_threshold:
-                scale_factor = Q_analytic / Q_numeric_total
-            
-            # 🔥 CRITICAL OPTIMIZATION: Replace Python loops with Cython batch operations!
-            if scale_factor > 0.0:
-                if CYTHON_AVAILABLE:
-                    # Cython batch update for Cathode (5-10x faster!)
-                    #print(f"🔥 DEBUG: Using Cython scale_electrode_charges for {len(self.Cathode.electrode_atoms)} atoms")
-                    ec_cython.scale_electrode_charges_cython(
-                        self.Cathode.electrode_atoms,
-                        self.nbondedForce,
-                        scale_factor
-                    )
-                    # Cython batch update for Conductors
-                    for Conductor in self.Conductor_list:
-                        ec_cython.scale_electrode_charges_cython(
-                            Conductor.electrode_atoms,
-                            self.nbondedForce,
-                            scale_factor
-                        )
-                else:
-                    # Fallback to Python loops
-                    for atom in self.Cathode.electrode_atoms:
-                        atom.charge = atom.charge * scale_factor
-                        self.nbondedForce.setParticleParameters(atom.atom_index, atom.charge, 1.0, 0.0)
-                    for Conductor in self.Conductor_list:
-                        for atom in Conductor.electrode_atoms:
-                            atom.charge = atom.charge * scale_factor
-                            self.nbondedForce.setParticleParameters(atom.atom_index, atom.charge, 1.0, 0.0)
-        else:
-            # No extra conductors - scale each electrode individually
-            self.Cathode.Scale_charges_analytic(self, print_flag)
-            self.Anode.Scale_charges_analytic(self, print_flag)
+            for Conductor in self.Conductor_list:
+                Conductor.Scale_charges_analytic(self, print_flag)
 
 
 # 🔥 Keep all other classes from OPTIMIZED unchanged

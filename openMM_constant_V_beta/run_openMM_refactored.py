@@ -17,7 +17,7 @@ import configparser
 from datetime import datetime
 
 # Add lib to path
-sys.path.insert(0, './lib/')
+sys.path.insert( 0, './lib/')
 
 # Electrode sheets need high recursion limit
 sys.setrecursionlimit(5000)
@@ -26,7 +26,7 @@ sys.setrecursionlimit(5000)
 # Parse Config
 # ============================================================
 parser = argparse.ArgumentParser(description="Run OpenMM Fixed-Voltage MD")
-parser.add_argument('-c', '--config', default='config.ini', help='Config file path')
+parser.add_argument('-c', '--config', default='config_refactored.ini', help='Config file path')
 args = parser.parse_args()
 
 if not os.path.exists(args.config):

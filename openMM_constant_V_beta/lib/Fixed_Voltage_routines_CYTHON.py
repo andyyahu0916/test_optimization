@@ -119,19 +119,29 @@ class Conductor_Virtual(object):
 
 
     def compute_z_position(self, MMsys):
-        """計算平均 Z 位置 (Python 更快,不用 Cython!)"""
+        """🔥 CYTHON OPTIMIZED: 計算平均 Z 位置"""
         state = MMsys.simmd.context.getState(getEnergy=False,getForces=False,getVelocities=False,getPositions=True)
         positions = state.getPositions()
-        
-        z_sum = 0.0
-        for atom in self.electrode_atoms:
-            z_sum += positions[atom.atom_index][2]._value
-        self.z_pos = z_sum / self.Natoms
+
+        if CYTHON_AVAILABLE:
+            # 使用 Cython C 迴圈，比 Python 迴圈更快
+            self.z_pos = ec_cython.compute_z_position_cython(self.electrode_atoms, positions)
+        else:
+            # Fallback (原始邏輯)
+            z_sum = 0.0
+            for atom in self.electrode_atoms:
+                z_sum += positions[atom.atom_index][2]._value
+            self.z_pos = z_sum / self.Natoms
 
 
     def get_total_charge(self):
-        """計算總電荷 (Python 更快,不用 Cython!)"""
-        return sum([atom.charge for atom in self.electrode_atoms])
+        """🔥 CYTHON OPTIMIZED: 計算總電荷"""
+        if CYTHON_AVAILABLE:
+            # 使用 Cython C 迴圈，避免建立中繼列表 (list comprehension)
+            return ec_cython.get_total_charge_cython(self.electrode_atoms)
+        else:
+            # Fallback (原始邏輯)
+            return sum([atom.charge for atom in self.electrode_atoms])
 
 
     def set_normal_vector(self, Electrode_contact):
@@ -179,39 +189,55 @@ class Conductor_Virtual(object):
 
 
     def compute_Electrode_charge_analytic( self, MMsys , z_positions_array, Conductor_list, z_opposite ):
-        """🔥 CYTHON OPTIMIZED: 已使用 cached charges (10-50x)"""
+        """
+        🔥 CYTHON OPTIMIZED: 使用緩存電荷 (10-50x speedup)
+
+        ✅ 安全性保證：
+        - MM_classes_CYTHON.py 的 Poisson_solver_fixed_voltage 在調用此函數前
+          會執行 self._cache_electrolyte_charges() 刷新緩存
+        - 因此 MMsys._electrolyte_charges 永遠是即時的！
+        """
         sign=1.0
         if self.electrode_type == 'anode':
             sign=-1.0
 
         self.Q_analytic = sign / ( 4.0 * numpy.pi ) * self.sheet_area * (self.Voltage / MMsys.Lgap + self.Voltage / MMsys.Lcell) * conversion_KjmolNm_Au
 
+        # Handle units - ensure both are pure numbers
+        z_opp_value = z_opposite._value if hasattr(z_opposite, '_value') else float(z_opposite)
+
+        #********** Image charge contribution:  sum over electrolyte atoms and Drude oscillators ...
         if getattr(MMsys, '_electrolyte_indices_array', None) is not None and MMsys._electrolyte_indices_array.size:
             if CYTHON_AVAILABLE:
+                # 🔥 CYTHON: Fast vectorized computation using REFRESHED cache
                 self.Q_analytic += ec_cython.compute_analytic_charge_contribution_cython(
                     z_positions_array,
-                    MMsys._electrolyte_charges,
+                    MMsys._electrolyte_charges,  # ✅ Safe: refreshed by Poisson solver
                     MMsys._electrolyte_indices_array,
-                    z_opposite,
+                    z_opp_value,
                     MMsys.Lcell
                 )
             else:
-                z_atoms = z_positions_array[MMsys.electrolyte_atom_indices]
-                z_distances = numpy.abs(z_atoms - z_opposite)
+                # Fallback: NumPy vectorized
+                z_atoms = numpy.take(z_positions_array, MMsys._electrolyte_indices_array)
+                z_distances = numpy.abs(z_atoms - z_opp_value)
                 self.Q_analytic += numpy.sum(z_distances / MMsys.Lcell * (-MMsys._electrolyte_charges))
 
+        #*********  Conductors are effectively in electrolyte as far as flat electrodes are concerned, sum over these atoms ...
         if Conductor_list and MMsys._conductor_charges is not None and getattr(MMsys, '_conductor_indices', None) is not None:
             if CYTHON_AVAILABLE:
+                # 🔥 CYTHON: Fast vectorized computation
                 self.Q_analytic += ec_cython.compute_analytic_charge_contribution_cython(
                     z_positions_array,
                     MMsys._conductor_charges,
                     MMsys._conductor_indices,
-                    z_opposite,
+                    z_opp_value,
                     MMsys.Lcell
                 )
             else:
-                z_atoms_cond = z_positions_array[MMsys._conductor_indices]
-                z_distances_cond = numpy.abs(z_atoms_cond - z_opposite)
+                # Fallback: NumPy vectorized
+                z_atoms_cond = numpy.take(z_positions_array, MMsys._conductor_indices)
+                z_distances_cond = numpy.abs(z_atoms_cond - z_opp_value)
                 self.Q_analytic += numpy.sum(z_distances_cond / MMsys.Lcell * (-MMsys._conductor_charges))
 
 
