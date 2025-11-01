@@ -3,7 +3,7 @@
 OpenMM Fixed-Voltage MD Simulation
 Refactored from original with Linus principles:
 - Config-driven (no hardcoding)
-- Support 4 MM versions (original/optimized/cython/plugin)
+- Support 3 MM versions (original/optimized/cython)
 - Zero functionality removal
 - Clean structure
 """
@@ -81,17 +81,9 @@ else:
 # ============================================================
 requested_version = mm_version
 actual_version = mm_version
-USE_PLUGIN = False
 
 try:
-    if mm_version == 'plugin':
-        print("🚀 Attempting to use Plugin (C++/CUDA Poisson solver)...")
-        from MM_classes import *
-        from Fixed_Voltage_routines import *
-        USE_PLUGIN = True
-        print("✓ Plugin version loaded successfully")
-
-    elif mm_version == 'cython':
+    if mm_version == 'cython':
         print("⚡ Attempting to use Cython version...")
         from MM_classes_CYTHON import *
         from Fixed_Voltage_routines_CYTHON import *
@@ -123,7 +115,6 @@ except (ImportError, ModuleNotFoundError, AttributeError) as e:
     from MM_classes import *
     from Fixed_Voltage_routines import *
     actual_version = 'original'
-    USE_PLUGIN = False
     print("✓ Original version loaded successfully (fallback)")
 
     # Log warning
@@ -139,18 +130,6 @@ except (ImportError, ModuleNotFoundError, AttributeError) as e:
 from simtk.openmm.app import *
 from simtk.openmm import *
 from simtk.unit import *
-
-# ============================================================
-# Setup Plugin (if requested)
-# ============================================================
-if USE_PLUGIN:
-    try:
-        import electrodecharge as ec
-        print("✓ Plugin imported")
-    except ImportError as e:
-        print(f"✗ Plugin import failed: {e}")
-        print("  Falling back to Python Poisson solver")
-        USE_PLUGIN = False
 
 # ============================================================
 # Setup Output Directory
@@ -221,80 +200,6 @@ for j in range(MMsys.system.getNumForces()):
 PDBFile.writeFile(MMsys.simmd.topology, positions, open(strdir + 'start_drudes.pdb', 'w'))
 
 # ============================================================
-# Attach Plugin Force (if using plugin)
-# ============================================================
-if USE_PLUGIN:
-    print("\n" + "="*60)
-    print("🔥 Configuring ElectrodeChargePlugin")
-    print("="*60)
-    try:
-        # Load plugin
-        conda_prefix = os.environ.get('CONDA_PREFIX', '')
-        plugin_dir = os.path.join(conda_prefix, 'lib', 'plugins')
-        if os.path.exists(plugin_dir):
-            Platform.loadPluginsFromDirectory(plugin_dir)
-            print(f"✓ Loaded plugins from: {plugin_dir}")
-
-        # Create Force object
-        force = ec.ElectrodeChargeForce()
-        force.setCathode([a.atom_index for a in MMsys.Cathode.electrode_atoms], abs(voltage))
-        force.setAnode([a.atom_index for a in MMsys.Anode.electrode_atoms], abs(voltage))
-        force.setNumIterations(4)
-        force.setSmallThreshold(MMsys.small_threshold)
-
-        # Handle conductors if present
-        if hasattr(MMsys, 'Conductor_list') and MMsys.Conductor_list:
-            print(f"✓ Found {len(MMsys.Conductor_list)} conductor(s)")
-            c_indices, c_normals, c_areas = [], [], []
-            c_contacts, c_contact_normals, c_geoms = [], [], []
-            c_atom_ids, c_atom_counts = [], []
-
-            for i, c in enumerate(MMsys.Conductor_list):
-                for atom in c.electrode_atoms:
-                    c_indices.append(atom.atom_index)
-                    c_normals.extend([atom.nx, atom.ny, atom.nz])
-                    c_areas.append(c.area_atom)
-                    c_atom_ids.append(i)
-                c_atom_counts.append(c.Natoms)
-                c_contacts.append(c.Electrode_contact_atom.atom_index)
-                c_contact_normals.extend([
-                    c.Electrode_contact_atom.nx,
-                    c.Electrode_contact_atom.ny,
-                    c.Electrode_contact_atom.nz
-                ])
-                # Geometry factor encodes conductor type
-                cname = type(c).__name__
-                if cname == 'Buckyball_Virtual':
-                    c_geoms.append(c.dr_center_contact**2)
-                elif cname == 'Nanotube_Virtual':
-                    c_geoms.append(c.dr_center_contact * c.length / 2.0)
-                else:
-                    c_geoms.append(0.0)
-
-            force.setConductorData(
-                c_indices, c_normals, c_areas,
-                c_contacts, c_contact_normals, c_geoms,
-                c_atom_ids, c_atom_counts
-            )
-
-        # Add force to system
-        force.setForceGroup(MMsys.system.getNumForces())
-        MMsys.system.addForce(force)
-
-        # Reinitialize context
-        state_tmp = MMsys.simmd.context.getState(getPositions=True, getVelocities=True)
-        MMsys.simmd.context.reinitialize()
-        MMsys.simmd.context.setPositions(state_tmp.getPositions())
-        if state_tmp.getVelocities() is not None:
-            MMsys.simmd.context.setVelocities(state_tmp.getVelocities())
-
-        print("✓ Plugin force attached to system")
-    except Exception as e:
-        print(f"✗ Plugin setup failed: {e}")
-        print("  Falling back to Python Poisson solver")
-        USE_PLUGIN = False
-
-# ============================================================
 # Setup Simulation Type
 # ============================================================
 if simulation_type == "MC_equil":
@@ -339,9 +244,8 @@ for i in range(int(simulation_time_ns * 1000 / freq_traj_output_ps)):
     # Constant Voltage Simulation
     elif simulation_type == "Constant_V":
         for j in range(int(freq_traj_output_ps * 1000 / freq_charge_update_fs)):
-            # Fixed Voltage Electrostatics (only if NOT using plugin)
-            if not USE_PLUGIN:
-                MMsys.Poisson_solver_fixed_voltage(Niterations=4)
+            # Fixed Voltage Electrostatics (Python Poisson solver)
+            MMsys.Poisson_solver_fixed_voltage(Niterations=4)
             # MD step
             MMsys.simmd.step(freq_charge_update_fs)
 
