@@ -117,9 +117,8 @@ class MM(object):
           self.friction_drude = 1/picosecond
           self.timestep = 0.001*picoseconds
           self.small_threshold = 1e-6  # threshold for charge magnitude
-          self.cutoff = 1.4*nanometer  
+          self.cutoff = 1.4*nanometer
           self.QMMM = False
-          self._electrolyte_indices_array = numpy.array([], dtype=numpy.int64)
 
           # override default settings if input to **kwargs
           if 'temperature' in kwargs :
@@ -296,18 +295,6 @@ class MM(object):
         self._cathode_indices = numpy.array([atom.atom_index for atom in self.Cathode.electrode_atoms], dtype=numpy.int64)
         self._anode_indices = numpy.array([atom.atom_index for atom in self.Anode.electrode_atoms], dtype=numpy.int64)
         
-        # 🚀 OPTIMIZATION: Cache conductor charges if they exist
-        if self.Conductor_list:
-            conductor_indices = []
-            for Conductor in self.Conductor_list:
-                conductor_indices.extend([atom.atom_index for atom in Conductor.electrode_atoms])
-            
-            # Use int64 for Cython compatibility
-            self._conductor_indices = numpy.array(conductor_indices, dtype=numpy.int64)
-            self._conductor_charges = numpy.array([
-                self.nbondedForce.getParticleParameters(idx)[0]._value
-                for idx in conductor_indices
-            ], dtype=numpy.float64)
 
 
     #******************************************
@@ -368,27 +355,7 @@ class MM(object):
                     for atom in res._atoms:
                         self.electrolyte_atom_indices.append(atom.index)
 
-        # 🚀 CRITICAL OPTIMIZATION: Cache electrolyte charges
-        # 避免在 Poisson solver 中重複調用 getParticleParameters (6000-18000 次 → 1 次!)
-        self._cache_electrolyte_charges()
     
-    
-    def _cache_electrolyte_charges(self):
-        """
-        Cache electrolyte charges to avoid repeated OpenMM API calls in Poisson solver
-        
-        Impact: Reduces getParticleParameters calls from 6,000-18,000 per MD step to just 1!
-        Speedup: 10-50x for compute_Electrode_charge_analytic
-        """
-        self._electrolyte_charges = numpy.array([
-            self.nbondedForce.getParticleParameters(idx)[0]._value
-            for idx in self.electrolyte_atom_indices
-        ], dtype=numpy.float64)
-        self._electrolyte_indices_array = numpy.array(self.electrolyte_atom_indices, dtype=numpy.int64)
-        
-        # Also prepare conductor data if applicable (will be set later in initialize_electrodes)
-        self._conductor_charges = None
-        self._conductor_indices = None
 
 
 
@@ -404,46 +371,14 @@ class MM(object):
             #print(' property value '  , platform.getPropertyValue( self.simmd.context , 'ReferenceVextGrid') )
             platform.setPropertyValue( self.simmd.context , 'ReferenceVextGrid' , "false" )
 
-        # 🔥 **【P0a - BUG修復 #1】** 🔥
-        # 刷新電解質電荷緩存！這修復了可極化力場中的能量爆炸BUG
-        #
-        # ⚠️  在可極化力場中，Drude振子的電荷會動態變化
-        # ⚠️  我們必須在每次Poisson solver調用時重新讀取電荷
-        #
-        # 這個方案的優勢：
-        # 1. ✅ 修復BUG：緩存永遠是即時的，能量爆炸消失
-        # 2. ✅ 保留性能：仍然可以使用快速的NumPy向量化操作
-        # 3. ✅ 最小代價：只在Poisson solver開始時刷新一次
-        if self.polarization:
-            self._cache_electrolyte_charges()
-
-        # 🔥 **【P0b - BUG修復 #2】** 🔥
-        # 刷新導體電荷緩存！這修復了Q_analytic使用過時導體電荷的BUG
-        #
-        # ⚠️  問題：compute_Electrode_charge_analytic 在迭代開始時被調用
-        # ⚠️  此時使用的是「上一個MD步驟」的導體電荷（過時！）
-        #
-        # 解決方案：在計算 Q_analytic 之前，立即從 Python objects 刷新緩存
-        # 這確保 Q_analytic 基於「即時」的導體電荷
-        if self.Conductor_list and hasattr(self, '_conductor_charges') and self._conductor_charges is not None:
-            # 直接從 Python objects 讀取（快速且即時）
-            idx = 0
-            for Conductor in self.Conductor_list:
-                for atom in Conductor.electrode_atoms:
-                    self._conductor_charges[idx] = atom.charge
-                    idx += 1
 
         #********* Analytic evaluation of total charge on electrodes based on electrolyte coordinates
         state = self.simmd.context.getState(getEnergy=False,getForces=False,getVelocities=False,getPositions=True)
-        
-        # 🚀 CRITICAL OPTIMIZATION: Get positions as NumPy array directly (100x faster!)
-        positions_np = state.getPositions(asNumpy=True)
-        z_component = positions_np[:, 2]
-        z_positions_array = z_component._value if hasattr(z_component, '_value') else z_component
+        positions = state.getPositions()
 
         # compute charge for both anode/cathode
-        self.Cathode.compute_Electrode_charge_analytic( self , z_positions_array , self.Conductor_list, z_opposite = self.Anode.z_pos ) # this is correct, input z_pos(Anode) for cathode charge, and vice-versa...
-        self.Anode.compute_Electrode_charge_analytic( self , z_positions_array , self.Conductor_list, z_opposite = self.Cathode.z_pos )
+        self.Cathode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Anode.z_pos ) # this is correct, input z_pos(Anode) for cathode charge, and vice-versa...
+        self.Anode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Cathode.z_pos )
 
         #print(" initial charge on Cathode/Anode " , self.Cathode.get_total_charge() , self.Anode.get_total_charge() )
 
@@ -547,15 +482,9 @@ class MM(object):
 
                 self.nbondedForce.updateParametersInContext(self.simmd.context)
                 
-                # 🚀 CRITICAL: Update cached conductor charges after Numerical_charge_Conductor modifies them
-                self._conductor_charges = numpy.array([
-                    self.nbondedForce.getParticleParameters(idx)[0]._value
-                    for idx in self._conductor_indices
-                ], dtype=numpy.float64)
-                
                 # because conductors within cell are "part of electrolyte" as far as analytic charge formula is concerned, need to recomput analytic charges here...
-                self.Cathode.compute_Electrode_charge_analytic( self , z_positions_array , self.Conductor_list, z_opposite = self.Anode.z_pos ) # this is correct, input z_pos(Anode) for cathode charge, and vice-versa...
-                self.Anode.compute_Electrode_charge_analytic( self , z_positions_array , self.Conductor_list, z_opposite = self.Cathode.z_pos )
+                self.Cathode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Anode.z_pos ) # this is correct, input z_pos(Anode) for cathode charge, and vice-versa...
+                self.Anode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Cathode.z_pos )
 
             # Now scale charges to exact Analytic normalization....
             self.Scale_charges_analytic_general()

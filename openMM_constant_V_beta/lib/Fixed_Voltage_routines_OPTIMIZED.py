@@ -317,7 +317,10 @@ class Electrode_Virtual(Conductor_Virtual):
     #
     # 🚀 OPTIMIZED: Use cached charges from MMsys to avoid 6,000-18,000 OpenMM API calls!
     #**************************
-    def compute_Electrode_charge_analytic( self, MMsys , z_positions_array, Conductor_list, z_opposite ):
+    def compute_Electrode_charge_analytic( self, MMsys , positions, Conductor_list, z_opposite ):
+        # 🔥 RESTORED TO GOLDEN STANDARD: 100% Professor's original algorithm
+        # No cache, direct getParticleParameters - "Good Taste" approach
+
         # positive sign for cathode, negative for anode
         sign=1.0
         if self.electrode_type == 'anode':
@@ -326,36 +329,24 @@ class Electrode_Virtual(Conductor_Virtual):
         #********** Geometrical contribution:  Note use the Sheet Area rather than area_atom since we want total charge...
         self.Q_analytic = sign / ( 4.0 * numpy.pi ) * self.sheet_area * (self.Voltage / MMsys.Lgap + self.Voltage / MMsys.Lcell) * conversion_KjmolNm_Au
 
-        # 🔥 NUMPY OPTIMIZED: 使用緩存電荷 (10-50x speedup)
-        #
-        # ✅ 安全性保證：
-        # - MM_classes_OPTIMIZED.py 的 Poisson_solver_fixed_voltage 在調用此函數前
-        #   會執行 self._cache_electrolyte_charges() 刷新緩存
-        # - 因此 MMsys._electrolyte_charges 永遠是即時的！
-
-        # Handle units - ensure both are pure numbers
-        z_opp_value = z_opposite._value if hasattr(z_opposite, '_value') else float(z_opposite)
-
         #********** Image charge contribution:  sum over electrolyte atoms and Drude oscillators ...
-        if getattr(MMsys, '_electrolyte_indices_array', None) is not None and MMsys._electrolyte_indices_array.size:
-            # 🔥 NUMPY: Fast vectorized computation using REFRESHED cache
-            z_atoms = numpy.take(z_positions_array, MMsys._electrolyte_indices_array)
-            z_distances = numpy.abs(z_atoms - z_opp_value)
-            self.Q_analytic += numpy.sum(z_distances / MMsys.Lcell * (-MMsys._electrolyte_charges))
-        elif MMsys.electrolyte_atom_indices:
-            # Fallback
-            z_atoms = z_positions_array[MMsys.electrolyte_atom_indices]
-            if hasattr(z_atoms, '_value'):
-                z_atoms = numpy.array([z._value for z in z_atoms], dtype=numpy.float64)
-            z_distances = numpy.abs(z_atoms - z_opp_value)
-            self.Q_analytic += numpy.sum(z_distances / MMsys.Lcell * (-MMsys._electrolyte_charges))
+        for index in MMsys.electrolyte_atom_indices:
+            (q_i, sig, eps) = MMsys.nbondedForce.getParticleParameters(index)
+            z_atom = positions[index][2]._value # in nm
+            z_distance = abs(z_atom - z_opposite)
+            # add image charge contribution
+            self.Q_analytic += (z_distance / MMsys.Lcell) * (- q_i._value)
 
         #*********  Conductors are effectively in electrolyte as far as flat electrodes are concerned, sum over these atoms ...
-        if Conductor_list and MMsys._conductor_charges is not None and getattr(MMsys, '_conductor_indices', None) is not None:
-            # 🔥 NUMPY: Fast vectorized computation using REFRESHED cache
-            z_atoms_cond = numpy.take(z_positions_array, MMsys._conductor_indices)
-            z_distances_cond = numpy.abs(z_atoms_cond - z_opp_value)
-            self.Q_analytic += numpy.sum(z_distances_cond / MMsys.Lcell * (-MMsys._conductor_charges))
+        if Conductor_list:
+            for Conductor in Conductor_list:
+                for atom in Conductor.electrode_atoms:
+                    index = atom.atom_index
+                    (q_i, sig, eps) = MMsys.nbondedForce.getParticleParameters(index)
+                    z_atom = positions[index][2]._value # in nm
+                    z_distance = abs(z_atom - z_opposite)
+                    # add image charge contribution
+                    self.Q_analytic += (z_distance / MMsys.Lcell) * (- q_i._value)
 
         
 
