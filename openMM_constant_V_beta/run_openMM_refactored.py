@@ -42,10 +42,10 @@ simulation_time_ns = sim.getfloat('simulation_time_ns')
 freq_charge_update_fs = sim.getint('freq_charge_update_fs')
 freq_traj_output_ps = sim.getint('freq_traj_output_ps')
 write_charges = sim.getboolean('write_charges', fallback=False)
-simulation_type = sim.get('simulation_type')  # "Constant_V" or "MC_equil"
+simulation_type = sim.get('simulation_type').strip()  # "Constant_V" or "MC_equil"
 voltage = sim.getfloat('voltage')
-platform = sim.get('platform', 'CUDA')
-mm_version = sim.get('mm_version', 'original').lower()
+openmm_platform = sim.get('platform', 'CUDA').strip()  # Renamed to avoid conflict with OpenMM's 'platform'
+mm_version = sim.get('mm_version', 'original').strip().lower()
 
 # [Files]
 files = config['Files']
@@ -65,7 +65,7 @@ anode_index = tuple(int(x) for x in elec.get('anode_index').split(','))
 # [MC_equil] - optional section for MC equilibration
 if config.has_section('MC_equil'):
     mc_config = config['MC_equil']
-    electrode_move = mc_config.get('electrode_move', 'Anode')
+    electrode_move = mc_config.get('electrode_move', 'Anode').strip()
     mc_pressure = mc_config.getfloat('pressure', 1.0)
     mc_barofreq = mc_config.getint('barofreq', 100)
     mc_shiftscale = mc_config.getfloat('shiftscale', 0.2)
@@ -167,7 +167,7 @@ MMsys.set_periodic_residue(True)
 t1 = datetime.now()
 
 # Set platform
-MMsys.set_platform(platform)
+MMsys.set_platform(openmm_platform)
 
 # Initialize electrodes
 MMsys.initialize_electrodes(
