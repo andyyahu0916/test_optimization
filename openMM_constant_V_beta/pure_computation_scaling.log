@@ -1,0 +1,57 @@
+======================================================================
+PURE POISSON COMPUTATION BENCHMARK
+======================================================================
+測試範圍：只有數值計算（不含 atom.charge 賦值和 setParticleParameters）
+======================================================================
+✓ Cython module available
+
+======================================================================
+SCALING TEST: Performance vs Electrode Size
+======================================================================
+
+--- Testing with 100 atoms per electrode ---
+
+
+======================================================================
+Benchmarking: Original (pure computation)
+======================================================================
+Warming up (100 iterations)... Done
+Running benchmark (1000 iterations)... Done
+
+Results:
+  Mean:   114.08 ± 44.06 μs
+  Median: 99.81 μs
+  Min:    95.06 μs
+  Max:    529.98 μs
+
+======================================================================
+Benchmarking: Optimized (pure computation)
+======================================================================
+Warming up (100 iterations)... Done
+Running benchmark (1000 iterations)... Done
+
+Results:
+  Mean:   62.70 ± 66.71 μs
+  Median: 44.48 μs
+  Min:    39.73 μs
+  Max:    1276.35 μs
+
+======================================================================
+Benchmarking: Cython (pure computation)
+======================================================================
+Warming up (100 iterations)... Traceback (most recent call last):
+  File "/home/andy/test_optimization/openMM_constant_V_beta/benchmark_poisson_pure_computation.py", line 458, in <module>
+    main()
+    ~~~~^^
+  File "/home/andy/test_optimization/openMM_constant_V_beta/benchmark_poisson_pure_computation.py", line 424, in main
+    test_scaling()
+    ~~~~~~~~~~~~^^
+  File "/home/andy/test_optimization/openMM_constant_V_beta/benchmark_poisson_pure_computation.py", line 365, in test_scaling
+    time_cyt = benchmark_version(compute_cython_pure, data, "Cython (pure computation)",
+                                warmup=warmup, iterations=iterations)
+  File "/home/andy/test_optimization/openMM_constant_V_beta/benchmark_poisson_pure_computation.py", line 274, in benchmark_version
+    compute_func(data)
+    ~~~~~~~~~~~~^^^^^^
+  File "/home/andy/test_optimization/openMM_constant_V_beta/benchmark_poisson_pure_computation.py", line 212, in compute_cython_pure
+    from electrode_charges_cython import compute_electrode_charges_pure
+ImportError: cannot import name 'compute_electrode_charges_pure' from 'electrode_charges_cython' (/home/andy/test_optimization/openMM_constant_V_beta/lib/electrode_charges_cython.cpython-313-x86_64-linux-gnu.so). Did you mean: 'compute_electrode_charges_cython'?

@@ -1,0 +1,243 @@
+======================================================================
+POISSON SOLVER COMPREHENSIVE BENCHMARK
+======================================================================
+✓ Complete calculation flow
+✓ Numerical consistency check
+✓ Multiple electrode sizes
+======================================================================
+✓ Cython module available
+
+======================================================================
+SCALING TEST: Performance vs Electrode Size
+======================================================================
+
+--- Testing with 100 atoms per electrode ---
+
+Creating test data:
+  Cathode atoms: 100
+  Anode atoms: 100
+  Total atoms: 1200 (including electrolyte)
+
+======================================================================
+Benchmarking: Original
+======================================================================
+Warming up (100 iterations)... Done
+Running benchmark (1000 iterations)... Done
+
+Results:
+  Mean:   84.20 ± 12.69 μs
+  Median: 80.25 μs
+  Min:    66.02 μs
+  Max:    236.98 μs
+
+======================================================================
+Benchmarking: Optimized
+======================================================================
+Warming up (100 iterations)... Done
+Running benchmark (1000 iterations)... Done
+
+Results:
+  Mean:   73.92 ± 8.80 μs
+  Median: 71.16 μs
+  Min:    67.81 μs
+  Max:    164.43 μs
+
+======================================================================
+Benchmarking: Cython
+======================================================================
+Warming up (100 iterations)... Done
+Running benchmark (1000 iterations)... Done
+
+Results:
+  Mean:   63.84 ± 6.16 μs
+  Median: 62.29 μs
+  Min:    59.90 μs
+  Max:    166.94 μs
+
+--- Testing with 500 atoms per electrode ---
+
+Creating test data:
+  Cathode atoms: 500
+  Anode atoms: 500
+  Total atoms: 2000 (including electrolyte)
+
+======================================================================
+Benchmarking: Original
+======================================================================
+Warming up (20 iterations)... Done
+Running benchmark (200 iterations)... Done
+
+Results:
+  Mean:   397.89 ± 18.82 μs
+  Median: 394.31 μs
+  Min:    372.32 μs
+  Max:    508.80 μs
+
+======================================================================
+Benchmarking: Optimized
+======================================================================
+Warming up (20 iterations)... Done
+Running benchmark (200 iterations)... Done
+
+Results:
+  Mean:   306.63 ± 20.23 μs
+  Median: 301.79 μs
+  Min:    287.19 μs
+  Max:    458.87 μs
+
+======================================================================
+Benchmarking: Cython
+======================================================================
+Warming up (20 iterations)... Done
+Running benchmark (200 iterations)... Done
+
+Results:
+  Mean:   294.75 ± 22.55 μs
+  Median: 289.86 μs
+  Min:    250.99 μs
+  Max:    515.12 μs
+
+--- Testing with 1000 atoms per electrode ---
+
+Creating test data:
+  Cathode atoms: 1000
+  Anode atoms: 1000
+  Total atoms: 3000 (including electrolyte)
+
+======================================================================
+Benchmarking: Original
+======================================================================
+Warming up (10 iterations)... Done
+Running benchmark (100 iterations)... Done
+
+Results:
+  Mean:   835.92 ± 44.57 μs
+  Median: 826.63 μs
+  Min:    734.01 μs
+  Max:    959.64 μs
+
+======================================================================
+Benchmarking: Optimized
+======================================================================
+Warming up (10 iterations)... Done
+Running benchmark (100 iterations)... Done
+
+Results:
+  Mean:   733.25 ± 33.69 μs
+  Median: 730.74 μs
+  Min:    680.25 μs
+  Max:    913.72 μs
+
+======================================================================
+Benchmarking: Cython
+======================================================================
+Warming up (10 iterations)... Done
+Running benchmark (100 iterations)... Done
+
+Results:
+  Mean:   691.25 ± 341.94 μs
+  Median: 649.47 μs
+  Min:    532.72 μs
+  Max:    4057.97 μs
+
+--- Testing with 2000 atoms per electrode ---
+
+Creating test data:
+  Cathode atoms: 2000
+  Anode atoms: 2000
+  Total atoms: 5000 (including electrolyte)
+
+======================================================================
+Benchmarking: Original
+======================================================================
+Warming up (10 iterations)... Done
+Running benchmark (100 iterations)... Done
+
+Results:
+  Mean:   2064.03 ± 664.83 μs
+  Median: 1940.52 μs
+  Min:    1576.31 μs
+  Max:    6167.69 μs
+
+======================================================================
+Benchmarking: Optimized
+======================================================================
+Warming up (10 iterations)... Done
+Running benchmark (100 iterations)... Done
+
+Results:
+  Mean:   1651.12 ± 488.85 μs
+  Median: 1599.98 μs
+  Min:    1276.30 μs
+  Max:    5045.03 μs
+
+======================================================================
+Benchmarking: Cython
+======================================================================
+Warming up (10 iterations)... Done
+Running benchmark (100 iterations)... Done
+
+Results:
+  Mean:   1543.80 ± 701.54 μs
+  Median: 1408.41 μs
+  Min:    1258.00 μs
+  Max:    6330.33 μs
+
+--- Testing with 5000 atoms per electrode ---
+
+Creating test data:
+  Cathode atoms: 5000
+  Anode atoms: 5000
+  Total atoms: 11000 (including electrolyte)
+
+======================================================================
+Benchmarking: Original
+======================================================================
+Warming up (10 iterations)... Done
+Running benchmark (100 iterations)... Done
+
+Results:
+  Mean:   4885.39 ± 949.93 μs
+  Median: 4676.22 μs
+  Min:    4183.57 μs
+  Max:    8993.87 μs
+
+======================================================================
+Benchmarking: Optimized
+======================================================================
+Warming up (10 iterations)... Done
+Running benchmark (100 iterations)... Done
+
+Results:
+  Mean:   3883.54 ± 999.33 μs
+  Median: 3624.71 μs
+  Min:    3235.36 μs
+  Max:    8991.20 μs
+
+======================================================================
+Benchmarking: Cython
+======================================================================
+Warming up (10 iterations)... Done
+Running benchmark (100 iterations)... Done
+
+Results:
+  Mean:   3666.94 ± 937.34 μs
+  Median: 3448.13 μs
+  Min:    3047.77 μs
+  Max:    7847.79 μs
+
+======================================================================
+SCALING SUMMARY
+======================================================================
+
+Size       Original        Optimized       Cython          Speedup (Opt)   Speedup (Cyt)  
+-------------------------------------------------------------------------------------
+100              84.2 μs        73.9 μs  63.840754955890596         1.1x     1.3188285274638307
+500             397.9 μs       306.6 μs  294.74746974301524         1.3x     1.3499318939095062
+1000            835.9 μs       733.2 μs  691.2504787032958         1.1x     1.209292283752204
+2000           2064.0 μs      1651.1 μs  1543.8014092796948         1.3x     1.3369774749498893
+5000           4885.4 μs      3883.5 μs  3666.9375802739523         1.3x     1.3322805074146462
+
+======================================================================
+BENCHMARK COMPLETE
+======================================================================

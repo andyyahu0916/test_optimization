@@ -1,0 +1,18 @@
+============================================================
+POISSON SOLVER BENCHMARK RESULTS
+============================================================
+Date: 2025-11-03 03:01:20
+Config: config_refactored.ini
+Iterations: 5
+Repeats: 3
+Warmup: 1
+
+Original Python:
+  Mean time: 315.391 ms
+  Per iter:  63.078 ms
+
+Cython Optimized:
+  Mean time: 224.000 ms
+  Per iter:  44.800 ms
+
+Speedup: 1.41x
