@@ -1775,7 +1775,7 @@ typedef npy_double __pyx_t_5numpy_double_t;
 */
 typedef npy_longdouble __pyx_t_5numpy_longdouble_t;
 
-/* "electrode_charges_cython.pyx":21
+/* "electrode_charges_cython.pyx":22
  * 
  * #  C
  * ctypedef np.float64_t DTYPE_t             # <<<<<<<<<<<<<<
@@ -1784,12 +1784,12 @@ typedef npy_longdouble __pyx_t_5numpy_longdouble_t;
 */
 typedef __pyx_t_5numpy_float64_t __pyx_t_24electrode_charges_cython_DTYPE_t;
 
-/* "electrode_charges_cython.pyx":22
+/* "electrode_charges_cython.pyx":23
  * #  C
  * ctypedef np.float64_t DTYPE_t
  * ctypedef np.int32_t ITYPE_t             # <<<<<<<<<<<<<<
  * 
- * @cython.boundscheck(False)  #
+ * #=========================================================================
 */
 typedef __pyx_t_5numpy_int32_t __pyx_t_24electrode_charges_cython_ITYPE_t;
 /* #### Code section: complex_type_declarations ### */
@@ -2637,23 +2637,6 @@ static CYTHON_INLINE void __Pyx_SafeReleaseBuffer(Py_buffer* info);
 static Py_ssize_t __Pyx_minusones[] = { -1, -1, -1, -1, -1, -1, -1, -1 };
 static Py_ssize_t __Pyx_zeros[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-#define __Pyx_BufPtrStrided1d(type, buf, i0, s0) (type)((char*)buf + i0 * s0)
-/* PyObjectDelAttr.proto */
-#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030d0000
-#define __Pyx_PyObject_DelAttr(o, n) PyObject_SetAttr(o, n, NULL)
-#else
-#define __Pyx_PyObject_DelAttr(o, n) PyObject_DelAttr(o, n)
-#endif
-
-/* PyObjectSetAttrStr.proto */
-#if CYTHON_USE_TYPE_SLOTS
-#define __Pyx_PyObject_DelAttrStr(o,n) __Pyx_PyObject_SetAttrStr(o, n, NULL)
-static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value);
-#else
-#define __Pyx_PyObject_DelAttrStr(o,n)   __Pyx_PyObject_DelAttr(o,n)
-#define __Pyx_PyObject_SetAttrStr(o,n,v) PyObject_SetAttr(o,n,v)
-#endif
-
 /* CallTypeTraverse.proto */
 #if !CYTHON_USE_TYPE_SPECS || (!CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x03090000)
 #define __Pyx_call_type_traverse(o, always_call, visit, arg) 0
@@ -3304,25 +3287,15 @@ static const char __pyx_k_N[] = "N";
 static const char __pyx_k_O[] = "O";
 static const char __pyx_k_c[] = "c";
 static const char __pyx_k_i[] = "i";
-static const char __pyx_k_q[] = "q";
 static const char __pyx_k_x[] = "x";
 static const char __pyx_k__2[] = ".";
 static const char __pyx_k__3[] = ">";
 static const char __pyx_k__4[] = "'";
 static const char __pyx_k__5[] = ")";
 static const char __pyx_k__6[] = "?";
-static const char __pyx_k_cx[] = "cx";
-static const char __pyx_k_cy[] = "cy";
-static const char __pyx_k_cz[] = "cz";
-static const char __pyx_k_dx[] = "dx";
-static const char __pyx_k_dy[] = "dy";
-static const char __pyx_k_dz[] = "dz";
 static const char __pyx_k_gc[] = "gc";
 static const char __pyx_k_id[] = "id";
 static const char __pyx_k_np[] = "np";
-static const char __pyx_k_nx[] = "nx";
-static const char __pyx_k_ny[] = "ny";
-static const char __pyx_k_nz[] = "nz";
 static const char __pyx_k_abc[] = "abc";
 static const char __pyx_k_and[] = " and ";
 static const char __pyx_k_got[] = " (got ";
@@ -3330,7 +3303,6 @@ static const char __pyx_k_new[] = "__new__";
 static const char __pyx_k_obj[] = "obj";
 static const char __pyx_k_pop[] = "pop";
 static const char __pyx_k_q_i[] = "q_i";
-static const char __pyx_k_atom[] = "atom";
 static const char __pyx_k_base[] = "base";
 static const char __pyx_k_dict[] = "__dict__";
 static const char __pyx_k_func[] = "__func__";
@@ -3338,7 +3310,6 @@ static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_mode[] = "mode";
 static const char __pyx_k_name[] = "name";
 static const char __pyx_k_ndim[] = "ndim";
-static const char __pyx_k_norm[] = "norm";
 static const char __pyx_k_pack[] = "pack";
 static const char __pyx_k_sign[] = "sign";
 static const char __pyx_k_size[] = "size";
@@ -3362,9 +3333,6 @@ static const char __pyx_k_q_old[] = "q_old";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_shape[] = "shape";
 static const char __pyx_k_start[] = "start";
-static const char __pyx_k_value[] = "_value";
-static const char __pyx_k_z_sum[] = "z_sum";
-static const char __pyx_k_charge[] = "charge";
 static const char __pyx_k_enable[] = "enable";
 static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_format[] = "format";
@@ -3373,13 +3341,11 @@ static const char __pyx_k_module[] = "__module__";
 static const char __pyx_k_name_2[] = "__name__";
 static const char __pyx_k_object[] = " object>";
 static const char __pyx_k_pickle[] = "pickle";
-static const char __pyx_k_radius[] = "radius";
 static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_struct[] = "struct";
 static const char __pyx_k_unpack[] = "unpack";
 static const char __pyx_k_update[] = "update";
 static const char __pyx_k_z_atom[] = "z_atom";
-static const char __pyx_k_charges[] = "charges";
 static const char __pyx_k_disable[] = "disable";
 static const char __pyx_k_float64[] = "float64";
 static const char __pyx_k_fortran[] = "fortran";
@@ -3398,8 +3364,9 @@ static const char __pyx_k_qualname[] = "__qualname__";
 static const char __pyx_k_register[] = "register";
 static const char __pyx_k_set_name[] = "__set_name__";
 static const char __pyx_k_setstate[] = "__setstate__";
-static const char __pyx_k_z_coords[] = "z_coords";
 static const char __pyx_k_TypeError[] = "TypeError";
+static const char __pyx_k_c_charges[] = "c_charges";
+static const char __pyx_k_c_indices[] = "c_indices";
 static const char __pyx_k_enumerate[] = "enumerate";
 static const char __pyx_k_isenabled[] = "isenabled";
 static const char __pyx_k_prefactor[] = "prefactor";
@@ -3407,8 +3374,6 @@ static const char __pyx_k_pyx_state[] = "__pyx_state";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
 static const char __pyx_k_IndexError[] = "IndexError";
 static const char __pyx_k_ValueError[] = "ValueError";
-static const char __pyx_k_atom_index[] = "atom_index";
-static const char __pyx_k_new_charge[] = "new_charge";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static const char __pyx_k_q_new_view[] = "q_new_view";
 static const char __pyx_k_z_distance[] = "z_distance";
@@ -3417,29 +3382,23 @@ static const char __pyx_k_Ez_external[] = "Ez_external";
 static const char __pyx_k_ImportError[] = "ImportError";
 static const char __pyx_k_MemoryError[] = "MemoryError";
 static const char __pyx_k_PickleError[] = "PickleError";
-static const char __pyx_k_forces_list[] = "forces_list";
 static const char __pyx_k_z_positions[] = "z_positions";
+static const char __pyx_k_0_q_U_1_y_Ba[] = "\200\001\3600\000\005\031\230\t\240\026\240q\250\001\340\004\010\210\005\210U\220!\2201\330\010\021\220\021\220%\220y\240\001\240\023\240B\240a";
 static const char __pyx_k_contribution[] = "contribution";
 static const char __pyx_k_initializing[] = "_initializing";
 static const char __pyx_k_is_coroutine[] = "_is_coroutine";
-static const char __pyx_k_nbondedForce[] = "nbondedForce";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
 static const char __pyx_k_scale_factor[] = "scale_factor";
-static const char __pyx_k_total_charge[] = "total_charge";
 static const char __pyx_k_voltage_term[] = "voltage_term";
 static const char __pyx_k_MemoryView_of[] = "<MemoryView of ";
 static const char __pyx_k_class_getitem[] = "__class_getitem__";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
 static const char __pyx_k_AssertionError[] = "AssertionError";
-static const char __pyx_k_positions_list[] = "positions_list";
-static const char __pyx_k_1A_U_1_aq_F_F_F[] = "\200\001\360\022\000\005\031\230\003\2301\230A\360\006\000\005\t\210\005\210U\220!\2201\330\010\017\210\177\230a\230q\330\010\014\210F\220!\330\010\014\210F\220!\330\010\014\210F\220!";
-static const char __pyx_k_1A_q_U_1_aq_A_1[] = "\200\001\360\022\000\005\031\230\003\2301\230A\330\004\037\230q\360\006\000\005\t\210\005\210U\220!\2201\330\010\017\210\177\230a\230q\330\010\030\230\004\230A\340\004\013\2101";
 static const char __pyx_k_View_MemoryView[] = "View.MemoryView";
 static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
 static const char __pyx_k_charge_per_atom[] = "charge_per_atom";
 static const char __pyx_k_collections_abc[] = "collections.abc";
 static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
-static const char __pyx_k_electrode_atoms[] = "electrode_atoms";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_small_threshold[] = "small_threshold";
 static const char __pyx_k_threshold_check[] = "threshold_check";
@@ -3447,42 +3406,25 @@ static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
-static const char __pyx_k_1A_0_F_A_U_1_nARq_1[] = "\200\001\360\022\000\005\031\230\003\2301\230A\330\0040\260\002\260&\270\001\270\023\270F\300\"\300A\340\004\010\210\005\210U\220!\2201\330\010\020\220\001\220\025\220n\240A\240R\240q\250\002\250!\340\004\013\2101";
-static const char __pyx_k_1A_0_F_A_U_1_k_ARq_1[] = "\200\001\360\022\000\005\031\230\003\2301\230A\330\0040\260\002\260&\270\001\270\023\270F\300\"\300A\340\004\010\210\005\210U\220!\2201\330\010\020\220\001\220\025\220k\240\021\240\"\240A\240R\240q\340\004\013\2101";
-static const char __pyx_k_1A_U_1_aq_4q_q_A_6_1[] = "\200\001\360\022\000\005\031\230\003\2301\230A\330\004\030\230\001\360\010\000\005\t\210\005\210U\220!\2201\330\010\017\210\177\230a\230q\330\010\023\2204\220q\330\010\021\220\036\230q\240\t\250\021\250\"\250A\340\004\013\2106\220\022\2201";
+static const char __pyx_k_q_U_1_a_4q_Rq_b_Rq_q[] = "\200\001\360<\000\005\031\230\t\240\026\240q\250\001\360\006\000\005\t\210\005\210U\220!\2201\330\010\016\210a\360\006\000\t\014\2104\210q\220\005\220R\220q\330\014\022\220$\220b\230\005\230R\230q\340\010\021\220\021\220%\220q";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
 static const char __pyx_k_Invalid_shape_in_axis[] = "Invalid shape in axis ";
 static const char __pyx_k_contiguous_and_direct[] = "<contiguous and direct>";
-static const char __pyx_k_setParticleParameters[] = "setParticleParameters";
-static const char __pyx_k_1A_U_1_aq_G1A_Ja_4_CuA[] = "\200\001\360\032\000\005\031\230\003\2301\230A\360\010\000\005\t\210\005\210U\220!\2201\330\010\017\210\177\230a\230q\330\010\014\210G\2201\220A\360\006\000\t\r\210J\220a\360\006\000\t\025\320\024*\250!\2504\250}\270C\270u\300A";
-static const char __pyx_k_1A_U_1_aq_T_1_Ja_4_L_Q[] = "\200\001\360\032\000\005\031\230\003\2301\230A\360\010\000\005\t\210\005\210U\220!\2201\330\010\017\210\177\230a\230q\330\010\025\220T\230\030\240\022\2401\330\010\014\210J\220a\330\010\024\320\024*\250!\2504\250}\270L\310\005\310Q";
 static const char __pyx_k_Cannot_index_with_type[] = "Cannot index with type '";
-static const char __pyx_k_1A_r_q_6_1_U_1_aq_q_T_1[] = "\200\001\360\030\000\005\031\230\003\2301\230A\330\004/\250r\260\026\260q\270\003\2706\300\022\3001\360\006\000\005\t\210\005\210U\220!\2201\330\010\017\210\177\230a\230q\330\010\017\210q\220\005\220T\230\021\340\004\013\2101";
 static const char __pyx_k_contiguous_and_indirect[] = "<contiguous and indirect>";
-static const char __pyx_k_extract_forces_z_cython[] = "extract_forces_z_cython";
-static const char __pyx_k_get_total_charge_cython[] = "get_total_charge_cython";
 static const char __pyx_k_electrode_charges_cython[] = "electrode_charges_cython";
 static const char __pyx_k_Dimension_d_is_not_direct[] = "Dimension %d is not direct";
-static const char __pyx_k_compute_z_position_cython[] = "compute_z_position_cython";
-static const char __pyx_k_set_normal_vectors_cython[] = "set_normal_vectors_cython";
+static const char __pyx_k_initialize_charges_cython[] = "initialize_charges_cython";
 static const char __pyx_k_Index_out_of_bounds_axis_d[] = "Index out of bounds (axis %d)";
 static const char __pyx_k_Step_may_not_be_zero_axis_d[] = "Step may not be zero (axis %d)";
 static const char __pyx_k_itemsize_0_for_cython_array[] = "itemsize <= 0 for cython.array";
-static const char __pyx_k_update_openmm_charges_batch[] = "update_openmm_charges_batch";
 static const char __pyx_k_electrode_charges_cython_pyx[] = "electrode_charges_cython.pyx";
-static const char __pyx_k_extract_z_coordinates_cython[] = "extract_z_coordinates_cython";
+static const char __pyx_k_scale_charges_inplace_cython[] = "scale_charges_inplace_cython";
 static const char __pyx_k_unable_to_allocate_array_data[] = "unable to allocate array data.";
-static const char __pyx_k_1_t1_q_HBa_q_HBa_q_HBa_T_AS_AS[] = "\200\001\360&\000\005\014\210?\230!\2301\330\004\017\210t\2201\340\004\t\210\036\220q\230\t\240\021\240\"\240H\250B\250a\330\004\t\210\036\220q\230\t\240\021\240\"\240H\250B\250a\330\004\t\210\036\220q\230\t\240\021\240\"\240H\250B\250a\340\004\r\210T\220\021\220\"\220A\220S\230\002\230\"\230A\230S\240\002\240\"\240A\240Q\340\004\013\2101";
-static const char __pyx_k_scale_electrode_charges_cython[] = "scale_electrode_charges_cython";
+static const char __pyx_k_J_q_q_U_1_9AQ_AQ_WBa_b_BgS_1_1[] = "\200\001\360J\001\000\005\031\230\t\240\026\240q\250\001\340\004\037\230q\360\006\000\005\t\210\005\210U\220!\2201\330\010\023\2209\230A\230Q\330\010\021\220\033\230A\230Q\360\006\000\t\026\220W\230B\230a\330\010\013\210;\220b\230\001\330\014\031\230\021\230!\360\006\000\t\032\230\033\240B\240g\250S\260\001\260\031\270!\2701\340\004\013\2101";
 static const char __pyx_k_strided_and_direct_or_indirect[] = "<strided and direct or indirect>";
-static const char __pyx_k_1A_U_1_aq_4q_1IQb_1IQb_1IQb_t1B[] = "\200\001\360 \000\005\031\230\003\2301\230A\360\n\000\005\t\210\005\210U\220!\2201\330\010\017\210\177\230a\230q\330\010\023\2204\220q\360\006\000\t\016\210^\2301\230I\240Q\240b\250\010\260\002\260!\330\010\r\210^\2301\230I\240Q\240b\250\010\260\002\260!\330\010\r\210^\2301\230I\240Q\240b\250\010\260\002\260!\360\006\000\t\020\210t\2201\220B\220a\220s\230\"\230B\230a\230s\240\"\240B\240a\240q\340\010\013\2105\220\002\220!\330\014\020\220\006\220c\230\022\2301\330\014\020\220\006\220c\230\022\2301\330\014\020\220\006\220c\230\022\2301\360\006\000\r\021\220\006\220a\330\014\020\220\006\220a\330\014\020\220\006\220a";
-static const char __pyx_k_1A_U_1_aq_a_4q_Rq_b_Rq_Ja_4_E_a[] = "\200\001\360 \000\005\031\230\003\2301\230A\360\010\000\005\t\210\005\210U\220!\2201\330\010\017\210\177\230a\230q\330\010\016\210a\360\006\000\t\014\2104\210q\220\005\220R\220q\330\014\022\220$\220b\230\005\230R\230q\340\010\014\210J\220a\330\010\024\320\024*\250!\2504\250}\270E\300\025\300a";
-static const char __pyx_k_1A_Zz_U_1_aq_4q_nAYar_nAYar_nAY[] = "\200\001\360\024\000\005\031\230\003\2301\230A\330\004\025\220Z\230z\250\021\360\010\000\005\t\210\005\210U\220!\2201\330\010\017\210\177\230a\230q\330\010\023\2204\220q\330\010\016\210n\230A\230Y\240a\240r\250\021\330\010\016\210n\230A\230Y\240a\240r\250\021\330\010\016\210n\230A\230Y\240a\240r\250\021\340\004\014\210C\210r\220\023\220C\220r\230\023\230C\230r\240\021";
-static const char __pyx_k_1A_q_U_1_7_1_AQ_WBa_b_2V3awaq_1[] = "\200\001\360 \000\005\031\230\003\2301\230A\340\004\037\230q\360\006\000\005\t\210\005\210U\220!\2201\330\010\023\2207\230!\2301\330\010\021\220\033\230A\230Q\360\006\000\t\026\220W\230B\230a\330\010\013\210;\220b\230\001\330\014\031\230\021\230!\360\006\000\t\031\230\013\2402\240V\2503\250a\250w\260a\260q\340\004\013\2101";
-static const char __pyx_k_V_1A_RvQc_r_U_1_7_1_q_4q_1_Rq_j[] = "\200\001\360V\001\000\005\031\230\003\2301\230A\360\010\000\005.\250R\250v\260Q\260c\270\026\270r\300\021\330\004 \240\001\360\006\000\005\t\210\005\210U\220!\2201\330\010\023\2207\230!\2301\330\010\022\220%\220q\230\001\360\006\000\t\014\2104\210q\220\t\230\022\2301\330\014\032\230(\240!\240:\250R\250q\340\014\032\230!\360\006\000\t\017\210j\230\003\230=\250\002\250!\360\006\000\t\014\2104\210q\220\005\220R\220q\330\014\022\220%\220r\230\021\340\010\022\220!\2205\230\001\340\004\013\2101";
-static const char __pyx_k_compute_buckyball_center_cython[] = "compute_buckyball_center_cython";
-static const char __pyx_k_compute_buckyball_radius_cython[] = "compute_buckyball_radius_cython";
-static const char __pyx_k_electrode_charges_cython_pyx_Cy[] = "\nelectrode_charges_cython.pyx\n\n\360\237\224\245 Cython \345\204\252\345\214\226\347\232\204 electrode charge \350\250\210\347\256\227\n\n\345\260\207 Python/NumPy \347\267\250\350\255\257\346\210\220 C \347\264\232\345\210\245\344\273\243\347\242\274\n\351\240\220\346\234\237\345\212\240\351\200\237: 2-5x vs NumPy vectorized\n";
+static const char __pyx_k_1A_RvQc_r_U_1_7_1_q_4q_1_Rq_j_4[] = "\200\001\360^\001\000\005\031\230\003\2301\230A\360\010\000\005.\250R\250v\260Q\260c\270\026\270r\300\021\330\004 \240\001\360\006\000\005\t\210\005\210U\220!\2201\330\010\023\2207\230!\2301\330\010\022\220%\220q\230\001\360\006\000\t\014\2104\210q\220\t\230\022\2301\330\014\032\230(\240!\240:\250R\250q\340\014\032\230!\360\006\000\t\017\210j\230\003\230=\250\002\250!\360\006\000\t\014\2104\210q\220\005\220R\220q\330\014\022\220%\220r\230\021\340\010\022\220!\2205\230\001\340\004\013\2101";
+static const char __pyx_k_electrode_charges_cython_pyx_GO[] = "\nelectrode_charges_cython.pyx\n\n\360\237\224\245 GOOD TASTE VERSION - Pure C-level computation\n\350\250\210\347\256\227\345\222\214\345\220\214\346\255\245\345\276\271\345\272\225\345\210\206\351\233\242\n\n\345\260\207 Python/NumPy \347\267\250\350\255\257\346\210\220 C \347\264\232\345\210\245\344\273\243\347\242\274\357\274\214\345\217\252\346\223\215\344\275\234 memoryviews\n\347\265\225\344\270\215\345\221\274\345\217\253 OpenMM API\357\274\214\347\265\225\344\270\215\346\216\245\350\247\270 Python \347\211\251\344\273\266\345\210\227\350\241\250\n";
 static const char __pyx_k_All_dimensions_preceding_dimensi[] = "All dimensions preceding dimension %d must be indexed and not sliced";
 static const char __pyx_k_Buffer_view_does_not_expose_stri[] = "Buffer view does not expose strides";
 static const char __pyx_k_Can_only_create_a_buffer_that_is[] = "Can only create a buffer that is contiguous in memory.";
@@ -3496,12 +3438,9 @@ static const char __pyx_k_Invalid_mode_expected_c_or_fortr[] = "Invalid mode, ex
 static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.";
 static const char __pyx_k_Out_of_bounds_on_buffer_access_a[] = "Out of bounds on buffer access (axis ";
 static const char __pyx_k_Unable_to_convert_item_to_object[] = "Unable to convert item to object";
-static const char __pyx_k_collect_electrode_charges_cython[] = "collect_electrode_charges_cython";
-static const char __pyx_k_compute_analytic_charge_contribu[] = "compute_analytic_charge_contribution_cython";
+static const char __pyx_k_compute_analytic_contribution_cy[] = "compute_analytic_contribution_cython";
 static const char __pyx_k_compute_electrode_charges_cython[] = "compute_electrode_charges_cython";
-static const char __pyx_k_compute_normal_vectors_buckyball[] = "compute_normal_vectors_buckyball_cython";
 static const char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension ";
-static const char __pyx_k_initialize_electrode_charge_cyth[] = "initialize_electrode_charge_cython";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
 static const char __pyx_k_numpy__core_multiarray_failed_to[] = "numpy._core.multiarray failed to import";
 static const char __pyx_k_numpy__core_umath_failed_to_impo[] = "numpy._core.umath failed to import";
@@ -3549,19 +3488,9 @@ static PyObject *__pyx_pf___pyx_memoryviewslice___reduce_cython__(CYTHON_UNUSED 
 static PyObject *__pyx_pf___pyx_memoryviewslice_2__setstate_cython__(CYTHON_UNUSED struct __pyx_memoryviewslice_obj *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_15View_dot_MemoryView___pyx_unpickle_Enum(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_cython(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_forces_z, __Pyx_memviewslice __pyx_v_q_old, __Pyx_memviewslice __pyx_v_indices, double __pyx_v_prefactor, double __pyx_v_voltage_term, double __pyx_v_threshold_check, double __pyx_v_small_threshold, double __pyx_v_sign); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_2compute_analytic_charge_contribution_cython(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_z_positions, __Pyx_memviewslice __pyx_v_charges, __Pyx_memviewslice __pyx_v_indices, double __pyx_v_z_opposite, double __pyx_v_Lcell); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_4extract_z_coordinates_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_positions_list); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_6extract_forces_z_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_forces_list); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_8update_openmm_charges_batch(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_nbondedForce, PyObject *__pyx_v_electrode_atoms, __Pyx_memviewslice __pyx_v_charges); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_10scale_electrode_charges_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, PyObject *__pyx_v_nbondedForce, double __pyx_v_scale_factor); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_12get_total_charge_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_14compute_z_position_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, PyObject *__pyx_v_positions_list); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_16collect_electrode_charges_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, CYTHON_UNUSED PyObject *__pyx_v_nbondedForce); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_18initialize_electrode_charge_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, PyObject *__pyx_v_nbondedForce, double __pyx_v_charge_per_atom, double __pyx_v_small_threshold, double __pyx_v_sign); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_20compute_buckyball_center_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, PyObject *__pyx_v_positions_list); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_22set_normal_vectors_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_24compute_buckyball_radius_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, PyObject *__pyx_v_positions_list, double __pyx_v_cx, double __pyx_v_cy, double __pyx_v_cz); /* proto */
-static PyObject *__pyx_pf_24electrode_charges_cython_26compute_normal_vectors_buckyball_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, PyObject *__pyx_v_positions_list, double __pyx_v_cx, double __pyx_v_cy, double __pyx_v_cz); /* proto */
+static PyObject *__pyx_pf_24electrode_charges_cython_2scale_charges_inplace_cython(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_c_charges, double __pyx_v_scale_factor); /* proto */
+static PyObject *__pyx_pf_24electrode_charges_cython_4initialize_charges_cython(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_c_charges, double __pyx_v_charge_per_atom, double __pyx_v_small_threshold, double __pyx_v_sign); /* proto */
+static PyObject *__pyx_pf_24electrode_charges_cython_6compute_analytic_contribution_cython(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_z_positions, __Pyx_memviewslice __pyx_v_c_indices, __Pyx_memviewslice __pyx_v_c_charges, double __pyx_v_z_opposite, double __pyx_v_Lcell); /* proto */
 static PyObject *__pyx_tp_new_array(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_Enum(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_memoryview(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
@@ -3631,10 +3560,8 @@ typedef struct {
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
   PyObject *__pyx_slice[1];
   PyObject *__pyx_tuple[2];
-  PyObject *__pyx_codeobj_tab[14];
-  PyObject *__pyx_string_tab[192];
-  PyObject *__pyx_float_0_0;
-  PyObject *__pyx_float_1_0;
+  PyObject *__pyx_codeobj_tab[4];
+  PyObject *__pyx_string_tab[158];
   PyObject *__pyx_int_0;
   PyObject *__pyx_int_1;
   PyObject *__pyx_int_112105877;
@@ -3724,152 +3651,118 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_kp_u_and __pyx_string_tab[43]
 #define __pyx_n_u_asyncio_coroutines __pyx_string_tab[44]
 #define __pyx_kp_u_at_0x __pyx_string_tab[45]
-#define __pyx_n_u_atom __pyx_string_tab[46]
-#define __pyx_n_u_atom_idx __pyx_string_tab[47]
-#define __pyx_n_u_atom_index __pyx_string_tab[48]
-#define __pyx_n_u_base __pyx_string_tab[49]
-#define __pyx_n_u_c __pyx_string_tab[50]
-#define __pyx_n_u_charge __pyx_string_tab[51]
-#define __pyx_n_u_charge_per_atom __pyx_string_tab[52]
-#define __pyx_n_u_charges __pyx_string_tab[53]
-#define __pyx_n_u_class __pyx_string_tab[54]
-#define __pyx_n_u_class_getitem __pyx_string_tab[55]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[56]
-#define __pyx_n_u_collect_electrode_charges_cython __pyx_string_tab[57]
-#define __pyx_kp_u_collections_abc __pyx_string_tab[58]
-#define __pyx_n_u_compute_analytic_charge_contribu __pyx_string_tab[59]
-#define __pyx_n_u_compute_buckyball_center_cython __pyx_string_tab[60]
-#define __pyx_n_u_compute_buckyball_radius_cython __pyx_string_tab[61]
-#define __pyx_n_u_compute_electrode_charges_cython __pyx_string_tab[62]
-#define __pyx_n_u_compute_normal_vectors_buckyball __pyx_string_tab[63]
-#define __pyx_n_u_compute_z_position_cython __pyx_string_tab[64]
-#define __pyx_kp_u_contiguous_and_direct __pyx_string_tab[65]
-#define __pyx_kp_u_contiguous_and_indirect __pyx_string_tab[66]
-#define __pyx_n_u_contribution __pyx_string_tab[67]
-#define __pyx_n_u_count __pyx_string_tab[68]
-#define __pyx_n_u_cx __pyx_string_tab[69]
-#define __pyx_n_u_cy __pyx_string_tab[70]
-#define __pyx_n_u_cz __pyx_string_tab[71]
-#define __pyx_n_u_dict __pyx_string_tab[72]
-#define __pyx_kp_u_disable __pyx_string_tab[73]
-#define __pyx_n_u_dtype __pyx_string_tab[74]
-#define __pyx_n_u_dtype_is_object __pyx_string_tab[75]
-#define __pyx_n_u_dx __pyx_string_tab[76]
-#define __pyx_n_u_dy __pyx_string_tab[77]
-#define __pyx_n_u_dz __pyx_string_tab[78]
-#define __pyx_n_u_electrode_atoms __pyx_string_tab[79]
-#define __pyx_n_u_electrode_charges_cython __pyx_string_tab[80]
-#define __pyx_kp_u_electrode_charges_cython_pyx __pyx_string_tab[81]
-#define __pyx_n_u_empty __pyx_string_tab[82]
-#define __pyx_kp_u_enable __pyx_string_tab[83]
-#define __pyx_n_u_encode __pyx_string_tab[84]
-#define __pyx_n_u_enumerate __pyx_string_tab[85]
-#define __pyx_n_u_error __pyx_string_tab[86]
-#define __pyx_n_u_extract_forces_z_cython __pyx_string_tab[87]
-#define __pyx_n_u_extract_z_coordinates_cython __pyx_string_tab[88]
-#define __pyx_n_u_flags __pyx_string_tab[89]
-#define __pyx_n_u_float64 __pyx_string_tab[90]
-#define __pyx_n_u_forces_list __pyx_string_tab[91]
-#define __pyx_n_u_forces_z __pyx_string_tab[92]
-#define __pyx_n_u_format __pyx_string_tab[93]
-#define __pyx_n_u_fortran __pyx_string_tab[94]
-#define __pyx_n_u_func __pyx_string_tab[95]
-#define __pyx_kp_u_gc __pyx_string_tab[96]
-#define __pyx_n_u_get_total_charge_cython __pyx_string_tab[97]
-#define __pyx_n_u_getstate __pyx_string_tab[98]
-#define __pyx_kp_u_got __pyx_string_tab[99]
-#define __pyx_kp_u_got_differing_extents_in_dimensi __pyx_string_tab[100]
-#define __pyx_n_u_i __pyx_string_tab[101]
-#define __pyx_n_u_id __pyx_string_tab[102]
-#define __pyx_n_u_import __pyx_string_tab[103]
-#define __pyx_n_u_index __pyx_string_tab[104]
-#define __pyx_n_u_indices __pyx_string_tab[105]
-#define __pyx_n_u_initialize_electrode_charge_cyth __pyx_string_tab[106]
-#define __pyx_n_u_initializing __pyx_string_tab[107]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[108]
-#define __pyx_kp_u_isenabled __pyx_string_tab[109]
-#define __pyx_n_u_itemsize __pyx_string_tab[110]
-#define __pyx_kp_u_itemsize_0_for_cython_array __pyx_string_tab[111]
-#define __pyx_n_u_main __pyx_string_tab[112]
-#define __pyx_n_u_memview __pyx_string_tab[113]
-#define __pyx_n_u_mode __pyx_string_tab[114]
-#define __pyx_n_u_module __pyx_string_tab[115]
-#define __pyx_n_u_name __pyx_string_tab[116]
-#define __pyx_n_u_name_2 __pyx_string_tab[117]
-#define __pyx_n_u_nbondedForce __pyx_string_tab[118]
-#define __pyx_n_u_ndim __pyx_string_tab[119]
-#define __pyx_n_u_new __pyx_string_tab[120]
-#define __pyx_n_u_new_charge __pyx_string_tab[121]
-#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[122]
-#define __pyx_n_u_norm __pyx_string_tab[123]
-#define __pyx_n_u_np __pyx_string_tab[124]
-#define __pyx_n_u_numpy __pyx_string_tab[125]
-#define __pyx_kp_u_numpy__core_multiarray_failed_to __pyx_string_tab[126]
-#define __pyx_kp_u_numpy__core_umath_failed_to_impo __pyx_string_tab[127]
-#define __pyx_n_u_nx __pyx_string_tab[128]
-#define __pyx_n_u_ny __pyx_string_tab[129]
-#define __pyx_n_u_nz __pyx_string_tab[130]
-#define __pyx_n_u_obj __pyx_string_tab[131]
-#define __pyx_kp_u_object __pyx_string_tab[132]
-#define __pyx_n_u_pack __pyx_string_tab[133]
-#define __pyx_n_u_pickle __pyx_string_tab[134]
-#define __pyx_n_u_pop __pyx_string_tab[135]
-#define __pyx_n_u_positions_list __pyx_string_tab[136]
-#define __pyx_n_u_prefactor __pyx_string_tab[137]
-#define __pyx_n_u_pyx_checksum __pyx_string_tab[138]
-#define __pyx_n_u_pyx_state __pyx_string_tab[139]
-#define __pyx_n_u_pyx_type __pyx_string_tab[140]
-#define __pyx_n_u_pyx_unpickle_Enum __pyx_string_tab[141]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[142]
-#define __pyx_n_u_q __pyx_string_tab[143]
-#define __pyx_n_u_q_i __pyx_string_tab[144]
-#define __pyx_n_u_q_i_old __pyx_string_tab[145]
-#define __pyx_n_u_q_new __pyx_string_tab[146]
-#define __pyx_n_u_q_new_view __pyx_string_tab[147]
-#define __pyx_n_u_q_old __pyx_string_tab[148]
-#define __pyx_n_u_qualname __pyx_string_tab[149]
-#define __pyx_n_u_radius __pyx_string_tab[150]
-#define __pyx_n_u_range __pyx_string_tab[151]
-#define __pyx_n_u_reduce __pyx_string_tab[152]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[153]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[154]
-#define __pyx_n_u_register __pyx_string_tab[155]
-#define __pyx_n_u_scale_electrode_charges_cython __pyx_string_tab[156]
-#define __pyx_n_u_scale_factor __pyx_string_tab[157]
-#define __pyx_n_u_setParticleParameters __pyx_string_tab[158]
-#define __pyx_n_u_set_name __pyx_string_tab[159]
-#define __pyx_n_u_set_normal_vectors_cython __pyx_string_tab[160]
-#define __pyx_n_u_setstate __pyx_string_tab[161]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[162]
-#define __pyx_n_u_shape __pyx_string_tab[163]
-#define __pyx_n_u_sign __pyx_string_tab[164]
-#define __pyx_n_u_size __pyx_string_tab[165]
-#define __pyx_n_u_small_threshold __pyx_string_tab[166]
-#define __pyx_n_u_spec __pyx_string_tab[167]
-#define __pyx_n_u_start __pyx_string_tab[168]
-#define __pyx_n_u_step __pyx_string_tab[169]
-#define __pyx_n_u_stop __pyx_string_tab[170]
-#define __pyx_kp_u_strided_and_direct __pyx_string_tab[171]
-#define __pyx_kp_u_strided_and_direct_or_indirect __pyx_string_tab[172]
-#define __pyx_kp_u_strided_and_indirect __pyx_string_tab[173]
-#define __pyx_n_u_struct __pyx_string_tab[174]
-#define __pyx_n_u_test __pyx_string_tab[175]
-#define __pyx_n_u_threshold_check __pyx_string_tab[176]
-#define __pyx_n_u_total_charge __pyx_string_tab[177]
-#define __pyx_kp_u_unable_to_allocate_array_data __pyx_string_tab[178]
-#define __pyx_kp_u_unable_to_allocate_shape_and_str __pyx_string_tab[179]
-#define __pyx_n_u_unpack __pyx_string_tab[180]
-#define __pyx_n_u_update __pyx_string_tab[181]
-#define __pyx_n_u_update_openmm_charges_batch __pyx_string_tab[182]
-#define __pyx_n_u_value __pyx_string_tab[183]
-#define __pyx_n_u_voltage_term __pyx_string_tab[184]
-#define __pyx_n_u_x __pyx_string_tab[185]
-#define __pyx_n_u_z_atom __pyx_string_tab[186]
-#define __pyx_n_u_z_coords __pyx_string_tab[187]
-#define __pyx_n_u_z_distance __pyx_string_tab[188]
-#define __pyx_n_u_z_opposite __pyx_string_tab[189]
-#define __pyx_n_u_z_positions __pyx_string_tab[190]
-#define __pyx_n_u_z_sum __pyx_string_tab[191]
+#define __pyx_n_u_atom_idx __pyx_string_tab[46]
+#define __pyx_n_u_base __pyx_string_tab[47]
+#define __pyx_n_u_c __pyx_string_tab[48]
+#define __pyx_n_u_c_charges __pyx_string_tab[49]
+#define __pyx_n_u_c_indices __pyx_string_tab[50]
+#define __pyx_n_u_charge_per_atom __pyx_string_tab[51]
+#define __pyx_n_u_class __pyx_string_tab[52]
+#define __pyx_n_u_class_getitem __pyx_string_tab[53]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[54]
+#define __pyx_kp_u_collections_abc __pyx_string_tab[55]
+#define __pyx_n_u_compute_analytic_contribution_cy __pyx_string_tab[56]
+#define __pyx_n_u_compute_electrode_charges_cython __pyx_string_tab[57]
+#define __pyx_kp_u_contiguous_and_direct __pyx_string_tab[58]
+#define __pyx_kp_u_contiguous_and_indirect __pyx_string_tab[59]
+#define __pyx_n_u_contribution __pyx_string_tab[60]
+#define __pyx_n_u_count __pyx_string_tab[61]
+#define __pyx_n_u_dict __pyx_string_tab[62]
+#define __pyx_kp_u_disable __pyx_string_tab[63]
+#define __pyx_n_u_dtype __pyx_string_tab[64]
+#define __pyx_n_u_dtype_is_object __pyx_string_tab[65]
+#define __pyx_n_u_electrode_charges_cython __pyx_string_tab[66]
+#define __pyx_kp_u_electrode_charges_cython_pyx __pyx_string_tab[67]
+#define __pyx_n_u_empty __pyx_string_tab[68]
+#define __pyx_kp_u_enable __pyx_string_tab[69]
+#define __pyx_n_u_encode __pyx_string_tab[70]
+#define __pyx_n_u_enumerate __pyx_string_tab[71]
+#define __pyx_n_u_error __pyx_string_tab[72]
+#define __pyx_n_u_flags __pyx_string_tab[73]
+#define __pyx_n_u_float64 __pyx_string_tab[74]
+#define __pyx_n_u_forces_z __pyx_string_tab[75]
+#define __pyx_n_u_format __pyx_string_tab[76]
+#define __pyx_n_u_fortran __pyx_string_tab[77]
+#define __pyx_n_u_func __pyx_string_tab[78]
+#define __pyx_kp_u_gc __pyx_string_tab[79]
+#define __pyx_n_u_getstate __pyx_string_tab[80]
+#define __pyx_kp_u_got __pyx_string_tab[81]
+#define __pyx_kp_u_got_differing_extents_in_dimensi __pyx_string_tab[82]
+#define __pyx_n_u_i __pyx_string_tab[83]
+#define __pyx_n_u_id __pyx_string_tab[84]
+#define __pyx_n_u_import __pyx_string_tab[85]
+#define __pyx_n_u_index __pyx_string_tab[86]
+#define __pyx_n_u_indices __pyx_string_tab[87]
+#define __pyx_n_u_initialize_charges_cython __pyx_string_tab[88]
+#define __pyx_n_u_initializing __pyx_string_tab[89]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[90]
+#define __pyx_kp_u_isenabled __pyx_string_tab[91]
+#define __pyx_n_u_itemsize __pyx_string_tab[92]
+#define __pyx_kp_u_itemsize_0_for_cython_array __pyx_string_tab[93]
+#define __pyx_n_u_main __pyx_string_tab[94]
+#define __pyx_n_u_memview __pyx_string_tab[95]
+#define __pyx_n_u_mode __pyx_string_tab[96]
+#define __pyx_n_u_module __pyx_string_tab[97]
+#define __pyx_n_u_name __pyx_string_tab[98]
+#define __pyx_n_u_name_2 __pyx_string_tab[99]
+#define __pyx_n_u_ndim __pyx_string_tab[100]
+#define __pyx_n_u_new __pyx_string_tab[101]
+#define __pyx_kp_u_no_default___reduce___due_to_non __pyx_string_tab[102]
+#define __pyx_n_u_np __pyx_string_tab[103]
+#define __pyx_n_u_numpy __pyx_string_tab[104]
+#define __pyx_kp_u_numpy__core_multiarray_failed_to __pyx_string_tab[105]
+#define __pyx_kp_u_numpy__core_umath_failed_to_impo __pyx_string_tab[106]
+#define __pyx_n_u_obj __pyx_string_tab[107]
+#define __pyx_kp_u_object __pyx_string_tab[108]
+#define __pyx_n_u_pack __pyx_string_tab[109]
+#define __pyx_n_u_pickle __pyx_string_tab[110]
+#define __pyx_n_u_pop __pyx_string_tab[111]
+#define __pyx_n_u_prefactor __pyx_string_tab[112]
+#define __pyx_n_u_pyx_checksum __pyx_string_tab[113]
+#define __pyx_n_u_pyx_state __pyx_string_tab[114]
+#define __pyx_n_u_pyx_type __pyx_string_tab[115]
+#define __pyx_n_u_pyx_unpickle_Enum __pyx_string_tab[116]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[117]
+#define __pyx_n_u_q_i __pyx_string_tab[118]
+#define __pyx_n_u_q_i_old __pyx_string_tab[119]
+#define __pyx_n_u_q_new __pyx_string_tab[120]
+#define __pyx_n_u_q_new_view __pyx_string_tab[121]
+#define __pyx_n_u_q_old __pyx_string_tab[122]
+#define __pyx_n_u_qualname __pyx_string_tab[123]
+#define __pyx_n_u_range __pyx_string_tab[124]
+#define __pyx_n_u_reduce __pyx_string_tab[125]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[126]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[127]
+#define __pyx_n_u_register __pyx_string_tab[128]
+#define __pyx_n_u_scale_charges_inplace_cython __pyx_string_tab[129]
+#define __pyx_n_u_scale_factor __pyx_string_tab[130]
+#define __pyx_n_u_set_name __pyx_string_tab[131]
+#define __pyx_n_u_setstate __pyx_string_tab[132]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[133]
+#define __pyx_n_u_shape __pyx_string_tab[134]
+#define __pyx_n_u_sign __pyx_string_tab[135]
+#define __pyx_n_u_size __pyx_string_tab[136]
+#define __pyx_n_u_small_threshold __pyx_string_tab[137]
+#define __pyx_n_u_spec __pyx_string_tab[138]
+#define __pyx_n_u_start __pyx_string_tab[139]
+#define __pyx_n_u_step __pyx_string_tab[140]
+#define __pyx_n_u_stop __pyx_string_tab[141]
+#define __pyx_kp_u_strided_and_direct __pyx_string_tab[142]
+#define __pyx_kp_u_strided_and_direct_or_indirect __pyx_string_tab[143]
+#define __pyx_kp_u_strided_and_indirect __pyx_string_tab[144]
+#define __pyx_n_u_struct __pyx_string_tab[145]
+#define __pyx_n_u_test __pyx_string_tab[146]
+#define __pyx_n_u_threshold_check __pyx_string_tab[147]
+#define __pyx_kp_u_unable_to_allocate_array_data __pyx_string_tab[148]
+#define __pyx_kp_u_unable_to_allocate_shape_and_str __pyx_string_tab[149]
+#define __pyx_n_u_unpack __pyx_string_tab[150]
+#define __pyx_n_u_update __pyx_string_tab[151]
+#define __pyx_n_u_voltage_term __pyx_string_tab[152]
+#define __pyx_n_u_x __pyx_string_tab[153]
+#define __pyx_n_u_z_atom __pyx_string_tab[154]
+#define __pyx_n_u_z_distance __pyx_string_tab[155]
+#define __pyx_n_u_z_opposite __pyx_string_tab[156]
+#define __pyx_n_u_z_positions __pyx_string_tab[157]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -3916,10 +3809,8 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_type___pyx_memoryviewslice);
   for (int i=0; i<1; ++i) { Py_CLEAR(clear_module_state->__pyx_slice[i]); }
   for (int i=0; i<2; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<14; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<192; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
-  Py_CLEAR(clear_module_state->__pyx_float_0_0);
-  Py_CLEAR(clear_module_state->__pyx_float_1_0);
+  for (int i=0; i<4; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<158; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   Py_CLEAR(clear_module_state->__pyx_int_0);
   Py_CLEAR(clear_module_state->__pyx_int_1);
   Py_CLEAR(clear_module_state->__pyx_int_112105877);
@@ -3972,10 +3863,8 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_type___pyx_memoryviewslice);
   for (int i=0; i<1; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_slice[i]); }
   for (int i=0; i<2; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<14; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<192; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_float_0_0);
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_float_1_0);
+  for (int i=0; i<4; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<158; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_0);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_1);
   __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_112105877);
@@ -19084,12 +18973,12 @@ static CYTHON_INLINE NPY_DATETIMEUNIT __pyx_f_5numpy_get_datetime64_unit(PyObjec
   return __pyx_r;
 }
 
-/* "electrode_charges_cython.pyx":24
- * ctypedef np.int32_t ITYPE_t
- * 
- * @cython.boundscheck(False)  #             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)   #
- * @cython.cdivision(True)      # C
+/* "electrode_charges_cython.pyx":30
+ * #  C-level  memoryviews API
+ * #=========================================================================
+ * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
+ * @cython.wraparound(False)
+ * @cython.cdivision(True)
 */
 
 /* Python wrapper */
@@ -19100,7 +18989,7 @@ PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_compute_electrode_charges_cython, "\n    Cython \345\204\252\345\214\226\347\211\210\346\234\254\347\232\204 electrode charge \350\250\210\347\256\227\n    \n    \347\264\224 C-level \345\276\252\347\222\260\357\274\214\347\204\241 Python overhead\n    \n    Parameters:\n    -----------\n    forces_z : memoryview of float64\n        All z-forces (full array, length = total_atoms)\n    q_old : memoryview of float64\n        Old electrode charges (length = N_electrode)\n    indices : memoryview of int64\n        Electrode atom indices in full array\n    prefactor : float64\n        Charge calculation prefactor\n    voltage_term : float64\n        Voltage contribution\n    threshold_check : float64\n        Threshold for safe division (0.9 * small_threshold)\n    small_threshold : float64\n        Minimum charge magnitude\n    sign : float64\n        Sign (+1 for cathode, -1 for anode)\n    \n    Returns:\n    --------\n    q_new : ndarray of float64\n        New electrode charges\n    ");
+PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_compute_electrode_charges_cython, "\n    \342\234\205 GOOD TASTE - \347\264\224 C-level electrode charge \350\250\210\347\256\227\n    \n    \351\200\231\345\200\213\345\207\275\346\225\270\346\230\257\345\256\214\347\276\216\347\232\204\357\274\232\n    - \345\217\252\346\216\245\345\217\227 memoryviews (C arrays)\n    - \347\204\241 Python \347\211\251\344\273\266\n    - \347\204\241 API \345\221\274\345\217\253\n    - \347\264\224\346\225\270\345\255\270\350\250\210\347\256\227\n    \n    Parameters:\n    -----------\n    forces_z : memoryview of float64\n        All z-forces (full array, length = total_atoms)\n    q_old : memoryview of float64\n        Old electrode charges (length = N_electrode)\n    indices : memoryview of int64\n        Electrode atom indices in full array\n    prefactor : float64\n        Charge calculation prefactor\n    voltage_term : float64\n        Voltage contribution\n    threshold_check : float64\n        Threshold for safe division (0.9 * small_threshold)\n    small_threshold : float64\n        Minimum charge magnitude\n    sign : float64\n        Sign (+1 for cathode, -1 for anode)\n    \n    Returns:\n    --------\n    q_new : ndarray of float64\n        New electrode charges\n    ");
 static PyMethodDef __pyx_mdef_24electrode_charges_cython_1compute_electrode_charges_cython = {"compute_electrode_charges_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_1compute_electrode_charges_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_compute_electrode_charges_cython};
 static PyObject *__pyx_pw_24electrode_charges_cython_1compute_electrode_charges_cython(PyObject *__pyx_self, 
 #if CYTHON_METH_FASTCALL
@@ -19139,81 +19028,81 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_forces_z,&__pyx_mstate_global->__pyx_n_u_q_old,&__pyx_mstate_global->__pyx_n_u_indices,&__pyx_mstate_global->__pyx_n_u_prefactor,&__pyx_mstate_global->__pyx_n_u_voltage_term,&__pyx_mstate_global->__pyx_n_u_threshold_check,&__pyx_mstate_global->__pyx_n_u_small_threshold,&__pyx_mstate_global->__pyx_n_u_sign,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 24, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 30, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  8:
         values[7] = __Pyx_ArgRef_FASTCALL(__pyx_args, 7);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[7])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[7])) __PYX_ERR(0, 30, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  7:
         values[6] = __Pyx_ArgRef_FASTCALL(__pyx_args, 6);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[6])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[6])) __PYX_ERR(0, 30, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  6:
         values[5] = __Pyx_ArgRef_FASTCALL(__pyx_args, 5);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 30, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  5:
         values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 30, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 30, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 30, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 30, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 30, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "compute_electrode_charges_cython", 0) < (0)) __PYX_ERR(0, 24, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "compute_electrode_charges_cython", 0) < (0)) __PYX_ERR(0, 30, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 8; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("compute_electrode_charges_cython", 1, 8, 8, i); __PYX_ERR(0, 24, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("compute_electrode_charges_cython", 1, 8, 8, i); __PYX_ERR(0, 30, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 8)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 24, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 30, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 24, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 30, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 24, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 30, __pyx_L3_error)
       values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 24, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 30, __pyx_L3_error)
       values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 24, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 30, __pyx_L3_error)
       values[5] = __Pyx_ArgRef_FASTCALL(__pyx_args, 5);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 24, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 30, __pyx_L3_error)
       values[6] = __Pyx_ArgRef_FASTCALL(__pyx_args, 6);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[6])) __PYX_ERR(0, 24, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[6])) __PYX_ERR(0, 30, __pyx_L3_error)
       values[7] = __Pyx_ArgRef_FASTCALL(__pyx_args, 7);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[7])) __PYX_ERR(0, 24, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[7])) __PYX_ERR(0, 30, __pyx_L3_error)
     }
-    __pyx_v_forces_z = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_forces_z.memview)) __PYX_ERR(0, 28, __pyx_L3_error)
-    __pyx_v_q_old = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_q_old.memview)) __PYX_ERR(0, 29, __pyx_L3_error)
-    __pyx_v_indices = __Pyx_PyObject_to_MemoryviewSlice_ds_long(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_indices.memview)) __PYX_ERR(0, 30, __pyx_L3_error)
-    __pyx_v_prefactor = __Pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_prefactor == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 31, __pyx_L3_error)
-    __pyx_v_voltage_term = __Pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_voltage_term == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 32, __pyx_L3_error)
-    __pyx_v_threshold_check = __Pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_threshold_check == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 33, __pyx_L3_error)
-    __pyx_v_small_threshold = __Pyx_PyFloat_AsDouble(values[6]); if (unlikely((__pyx_v_small_threshold == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 34, __pyx_L3_error)
-    __pyx_v_sign = __Pyx_PyFloat_AsDouble(values[7]); if (unlikely((__pyx_v_sign == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 35, __pyx_L3_error)
+    __pyx_v_forces_z = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_forces_z.memview)) __PYX_ERR(0, 34, __pyx_L3_error)
+    __pyx_v_q_old = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_q_old.memview)) __PYX_ERR(0, 35, __pyx_L3_error)
+    __pyx_v_indices = __Pyx_PyObject_to_MemoryviewSlice_ds_long(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_indices.memview)) __PYX_ERR(0, 36, __pyx_L3_error)
+    __pyx_v_prefactor = __Pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_prefactor == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 37, __pyx_L3_error)
+    __pyx_v_voltage_term = __Pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_voltage_term == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 38, __pyx_L3_error)
+    __pyx_v_threshold_check = __Pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_threshold_check == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 39, __pyx_L3_error)
+    __pyx_v_small_threshold = __Pyx_PyFloat_AsDouble(values[6]); if (unlikely((__pyx_v_small_threshold == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 40, __pyx_L3_error)
+    __pyx_v_sign = __Pyx_PyFloat_AsDouble(values[7]); if (unlikely((__pyx_v_sign == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 41, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("compute_electrode_charges_cython", 1, 8, 8, __pyx_nargs); __PYX_ERR(0, 24, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("compute_electrode_charges_cython", 1, 8, 8, __pyx_nargs); __PYX_ERR(0, 30, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -19275,7 +19164,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
   __pyx_pybuffernd_q_new.data = NULL;
   __pyx_pybuffernd_q_new.rcbuffer = &__pyx_pybuffer_q_new;
 
-  /* "electrode_charges_cython.pyx":67
+  /* "electrode_charges_cython.pyx":77
  *     """
  *     cdef Py_ssize_t i, atom_idx
  *     cdef Py_ssize_t N = len(indices)             # <<<<<<<<<<<<<<
@@ -19285,7 +19174,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
   __pyx_t_1 = __Pyx_MemoryView_Len(__pyx_v_indices); 
   __pyx_v_N = __pyx_t_1;
 
-  /* "electrode_charges_cython.pyx":71
+  /* "electrode_charges_cython.pyx":81
  * 
  *     # Pre-allocate output array
  *     cdef np.ndarray[DTYPE_t, ndim=1] q_new = np.empty(N, dtype=np.float64)             # <<<<<<<<<<<<<<
@@ -19293,16 +19182,16 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
  * 
 */
   __pyx_t_3 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_empty); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_empty); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyLong_FromSsize_t(__pyx_v_N); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_t_4 = PyLong_FromSsize_t(__pyx_v_N); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_float64); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_float64); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_t_8 = 1;
@@ -19319,43 +19208,43 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
   #endif
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_3, __pyx_t_4};
-    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 71, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 81, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_dtype, __pyx_t_7, __pyx_t_6, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 71, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_dtype, __pyx_t_7, __pyx_t_6, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 81, __pyx_L1_error)
     __pyx_t_2 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_5, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 71, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 81, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 71, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 81, __pyx_L1_error)
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_q_new.rcbuffer->pybuffer, (PyObject*)((PyArrayObject *)__pyx_t_2), &__Pyx_TypeInfo_nn___pyx_t_24electrode_charges_cython_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_q_new = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_q_new.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 71, __pyx_L1_error)
+      __PYX_ERR(0, 81, __pyx_L1_error)
     } else {__pyx_pybuffernd_q_new.diminfo[0].strides = __pyx_pybuffernd_q_new.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_q_new.diminfo[0].shape = __pyx_pybuffernd_q_new.rcbuffer->pybuffer.shape[0];
     }
   }
   __pyx_v_q_new = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "electrode_charges_cython.pyx":72
+  /* "electrode_charges_cython.pyx":82
  *     # Pre-allocate output array
  *     cdef np.ndarray[DTYPE_t, ndim=1] q_new = np.empty(N, dtype=np.float64)
  *     cdef double[:] q_new_view = q_new  # Memoryview for fast access             # <<<<<<<<<<<<<<
  * 
  *     # C-level for loop ( Python overhead!)
 */
-  __pyx_t_9 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(((PyObject *)__pyx_v_q_new), PyBUF_WRITABLE); if (unlikely(!__pyx_t_9.memview)) __PYX_ERR(0, 72, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(((PyObject *)__pyx_v_q_new), PyBUF_WRITABLE); if (unlikely(!__pyx_t_9.memview)) __PYX_ERR(0, 82, __pyx_L1_error)
   __pyx_v_q_new_view = __pyx_t_9;
   __pyx_t_9.memview = NULL;
   __pyx_t_9.data = NULL;
 
-  /* "electrode_charges_cython.pyx":75
+  /* "electrode_charges_cython.pyx":85
  * 
  *     # C-level for loop ( Python overhead!)
  *     for i in range(N):             # <<<<<<<<<<<<<<
@@ -19367,7 +19256,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
   for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
     __pyx_v_i = __pyx_t_11;
 
-    /* "electrode_charges_cython.pyx":76
+    /* "electrode_charges_cython.pyx":86
  *     # C-level for loop ( Python overhead!)
  *     for i in range(N):
  *         atom_idx = indices[i]             # <<<<<<<<<<<<<<
@@ -19377,7 +19266,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
     __pyx_t_12 = __pyx_v_i;
     __pyx_v_atom_idx = (*((long *) ( /* dim=0 */ (__pyx_v_indices.data + __pyx_t_12 * __pyx_v_indices.strides[0]) )));
 
-    /* "electrode_charges_cython.pyx":77
+    /* "electrode_charges_cython.pyx":87
  *     for i in range(N):
  *         atom_idx = indices[i]
  *         q_i_old = q_old[i]             # <<<<<<<<<<<<<<
@@ -19387,7 +19276,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
     __pyx_t_12 = __pyx_v_i;
     __pyx_v_q_i_old = (*((double *) ( /* dim=0 */ (__pyx_v_q_old.data + __pyx_t_12 * __pyx_v_q_old.strides[0]) )));
 
-    /* "electrode_charges_cython.pyx":80
+    /* "electrode_charges_cython.pyx":90
  * 
  *         # Safe division (matches NumPy where logic)
  *         if fabs(q_i_old) > threshold_check:             # <<<<<<<<<<<<<<
@@ -19397,7 +19286,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
     __pyx_t_13 = (fabs(__pyx_v_q_i_old) > __pyx_v_threshold_check);
     if (__pyx_t_13) {
 
-      /* "electrode_charges_cython.pyx":81
+      /* "electrode_charges_cython.pyx":91
  *         # Safe division (matches NumPy where logic)
  *         if fabs(q_i_old) > threshold_check:
  *             Ez_external = forces_z[atom_idx] / q_i_old             # <<<<<<<<<<<<<<
@@ -19407,7 +19296,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
       __pyx_t_12 = __pyx_v_atom_idx;
       __pyx_v_Ez_external = ((*((double *) ( /* dim=0 */ (__pyx_v_forces_z.data + __pyx_t_12 * __pyx_v_forces_z.strides[0]) ))) / __pyx_v_q_i_old);
 
-      /* "electrode_charges_cython.pyx":80
+      /* "electrode_charges_cython.pyx":90
  * 
  *         # Safe division (matches NumPy where logic)
  *         if fabs(q_i_old) > threshold_check:             # <<<<<<<<<<<<<<
@@ -19417,7 +19306,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
       goto __pyx_L5;
     }
 
-    /* "electrode_charges_cython.pyx":83
+    /* "electrode_charges_cython.pyx":93
  *             Ez_external = forces_z[atom_idx] / q_i_old
  *         else:
  *             Ez_external = 0.0             # <<<<<<<<<<<<<<
@@ -19429,7 +19318,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
     }
     __pyx_L5:;
 
-    /* "electrode_charges_cython.pyx":86
+    /* "electrode_charges_cython.pyx":96
  * 
  *         # Compute new charge
  *         q_i = prefactor * (voltage_term + Ez_external)             # <<<<<<<<<<<<<<
@@ -19438,7 +19327,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
 */
     __pyx_v_q_i = (__pyx_v_prefactor * (__pyx_v_voltage_term + __pyx_v_Ez_external));
 
-    /* "electrode_charges_cython.pyx":89
+    /* "electrode_charges_cython.pyx":99
  * 
  *         # Apply threshold
  *         if fabs(q_i) < small_threshold:             # <<<<<<<<<<<<<<
@@ -19448,7 +19337,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
     __pyx_t_13 = (fabs(__pyx_v_q_i) < __pyx_v_small_threshold);
     if (__pyx_t_13) {
 
-      /* "electrode_charges_cython.pyx":90
+      /* "electrode_charges_cython.pyx":100
  *         # Apply threshold
  *         if fabs(q_i) < small_threshold:
  *             q_i = sign * small_threshold             # <<<<<<<<<<<<<<
@@ -19457,7 +19346,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
 */
       __pyx_v_q_i = (__pyx_v_sign * __pyx_v_small_threshold);
 
-      /* "electrode_charges_cython.pyx":89
+      /* "electrode_charges_cython.pyx":99
  * 
  *         # Apply threshold
  *         if fabs(q_i) < small_threshold:             # <<<<<<<<<<<<<<
@@ -19466,7 +19355,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
 */
     }
 
-    /* "electrode_charges_cython.pyx":92
+    /* "electrode_charges_cython.pyx":102
  *             q_i = sign * small_threshold
  * 
  *         q_new_view[i] = q_i             # <<<<<<<<<<<<<<
@@ -19477,7 +19366,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
     *((double *) ( /* dim=0 */ (__pyx_v_q_new_view.data + __pyx_t_12 * __pyx_v_q_new_view.strides[0]) )) = __pyx_v_q_i;
   }
 
-  /* "electrode_charges_cython.pyx":94
+  /* "electrode_charges_cython.pyx":104
  *         q_new_view[i] = q_i
  * 
  *     return q_new             # <<<<<<<<<<<<<<
@@ -19489,12 +19378,12 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
   __pyx_r = ((PyObject *)__pyx_v_q_new);
   goto __pyx_L0;
 
-  /* "electrode_charges_cython.pyx":24
- * ctypedef np.int32_t ITYPE_t
- * 
- * @cython.boundscheck(False)  #             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)   #
- * @cython.cdivision(True)      # C
+  /* "electrode_charges_cython.pyx":30
+ * #  C-level  memoryviews API
+ * #=========================================================================
+ * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
+ * @cython.wraparound(False)
+ * @cython.cdivision(True)
 */
 
   /* function exit code */
@@ -19525,25 +19414,406 @@ static PyObject *__pyx_pf_24electrode_charges_cython_compute_electrode_charges_c
   return __pyx_r;
 }
 
-/* "electrode_charges_cython.pyx":97
- * 
- * 
+/* "electrode_charges_cython.pyx":112
+ * #  C-level  API
+ * #=========================================================================
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  * @cython.wraparound(False)
  * @cython.cdivision(True)
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_3compute_analytic_charge_contribution_cython(PyObject *__pyx_self, 
+static PyObject *__pyx_pw_24electrode_charges_cython_3scale_charges_inplace_cython(PyObject *__pyx_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_2compute_analytic_charge_contribution_cython, "\n    Cython \345\204\252\345\214\226\347\211\210\346\234\254\347\232\204 analytic charge contribution\n    \n    \347\264\224 C-level \345\276\252\347\222\260\350\250\210\347\256\227 sum\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_3compute_analytic_charge_contribution_cython = {"compute_analytic_charge_contribution_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_3compute_analytic_charge_contribution_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_2compute_analytic_charge_contribution_cython};
-static PyObject *__pyx_pw_24electrode_charges_cython_3compute_analytic_charge_contribution_cython(PyObject *__pyx_self, 
+PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_2scale_charges_inplace_cython, "\n    \342\234\205 GOOD TASTE - \345\277\253\351\200\237\343\200\201\345\260\261\345\234\260\347\270\256\346\224\276 C \351\231\243\345\210\227\344\270\255\347\232\204 charges\n    \n    \347\264\224 C-level \346\225\270\345\255\270\357\274\214\347\204\241 API \345\221\274\345\217\253\n    \n    Parameters:\n    -----------\n    c_charges : memoryview of float64\n        Charge array to scale (modified in-place)\n    scale_factor : float64\n        Factor to scale by\n    \n    Returns:\n    --------\n    None (modifies c_charges in-place)\n    ");
+static PyMethodDef __pyx_mdef_24electrode_charges_cython_3scale_charges_inplace_cython = {"scale_charges_inplace_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_3scale_charges_inplace_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_2scale_charges_inplace_cython};
+static PyObject *__pyx_pw_24electrode_charges_cython_3scale_charges_inplace_cython(PyObject *__pyx_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  __Pyx_memviewslice __pyx_v_c_charges = { 0, 0, { 0 }, { 0 }, { 0 } };
+  double __pyx_v_scale_factor;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[2] = {0,0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("scale_charges_inplace_cython (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_c_charges,&__pyx_mstate_global->__pyx_n_u_scale_factor,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 112, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  2:
+        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 112, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 112, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "scale_charges_inplace_cython", 0) < (0)) __PYX_ERR(0, 112, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("scale_charges_inplace_cython", 1, 2, 2, i); __PYX_ERR(0, 112, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 2)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 112, __pyx_L3_error)
+      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 112, __pyx_L3_error)
+    }
+    __pyx_v_c_charges = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_c_charges.memview)) __PYX_ERR(0, 116, __pyx_L3_error)
+    __pyx_v_scale_factor = __Pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_scale_factor == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 117, __pyx_L3_error)
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("scale_charges_inplace_cython", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 112, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __PYX_XCLEAR_MEMVIEW(&__pyx_v_c_charges, 1);
+  __Pyx_AddTraceback("electrode_charges_cython.scale_charges_inplace_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_24electrode_charges_cython_2scale_charges_inplace_cython(__pyx_self, __pyx_v_c_charges, __pyx_v_scale_factor);
+
+  /* function exit code */
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __PYX_XCLEAR_MEMVIEW(&__pyx_v_c_charges, 1);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_24electrode_charges_cython_2scale_charges_inplace_cython(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_c_charges, double __pyx_v_scale_factor) {
+  Py_ssize_t __pyx_v_i;
+  Py_ssize_t __pyx_v_N;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  Py_ssize_t __pyx_t_1;
+  Py_ssize_t __pyx_t_2;
+  Py_ssize_t __pyx_t_3;
+  Py_ssize_t __pyx_t_4;
+  Py_ssize_t __pyx_t_5;
+  __Pyx_RefNannySetupContext("scale_charges_inplace_cython", 0);
+
+  /* "electrode_charges_cython.pyx":136
+ *     """
+ *     cdef Py_ssize_t i
+ *     cdef Py_ssize_t N = c_charges.shape[0]             # <<<<<<<<<<<<<<
+ * 
+ *     for i in range(N):
+*/
+  __pyx_v_N = (__pyx_v_c_charges.shape[0]);
+
+  /* "electrode_charges_cython.pyx":138
+ *     cdef Py_ssize_t N = c_charges.shape[0]
+ * 
+ *     for i in range(N):             # <<<<<<<<<<<<<<
+ *         c_charges[i] = c_charges[i] * scale_factor
+ * 
+*/
+  __pyx_t_1 = __pyx_v_N;
+  __pyx_t_2 = __pyx_t_1;
+  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
+    __pyx_v_i = __pyx_t_3;
+
+    /* "electrode_charges_cython.pyx":139
+ * 
+ *     for i in range(N):
+ *         c_charges[i] = c_charges[i] * scale_factor             # <<<<<<<<<<<<<<
+ * 
+ * 
+*/
+    __pyx_t_4 = __pyx_v_i;
+    __pyx_t_5 = __pyx_v_i;
+    *((double *) ( /* dim=0 */ (__pyx_v_c_charges.data + __pyx_t_5 * __pyx_v_c_charges.strides[0]) )) = ((*((double *) ( /* dim=0 */ (__pyx_v_c_charges.data + __pyx_t_4 * __pyx_v_c_charges.strides[0]) ))) * __pyx_v_scale_factor);
+  }
+
+  /* "electrode_charges_cython.pyx":112
+ * #  C-level  API
+ * #=========================================================================
+ * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
+ * @cython.wraparound(False)
+ * @cython.cdivision(True)
+*/
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "electrode_charges_cython.pyx":147
+ * #  C-level  API
+ * #=========================================================================
+ * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
+ * @cython.wraparound(False)
+ * @cython.cdivision(True)
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_24electrode_charges_cython_5initialize_charges_cython(PyObject *__pyx_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_4initialize_charges_cython, "\n    \342\234\205 GOOD TASTE - \345\277\253\351\200\237\345\210\235\345\247\213\345\214\226 C \351\231\243\345\210\227\344\270\255\347\232\204 charges\n    \n    \347\264\224 C-level \346\225\270\345\255\270\357\274\214\347\204\241 API \345\221\274\345\217\253\n    \n    Parameters:\n    -----------\n    c_charges : memoryview of float64\n        Charge array to initialize (modified in-place)\n    charge_per_atom : float64\n        Base charge value\n    small_threshold : float64\n        Minimum charge magnitude\n    sign : float64\n        Sign (+1 for cathode, -1 for anode)\n    \n    Returns:\n    --------\n    None (modifies c_charges in-place)\n    ");
+static PyMethodDef __pyx_mdef_24electrode_charges_cython_5initialize_charges_cython = {"initialize_charges_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_5initialize_charges_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_4initialize_charges_cython};
+static PyObject *__pyx_pw_24electrode_charges_cython_5initialize_charges_cython(PyObject *__pyx_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  __Pyx_memviewslice __pyx_v_c_charges = { 0, 0, { 0 }, { 0 }, { 0 } };
+  double __pyx_v_charge_per_atom;
+  double __pyx_v_small_threshold;
+  double __pyx_v_sign;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[4] = {0,0,0,0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("initialize_charges_cython (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_c_charges,&__pyx_mstate_global->__pyx_n_u_charge_per_atom,&__pyx_mstate_global->__pyx_n_u_small_threshold,&__pyx_mstate_global->__pyx_n_u_sign,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 147, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  4:
+        values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 147, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  3:
+        values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 147, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  2:
+        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 147, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 147, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "initialize_charges_cython", 0) < (0)) __PYX_ERR(0, 147, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 4; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("initialize_charges_cython", 1, 4, 4, i); __PYX_ERR(0, 147, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 4)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 147, __pyx_L3_error)
+      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 147, __pyx_L3_error)
+      values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 147, __pyx_L3_error)
+      values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 147, __pyx_L3_error)
+    }
+    __pyx_v_c_charges = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_c_charges.memview)) __PYX_ERR(0, 151, __pyx_L3_error)
+    __pyx_v_charge_per_atom = __Pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_charge_per_atom == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 152, __pyx_L3_error)
+    __pyx_v_small_threshold = __Pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_small_threshold == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 153, __pyx_L3_error)
+    __pyx_v_sign = __Pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_sign == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 154, __pyx_L3_error)
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("initialize_charges_cython", 1, 4, 4, __pyx_nargs); __PYX_ERR(0, 147, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __PYX_XCLEAR_MEMVIEW(&__pyx_v_c_charges, 1);
+  __Pyx_AddTraceback("electrode_charges_cython.initialize_charges_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_24electrode_charges_cython_4initialize_charges_cython(__pyx_self, __pyx_v_c_charges, __pyx_v_charge_per_atom, __pyx_v_small_threshold, __pyx_v_sign);
+
+  /* function exit code */
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __PYX_XCLEAR_MEMVIEW(&__pyx_v_c_charges, 1);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_24electrode_charges_cython_4initialize_charges_cython(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_c_charges, double __pyx_v_charge_per_atom, double __pyx_v_small_threshold, double __pyx_v_sign) {
+  Py_ssize_t __pyx_v_i;
+  Py_ssize_t __pyx_v_N;
+  double __pyx_v_q_i;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  Py_ssize_t __pyx_t_1;
+  Py_ssize_t __pyx_t_2;
+  Py_ssize_t __pyx_t_3;
+  int __pyx_t_4;
+  Py_ssize_t __pyx_t_5;
+  __Pyx_RefNannySetupContext("initialize_charges_cython", 0);
+
+  /* "electrode_charges_cython.pyx":177
+ *     """
+ *     cdef Py_ssize_t i
+ *     cdef Py_ssize_t N = c_charges.shape[0]             # <<<<<<<<<<<<<<
+ *     cdef double q_i
+ * 
+*/
+  __pyx_v_N = (__pyx_v_c_charges.shape[0]);
+
+  /* "electrode_charges_cython.pyx":180
+ *     cdef double q_i
+ * 
+ *     for i in range(N):             # <<<<<<<<<<<<<<
+ *         q_i = charge_per_atom
+ * 
+*/
+  __pyx_t_1 = __pyx_v_N;
+  __pyx_t_2 = __pyx_t_1;
+  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
+    __pyx_v_i = __pyx_t_3;
+
+    /* "electrode_charges_cython.pyx":181
+ * 
+ *     for i in range(N):
+ *         q_i = charge_per_atom             # <<<<<<<<<<<<<<
+ * 
+ *         # Apply threshold
+*/
+    __pyx_v_q_i = __pyx_v_charge_per_atom;
+
+    /* "electrode_charges_cython.pyx":184
+ * 
+ *         # Apply threshold
+ *         if fabs(q_i) < small_threshold:             # <<<<<<<<<<<<<<
+ *             q_i = q_i + sign * small_threshold
+ * 
+*/
+    __pyx_t_4 = (fabs(__pyx_v_q_i) < __pyx_v_small_threshold);
+    if (__pyx_t_4) {
+
+      /* "electrode_charges_cython.pyx":185
+ *         # Apply threshold
+ *         if fabs(q_i) < small_threshold:
+ *             q_i = q_i + sign * small_threshold             # <<<<<<<<<<<<<<
+ * 
+ *         c_charges[i] = q_i
+*/
+      __pyx_v_q_i = (__pyx_v_q_i + (__pyx_v_sign * __pyx_v_small_threshold));
+
+      /* "electrode_charges_cython.pyx":184
+ * 
+ *         # Apply threshold
+ *         if fabs(q_i) < small_threshold:             # <<<<<<<<<<<<<<
+ *             q_i = q_i + sign * small_threshold
+ * 
+*/
+    }
+
+    /* "electrode_charges_cython.pyx":187
+ *             q_i = q_i + sign * small_threshold
+ * 
+ *         c_charges[i] = q_i             # <<<<<<<<<<<<<<
+ * 
+ * 
+*/
+    __pyx_t_5 = __pyx_v_i;
+    *((double *) ( /* dim=0 */ (__pyx_v_c_charges.data + __pyx_t_5 * __pyx_v_c_charges.strides[0]) )) = __pyx_v_q_i;
+  }
+
+  /* "electrode_charges_cython.pyx":147
+ * #  C-level  API
+ * #=========================================================================
+ * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
+ * @cython.wraparound(False)
+ * @cython.cdivision(True)
+*/
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "electrode_charges_cython.pyx":195
+ * #  C-level  API
+ * #=========================================================================
+ * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
+ * @cython.wraparound(False)
+ * @cython.cdivision(True)
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_24electrode_charges_cython_7compute_analytic_contribution_cython(PyObject *__pyx_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_6compute_analytic_contribution_cython, "\n    \342\234\205 GOOD TASTE - \345\277\253\351\200\237\350\250\210\347\256\227 Q_analytic \350\262\242\347\215\273\n    \n    \347\264\224 C-level \346\225\270\345\255\270\357\274\214\345\217\252\346\223\215\344\275\234 memoryviews\n    \347\224\250\346\226\274 compute_Electrode_charge_analytic \344\270\255\347\232\204\351\233\273\350\247\243\350\263\252\345\222\214\345\260\216\351\253\224\350\262\242\347\215\273\350\250\210\347\256\227\n    \n    \350\250\210\347\256\227\357\274\232sum( |z_atom - z_opposite| / Lcell * (-q_atom) )\n    \n    Parameters:\n    -----------\n    z_positions : memoryview of float64\n        All atom z-coordinates (length = N_total_atoms)\n    c_indices : memoryview of int64\n        Indices of atoms to sum over (length = N_contrib)\n    c_charges : memoryview of float64\n        Charges of atoms to sum over (length = N_contrib)\n    z_opposite : float64\n        Z-coordinate of opposite electrode\n    Lcell : float64\n        Cell length\n    \n    Returns:\n    --------\n    contribution : float64\n        Computed contribution to Q_analytic\n    ");
+static PyMethodDef __pyx_mdef_24electrode_charges_cython_7compute_analytic_contribution_cython = {"compute_analytic_contribution_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_7compute_analytic_contribution_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_6compute_analytic_contribution_cython};
+static PyObject *__pyx_pw_24electrode_charges_cython_7compute_analytic_contribution_cython(PyObject *__pyx_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -19551,8 +19821,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ) {
   __Pyx_memviewslice __pyx_v_z_positions = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_charges = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_indices = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_c_indices = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_c_charges = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_z_opposite;
   double __pyx_v_Lcell;
   #if !CYTHON_METH_FASTCALL
@@ -19565,7 +19835,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("compute_analytic_charge_contribution_cython (wrapper)", 0);
+  __Pyx_RefNannySetupContext("compute_analytic_contribution_cython (wrapper)", 0);
   #if !CYTHON_METH_FASTCALL
   #if CYTHON_ASSUME_SAFE_SIZE
   __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
@@ -19575,62 +19845,62 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   #endif
   __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
   {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_z_positions,&__pyx_mstate_global->__pyx_n_u_charges,&__pyx_mstate_global->__pyx_n_u_indices,&__pyx_mstate_global->__pyx_n_u_z_opposite,&__pyx_mstate_global->__pyx_n_u_Lcell,0};
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_z_positions,&__pyx_mstate_global->__pyx_n_u_c_indices,&__pyx_mstate_global->__pyx_n_u_c_charges,&__pyx_mstate_global->__pyx_n_u_z_opposite,&__pyx_mstate_global->__pyx_n_u_Lcell,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 97, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 195, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  5:
         values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 97, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 195, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 97, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 195, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 97, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 195, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 97, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 195, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 97, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 195, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "compute_analytic_charge_contribution_cython", 0) < (0)) __PYX_ERR(0, 97, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "compute_analytic_contribution_cython", 0) < (0)) __PYX_ERR(0, 195, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 5; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("compute_analytic_charge_contribution_cython", 1, 5, 5, i); __PYX_ERR(0, 97, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("compute_analytic_contribution_cython", 1, 5, 5, i); __PYX_ERR(0, 195, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 5)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 97, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 195, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 97, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 195, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 97, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 195, __pyx_L3_error)
       values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 97, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 195, __pyx_L3_error)
       values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 97, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 195, __pyx_L3_error)
     }
-    __pyx_v_z_positions = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_z_positions.memview)) __PYX_ERR(0, 101, __pyx_L3_error)
-    __pyx_v_charges = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_charges.memview)) __PYX_ERR(0, 102, __pyx_L3_error)
-    __pyx_v_indices = __Pyx_PyObject_to_MemoryviewSlice_ds_long(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_indices.memview)) __PYX_ERR(0, 103, __pyx_L3_error)
-    __pyx_v_z_opposite = __Pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_z_opposite == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 104, __pyx_L3_error)
-    __pyx_v_Lcell = __Pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_Lcell == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 105, __pyx_L3_error)
+    __pyx_v_z_positions = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_z_positions.memview)) __PYX_ERR(0, 199, __pyx_L3_error)
+    __pyx_v_c_indices = __Pyx_PyObject_to_MemoryviewSlice_ds_long(values[1], PyBUF_WRITABLE); if (unlikely(!__pyx_v_c_indices.memview)) __PYX_ERR(0, 200, __pyx_L3_error)
+    __pyx_v_c_charges = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_c_charges.memview)) __PYX_ERR(0, 201, __pyx_L3_error)
+    __pyx_v_z_opposite = __Pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_z_opposite == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 202, __pyx_L3_error)
+    __pyx_v_Lcell = __Pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_Lcell == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 203, __pyx_L3_error)
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("compute_analytic_charge_contribution_cython", 1, 5, 5, __pyx_nargs); __PYX_ERR(0, 97, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("compute_analytic_contribution_cython", 1, 5, 5, __pyx_nargs); __PYX_ERR(0, 195, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -19638,26 +19908,26 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
     Py_XDECREF(values[__pyx_temp]);
   }
   __PYX_XCLEAR_MEMVIEW(&__pyx_v_z_positions, 1);
-  __PYX_XCLEAR_MEMVIEW(&__pyx_v_charges, 1);
-  __PYX_XCLEAR_MEMVIEW(&__pyx_v_indices, 1);
-  __Pyx_AddTraceback("electrode_charges_cython.compute_analytic_charge_contribution_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __PYX_XCLEAR_MEMVIEW(&__pyx_v_c_indices, 1);
+  __PYX_XCLEAR_MEMVIEW(&__pyx_v_c_charges, 1);
+  __Pyx_AddTraceback("electrode_charges_cython.compute_analytic_contribution_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_2compute_analytic_charge_contribution_cython(__pyx_self, __pyx_v_z_positions, __pyx_v_charges, __pyx_v_indices, __pyx_v_z_opposite, __pyx_v_Lcell);
+  __pyx_r = __pyx_pf_24electrode_charges_cython_6compute_analytic_contribution_cython(__pyx_self, __pyx_v_z_positions, __pyx_v_c_indices, __pyx_v_c_charges, __pyx_v_z_opposite, __pyx_v_Lcell);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
     Py_XDECREF(values[__pyx_temp]);
   }
   __PYX_XCLEAR_MEMVIEW(&__pyx_v_z_positions, 1);
-  __PYX_XCLEAR_MEMVIEW(&__pyx_v_charges, 1);
-  __PYX_XCLEAR_MEMVIEW(&__pyx_v_indices, 1);
+  __PYX_XCLEAR_MEMVIEW(&__pyx_v_c_indices, 1);
+  __PYX_XCLEAR_MEMVIEW(&__pyx_v_c_charges, 1);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_24electrode_charges_cython_2compute_analytic_charge_contribution_cython(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_z_positions, __Pyx_memviewslice __pyx_v_charges, __Pyx_memviewslice __pyx_v_indices, double __pyx_v_z_opposite, double __pyx_v_Lcell) {
+static PyObject *__pyx_pf_24electrode_charges_cython_6compute_analytic_contribution_cython(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_z_positions, __Pyx_memviewslice __pyx_v_c_indices, __Pyx_memviewslice __pyx_v_c_charges, double __pyx_v_z_opposite, double __pyx_v_Lcell) {
   Py_ssize_t __pyx_v_i;
   Py_ssize_t __pyx_v_atom_idx;
   Py_ssize_t __pyx_v_N;
@@ -19675,32 +19945,31 @@ static PyObject *__pyx_pf_24electrode_charges_cython_2compute_analytic_charge_co
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("compute_analytic_charge_contribution_cython", 0);
+  __Pyx_RefNannySetupContext("compute_analytic_contribution_cython", 0);
 
-  /* "electrode_charges_cython.pyx":113
+  /* "electrode_charges_cython.pyx":232
  *     """
  *     cdef Py_ssize_t i, atom_idx
- *     cdef Py_ssize_t N = len(indices)             # <<<<<<<<<<<<<<
+ *     cdef Py_ssize_t N = c_indices.shape[0]             # <<<<<<<<<<<<<<
  *     cdef double z_atom, z_distance
  *     cdef double contribution = 0.0
 */
-  __pyx_t_1 = __Pyx_MemoryView_Len(__pyx_v_indices); 
-  __pyx_v_N = __pyx_t_1;
+  __pyx_v_N = (__pyx_v_c_indices.shape[0]);
 
-  /* "electrode_charges_cython.pyx":115
- *     cdef Py_ssize_t N = len(indices)
+  /* "electrode_charges_cython.pyx":234
+ *     cdef Py_ssize_t N = c_indices.shape[0]
  *     cdef double z_atom, z_distance
  *     cdef double contribution = 0.0             # <<<<<<<<<<<<<<
  * 
- *     # C-level accumulation loop
+ *     # C-level for loop ()
 */
   __pyx_v_contribution = 0.0;
 
-  /* "electrode_charges_cython.pyx":118
+  /* "electrode_charges_cython.pyx":237
  * 
- *     # C-level accumulation loop
+ *     # C-level for loop ()
  *     for i in range(N):             # <<<<<<<<<<<<<<
- *         atom_idx = indices[i]
+ *         atom_idx = c_indices[i]
  *         z_atom = z_positions[atom_idx]
 */
   __pyx_t_1 = __pyx_v_N;
@@ -19708,19 +19977,19 @@ static PyObject *__pyx_pf_24electrode_charges_cython_2compute_analytic_charge_co
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "electrode_charges_cython.pyx":119
- *     # C-level accumulation loop
+    /* "electrode_charges_cython.pyx":238
+ *     # C-level for loop ()
  *     for i in range(N):
- *         atom_idx = indices[i]             # <<<<<<<<<<<<<<
+ *         atom_idx = c_indices[i]             # <<<<<<<<<<<<<<
  *         z_atom = z_positions[atom_idx]
  * 
 */
     __pyx_t_4 = __pyx_v_i;
-    __pyx_v_atom_idx = (*((long *) ( /* dim=0 */ (__pyx_v_indices.data + __pyx_t_4 * __pyx_v_indices.strides[0]) )));
+    __pyx_v_atom_idx = (*((long *) ( /* dim=0 */ (__pyx_v_c_indices.data + __pyx_t_4 * __pyx_v_c_indices.strides[0]) )));
 
-    /* "electrode_charges_cython.pyx":120
+    /* "electrode_charges_cython.pyx":239
  *     for i in range(N):
- *         atom_idx = indices[i]
+ *         atom_idx = c_indices[i]
  *         z_atom = z_positions[atom_idx]             # <<<<<<<<<<<<<<
  * 
  *         # abs(z_atom - z_opposite)
@@ -19728,7 +19997,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_2compute_analytic_charge_co
     __pyx_t_4 = __pyx_v_atom_idx;
     __pyx_v_z_atom = (*((double *) ( /* dim=0 */ (__pyx_v_z_positions.data + __pyx_t_4 * __pyx_v_z_positions.strides[0]) )));
 
-    /* "electrode_charges_cython.pyx":123
+    /* "electrode_charges_cython.pyx":242
  * 
  *         # abs(z_atom - z_opposite)
  *         z_distance = z_atom - z_opposite             # <<<<<<<<<<<<<<
@@ -19737,7 +20006,7 @@ static PyObject *__pyx_pf_24electrode_charges_cython_2compute_analytic_charge_co
 */
     __pyx_v_z_distance = (__pyx_v_z_atom - __pyx_v_z_opposite);
 
-    /* "electrode_charges_cython.pyx":124
+    /* "electrode_charges_cython.pyx":243
  *         # abs(z_atom - z_opposite)
  *         z_distance = z_atom - z_opposite
  *         if z_distance < 0.0:             # <<<<<<<<<<<<<<
@@ -19747,16 +20016,16 @@ static PyObject *__pyx_pf_24electrode_charges_cython_2compute_analytic_charge_co
     __pyx_t_5 = (__pyx_v_z_distance < 0.0);
     if (__pyx_t_5) {
 
-      /* "electrode_charges_cython.pyx":125
+      /* "electrode_charges_cython.pyx":244
  *         z_distance = z_atom - z_opposite
  *         if z_distance < 0.0:
  *             z_distance = -z_distance             # <<<<<<<<<<<<<<
  * 
- *         # Accumulate: sum(|z - z_opp| / Lcell * (-q))
+ *         # : sum(|z - z_opp| / Lcell * (-q))
 */
       __pyx_v_z_distance = (-__pyx_v_z_distance);
 
-      /* "electrode_charges_cython.pyx":124
+      /* "electrode_charges_cython.pyx":243
  *         # abs(z_atom - z_opposite)
  *         z_distance = z_atom - z_opposite
  *         if z_distance < 0.0:             # <<<<<<<<<<<<<<
@@ -19765,34 +20034,34 @@ static PyObject *__pyx_pf_24electrode_charges_cython_2compute_analytic_charge_co
 */
     }
 
-    /* "electrode_charges_cython.pyx":128
+    /* "electrode_charges_cython.pyx":247
  * 
- *         # Accumulate: sum(|z - z_opp| / Lcell * (-q))
- *         contribution += z_distance / Lcell * (-charges[i])             # <<<<<<<<<<<<<<
+ *         # : sum(|z - z_opp| / Lcell * (-q))
+ *         contribution += (z_distance / Lcell) * (-c_charges[i])             # <<<<<<<<<<<<<<
  * 
  *     return contribution
 */
     __pyx_t_4 = __pyx_v_i;
-    __pyx_v_contribution = (__pyx_v_contribution + ((__pyx_v_z_distance / __pyx_v_Lcell) * (-(*((double *) ( /* dim=0 */ (__pyx_v_charges.data + __pyx_t_4 * __pyx_v_charges.strides[0]) ))))));
+    __pyx_v_contribution = (__pyx_v_contribution + ((__pyx_v_z_distance / __pyx_v_Lcell) * (-(*((double *) ( /* dim=0 */ (__pyx_v_c_charges.data + __pyx_t_4 * __pyx_v_c_charges.strides[0]) ))))));
   }
 
-  /* "electrode_charges_cython.pyx":130
- *         contribution += z_distance / Lcell * (-charges[i])
+  /* "electrode_charges_cython.pyx":249
+ *         contribution += (z_distance / Lcell) * (-c_charges[i])
  * 
  *     return contribution             # <<<<<<<<<<<<<<
  * 
  * 
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_6 = PyFloat_FromDouble(__pyx_v_contribution); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_6 = PyFloat_FromDouble(__pyx_v_contribution); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 249, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_r = __pyx_t_6;
   __pyx_t_6 = 0;
   goto __pyx_L0;
 
-  /* "electrode_charges_cython.pyx":97
- * 
- * 
+  /* "electrode_charges_cython.pyx":195
+ * #  C-level  API
+ * #=========================================================================
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  * @cython.wraparound(False)
  * @cython.cdivision(True)
@@ -19801,3241 +20070,9 @@ static PyObject *__pyx_pf_24electrode_charges_cython_2compute_analytic_charge_co
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("electrode_charges_cython.compute_analytic_charge_contribution_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("electrode_charges_cython.compute_analytic_contribution_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "electrode_charges_cython.pyx":133
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def extract_z_coordinates_cython(positions_list):
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_5extract_z_coordinates_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_4extract_z_coordinates_cython, "\n    \345\277\253\351\200\237\346\217\220\345\217\226 z \345\272\247\346\250\231\n    \n    \346\257\224 list comprehension \345\277\253 2-3x\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_5extract_z_coordinates_cython = {"extract_z_coordinates_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_5extract_z_coordinates_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_4extract_z_coordinates_cython};
-static PyObject *__pyx_pw_24electrode_charges_cython_5extract_z_coordinates_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_positions_list = 0;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[1] = {0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("extract_z_coordinates_cython (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_positions_list,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 133, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 133, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "extract_z_coordinates_cython", 0) < (0)) __PYX_ERR(0, 133, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("extract_z_coordinates_cython", 1, 1, 1, i); __PYX_ERR(0, 133, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 1)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 133, __pyx_L3_error)
-    }
-    __pyx_v_positions_list = values[0];
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("extract_z_coordinates_cython", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 133, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("electrode_charges_cython.extract_z_coordinates_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_4extract_z_coordinates_cython(__pyx_self, __pyx_v_positions_list);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_24electrode_charges_cython_4extract_z_coordinates_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_positions_list) {
-  Py_ssize_t __pyx_v_i;
-  Py_ssize_t __pyx_v_N;
-  PyArrayObject *__pyx_v_z_coords = 0;
-  __Pyx_LocalBuf_ND __pyx_pybuffernd_z_coords;
-  __Pyx_Buffer __pyx_pybuffer_z_coords;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  size_t __pyx_t_8;
-  Py_ssize_t __pyx_t_9;
-  Py_ssize_t __pyx_t_10;
-  __pyx_t_24electrode_charges_cython_DTYPE_t __pyx_t_11;
-  Py_ssize_t __pyx_t_12;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("extract_z_coordinates_cython", 0);
-  __pyx_pybuffer_z_coords.pybuffer.buf = NULL;
-  __pyx_pybuffer_z_coords.refcount = 0;
-  __pyx_pybuffernd_z_coords.data = NULL;
-  __pyx_pybuffernd_z_coords.rcbuffer = &__pyx_pybuffer_z_coords;
-
-  /* "electrode_charges_cython.pyx":142
- *     """
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(positions_list)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray[DTYPE_t, ndim=1] z_coords = np.empty(N, dtype=np.float64)
- * 
-*/
-  __pyx_t_1 = PyObject_Length(__pyx_v_positions_list); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 142, __pyx_L1_error)
-  __pyx_v_N = __pyx_t_1;
-
-  /* "electrode_charges_cython.pyx":143
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(positions_list)
- *     cdef np.ndarray[DTYPE_t, ndim=1] z_coords = np.empty(N, dtype=np.float64)             # <<<<<<<<<<<<<<
- * 
- *     for i in range(N):
-*/
-  __pyx_t_3 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 143, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_empty); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 143, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyLong_FromSsize_t(__pyx_v_N); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 143, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 143, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_float64); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 143, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_8 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_5))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_5);
-    assert(__pyx_t_3);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_5);
-    __Pyx_INCREF(__pyx_t_3);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_5, __pyx__function);
-    __pyx_t_8 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_3, __pyx_t_4};
-    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 143, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_dtype, __pyx_t_7, __pyx_t_6, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 143, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_5, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 143, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-  }
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 143, __pyx_L1_error)
-  {
-    __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_z_coords.rcbuffer->pybuffer, (PyObject*)((PyArrayObject *)__pyx_t_2), &__Pyx_TypeInfo_nn___pyx_t_24electrode_charges_cython_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 1, 0, __pyx_stack) == -1)) {
-      __pyx_v_z_coords = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_z_coords.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 143, __pyx_L1_error)
-    } else {__pyx_pybuffernd_z_coords.diminfo[0].strides = __pyx_pybuffernd_z_coords.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_z_coords.diminfo[0].shape = __pyx_pybuffernd_z_coords.rcbuffer->pybuffer.shape[0];
-    }
-  }
-  __pyx_v_z_coords = ((PyArrayObject *)__pyx_t_2);
-  __pyx_t_2 = 0;
-
-  /* "electrode_charges_cython.pyx":145
- *     cdef np.ndarray[DTYPE_t, ndim=1] z_coords = np.empty(N, dtype=np.float64)
- * 
- *     for i in range(N):             # <<<<<<<<<<<<<<
- *         z_coords[i] = positions_list[i][2]._value
- * 
-*/
-  __pyx_t_1 = __pyx_v_N;
-  __pyx_t_9 = __pyx_t_1;
-  for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
-    __pyx_v_i = __pyx_t_10;
-
-    /* "electrode_charges_cython.pyx":146
- * 
- *     for i in range(N):
- *         z_coords[i] = positions_list[i][2]._value             # <<<<<<<<<<<<<<
- * 
- *     return z_coords
-*/
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_positions_list, __pyx_v_i, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_2, 2, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 146, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_value); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_11 = __Pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_11 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 146, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_12 = __pyx_v_i;
-    *__Pyx_BufPtrStrided1d(__pyx_t_24electrode_charges_cython_DTYPE_t *, __pyx_pybuffernd_z_coords.rcbuffer->pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_z_coords.diminfo[0].strides) = __pyx_t_11;
-  }
-
-  /* "electrode_charges_cython.pyx":148
- *         z_coords[i] = positions_list[i][2]._value
- * 
- *     return z_coords             # <<<<<<<<<<<<<<
- * 
- * 
-*/
-  __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF((PyObject *)__pyx_v_z_coords);
-  __pyx_r = ((PyObject *)__pyx_v_z_coords);
-  goto __pyx_L0;
-
-  /* "electrode_charges_cython.pyx":133
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def extract_z_coordinates_cython(positions_list):
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
-    __Pyx_PyThreadState_declare
-    __Pyx_PyThreadState_assign
-    __Pyx_ErrFetch(&__pyx_type, &__pyx_value, &__pyx_tb);
-    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_z_coords.rcbuffer->pybuffer);
-  __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("electrode_charges_cython.extract_z_coordinates_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  goto __pyx_L2;
-  __pyx_L0:;
-  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_z_coords.rcbuffer->pybuffer);
-  __pyx_L2:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_z_coords);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "electrode_charges_cython.pyx":151
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def extract_forces_z_cython(forces_list):
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_7extract_forces_z_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_6extract_forces_z_cython, "\n    \345\277\253\351\200\237\346\217\220\345\217\226 z \346\226\271\345\220\221\345\212\233\n    \n    \346\257\224 list comprehension \345\277\253 2-3x\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_7extract_forces_z_cython = {"extract_forces_z_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_7extract_forces_z_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_6extract_forces_z_cython};
-static PyObject *__pyx_pw_24electrode_charges_cython_7extract_forces_z_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_forces_list = 0;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[1] = {0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("extract_forces_z_cython (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_forces_list,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 151, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 151, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "extract_forces_z_cython", 0) < (0)) __PYX_ERR(0, 151, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("extract_forces_z_cython", 1, 1, 1, i); __PYX_ERR(0, 151, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 1)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 151, __pyx_L3_error)
-    }
-    __pyx_v_forces_list = values[0];
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("extract_forces_z_cython", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 151, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("electrode_charges_cython.extract_forces_z_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_6extract_forces_z_cython(__pyx_self, __pyx_v_forces_list);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_24electrode_charges_cython_6extract_forces_z_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_forces_list) {
-  Py_ssize_t __pyx_v_i;
-  Py_ssize_t __pyx_v_N;
-  PyArrayObject *__pyx_v_forces_z = 0;
-  __Pyx_LocalBuf_ND __pyx_pybuffernd_forces_z;
-  __Pyx_Buffer __pyx_pybuffer_forces_z;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  size_t __pyx_t_8;
-  Py_ssize_t __pyx_t_9;
-  Py_ssize_t __pyx_t_10;
-  __pyx_t_24electrode_charges_cython_DTYPE_t __pyx_t_11;
-  Py_ssize_t __pyx_t_12;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("extract_forces_z_cython", 0);
-  __pyx_pybuffer_forces_z.pybuffer.buf = NULL;
-  __pyx_pybuffer_forces_z.refcount = 0;
-  __pyx_pybuffernd_forces_z.data = NULL;
-  __pyx_pybuffernd_forces_z.rcbuffer = &__pyx_pybuffer_forces_z;
-
-  /* "electrode_charges_cython.pyx":160
- *     """
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(forces_list)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray[DTYPE_t, ndim=1] forces_z = np.empty(N, dtype=np.float64)
- * 
-*/
-  __pyx_t_1 = PyObject_Length(__pyx_v_forces_list); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 160, __pyx_L1_error)
-  __pyx_v_N = __pyx_t_1;
-
-  /* "electrode_charges_cython.pyx":161
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(forces_list)
- *     cdef np.ndarray[DTYPE_t, ndim=1] forces_z = np.empty(N, dtype=np.float64)             # <<<<<<<<<<<<<<
- * 
- *     for i in range(N):
-*/
-  __pyx_t_3 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 161, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_empty); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 161, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyLong_FromSsize_t(__pyx_v_N); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 161, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 161, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_float64); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 161, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_8 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_5))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_5);
-    assert(__pyx_t_3);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_5);
-    __Pyx_INCREF(__pyx_t_3);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_5, __pyx__function);
-    __pyx_t_8 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_3, __pyx_t_4};
-    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 161, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_dtype, __pyx_t_7, __pyx_t_6, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 161, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_5, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 161, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-  }
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 161, __pyx_L1_error)
-  {
-    __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_forces_z.rcbuffer->pybuffer, (PyObject*)((PyArrayObject *)__pyx_t_2), &__Pyx_TypeInfo_nn___pyx_t_24electrode_charges_cython_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 1, 0, __pyx_stack) == -1)) {
-      __pyx_v_forces_z = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_forces_z.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 161, __pyx_L1_error)
-    } else {__pyx_pybuffernd_forces_z.diminfo[0].strides = __pyx_pybuffernd_forces_z.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_forces_z.diminfo[0].shape = __pyx_pybuffernd_forces_z.rcbuffer->pybuffer.shape[0];
-    }
-  }
-  __pyx_v_forces_z = ((PyArrayObject *)__pyx_t_2);
-  __pyx_t_2 = 0;
-
-  /* "electrode_charges_cython.pyx":163
- *     cdef np.ndarray[DTYPE_t, ndim=1] forces_z = np.empty(N, dtype=np.float64)
- * 
- *     for i in range(N):             # <<<<<<<<<<<<<<
- *         forces_z[i] = forces_list[i][2]._value
- * 
-*/
-  __pyx_t_1 = __pyx_v_N;
-  __pyx_t_9 = __pyx_t_1;
-  for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
-    __pyx_v_i = __pyx_t_10;
-
-    /* "electrode_charges_cython.pyx":164
- * 
- *     for i in range(N):
- *         forces_z[i] = forces_list[i][2]._value             # <<<<<<<<<<<<<<
- * 
- *     return forces_z
-*/
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_forces_list, __pyx_v_i, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_2, 2, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 164, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_value); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_11 = __Pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_11 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 164, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_12 = __pyx_v_i;
-    *__Pyx_BufPtrStrided1d(__pyx_t_24electrode_charges_cython_DTYPE_t *, __pyx_pybuffernd_forces_z.rcbuffer->pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_forces_z.diminfo[0].strides) = __pyx_t_11;
-  }
-
-  /* "electrode_charges_cython.pyx":166
- *         forces_z[i] = forces_list[i][2]._value
- * 
- *     return forces_z             # <<<<<<<<<<<<<<
- * 
- * 
-*/
-  __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF((PyObject *)__pyx_v_forces_z);
-  __pyx_r = ((PyObject *)__pyx_v_forces_z);
-  goto __pyx_L0;
-
-  /* "electrode_charges_cython.pyx":151
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def extract_forces_z_cython(forces_list):
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
-    __Pyx_PyThreadState_declare
-    __Pyx_PyThreadState_assign
-    __Pyx_ErrFetch(&__pyx_type, &__pyx_value, &__pyx_tb);
-    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_forces_z.rcbuffer->pybuffer);
-  __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("electrode_charges_cython.extract_forces_z_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  goto __pyx_L2;
-  __pyx_L0:;
-  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_forces_z.rcbuffer->pybuffer);
-  __pyx_L2:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_forces_z);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "electrode_charges_cython.pyx":169
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def update_openmm_charges_batch(
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_9update_openmm_charges_batch(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_8update_openmm_charges_batch, "\n    \346\211\271\346\254\241\346\233\264\346\226\260 OpenMM charges\n    \n    \346\270\233\345\260\221 Python \345\207\275\346\225\270\350\252\277\347\224\250 overhead\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_9update_openmm_charges_batch = {"update_openmm_charges_batch", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_9update_openmm_charges_batch, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_8update_openmm_charges_batch};
-static PyObject *__pyx_pw_24electrode_charges_cython_9update_openmm_charges_batch(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_nbondedForce = 0;
-  PyObject *__pyx_v_electrode_atoms = 0;
-  __Pyx_memviewslice __pyx_v_charges = { 0, 0, { 0 }, { 0 }, { 0 } };
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[3] = {0,0,0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("update_openmm_charges_batch (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_nbondedForce,&__pyx_mstate_global->__pyx_n_u_electrode_atoms,&__pyx_mstate_global->__pyx_n_u_charges,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 169, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  3:
-        values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 169, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  2:
-        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 169, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 169, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "update_openmm_charges_batch", 0) < (0)) __PYX_ERR(0, 169, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("update_openmm_charges_batch", 1, 3, 3, i); __PYX_ERR(0, 169, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 3)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 169, __pyx_L3_error)
-      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 169, __pyx_L3_error)
-      values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 169, __pyx_L3_error)
-    }
-    __pyx_v_nbondedForce = values[0];
-    __pyx_v_electrode_atoms = values[1];
-    __pyx_v_charges = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[2], PyBUF_WRITABLE); if (unlikely(!__pyx_v_charges.memview)) __PYX_ERR(0, 174, __pyx_L3_error)
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("update_openmm_charges_batch", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 169, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __PYX_XCLEAR_MEMVIEW(&__pyx_v_charges, 1);
-  __Pyx_AddTraceback("electrode_charges_cython.update_openmm_charges_batch", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_8update_openmm_charges_batch(__pyx_self, __pyx_v_nbondedForce, __pyx_v_electrode_atoms, __pyx_v_charges);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __PYX_XCLEAR_MEMVIEW(&__pyx_v_charges, 1);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_24electrode_charges_cython_8update_openmm_charges_batch(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_nbondedForce, PyObject *__pyx_v_electrode_atoms, __Pyx_memviewslice __pyx_v_charges) {
-  Py_ssize_t __pyx_v_i;
-  Py_ssize_t __pyx_v_N;
-  double __pyx_v_q;
-  PyObject *__pyx_v_atom = 0;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  Py_ssize_t __pyx_t_2;
-  Py_ssize_t __pyx_t_3;
-  PyObject *__pyx_t_4 = NULL;
-  Py_ssize_t __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
-  size_t __pyx_t_9;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("update_openmm_charges_batch", 0);
-
-  /* "electrode_charges_cython.pyx":182
- *     """
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)             # <<<<<<<<<<<<<<
- *     cdef double q
- *     cdef object atom
-*/
-  __pyx_t_1 = PyObject_Length(__pyx_v_electrode_atoms); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 182, __pyx_L1_error)
-  __pyx_v_N = __pyx_t_1;
-
-  /* "electrode_charges_cython.pyx":186
- *     cdef object atom
- * 
- *     for i in range(N):             # <<<<<<<<<<<<<<
- *         atom = electrode_atoms[i]
- *         q = charges[i]
-*/
-  __pyx_t_1 = __pyx_v_N;
-  __pyx_t_2 = __pyx_t_1;
-  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
-
-    /* "electrode_charges_cython.pyx":187
- * 
- *     for i in range(N):
- *         atom = electrode_atoms[i]             # <<<<<<<<<<<<<<
- *         q = charges[i]
- * 
-*/
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_electrode_atoms, __pyx_v_i, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 187, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_XDECREF_SET(__pyx_v_atom, __pyx_t_4);
-    __pyx_t_4 = 0;
-
-    /* "electrode_charges_cython.pyx":188
- *     for i in range(N):
- *         atom = electrode_atoms[i]
- *         q = charges[i]             # <<<<<<<<<<<<<<
- * 
- *         # Update atom.charge (Python attribute)
-*/
-    __pyx_t_5 = __pyx_v_i;
-    __pyx_v_q = (*((double *) ( /* dim=0 */ (__pyx_v_charges.data + __pyx_t_5 * __pyx_v_charges.strides[0]) )));
-
-    /* "electrode_charges_cython.pyx":191
- * 
- *         # Update atom.charge (Python attribute)
- *         atom.charge = q             # <<<<<<<<<<<<<<
- * 
- *         # Update OpenMM force
-*/
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_q); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 191, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_charge, __pyx_t_4) < (0)) __PYX_ERR(0, 191, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-    /* "electrode_charges_cython.pyx":194
- * 
- *         # Update OpenMM force
- *         nbondedForce.setParticleParameters(atom.atom_index, q, 1.0, 0.0)             # <<<<<<<<<<<<<<
- * 
- * 
-*/
-    __pyx_t_6 = __pyx_v_nbondedForce;
-    __Pyx_INCREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_atom_index); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 194, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = PyFloat_FromDouble(__pyx_v_q); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 194, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_9 = 0;
-    {
-      PyObject *__pyx_callargs[5] = {__pyx_t_6, __pyx_t_7, __pyx_t_8, __pyx_mstate_global->__pyx_float_1_0, __pyx_mstate_global->__pyx_float_0_0};
-      __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_setParticleParameters, __pyx_callargs+__pyx_t_9, (5-__pyx_t_9) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 194, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_4);
-    }
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  }
-
-  /* "electrode_charges_cython.pyx":169
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def update_openmm_charges_batch(
-*/
-
-  /* function exit code */
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_AddTraceback("electrode_charges_cython.update_openmm_charges_batch", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_atom);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "electrode_charges_cython.pyx":197
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def scale_electrode_charges_cython(
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_11scale_electrode_charges_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_10scale_electrode_charges_cython, "\n    \345\277\253\351\200\237\347\270\256\346\224\276 electrode charges\n    \n    \347\224\250\346\226\274 Analytic normalization (Scale_charges_analytic)\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_11scale_electrode_charges_cython = {"scale_electrode_charges_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_11scale_electrode_charges_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_10scale_electrode_charges_cython};
-static PyObject *__pyx_pw_24electrode_charges_cython_11scale_electrode_charges_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_electrode_atoms = 0;
-  PyObject *__pyx_v_nbondedForce = 0;
-  double __pyx_v_scale_factor;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[3] = {0,0,0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("scale_electrode_charges_cython (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_electrode_atoms,&__pyx_mstate_global->__pyx_n_u_nbondedForce,&__pyx_mstate_global->__pyx_n_u_scale_factor,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 197, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  3:
-        values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 197, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  2:
-        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 197, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 197, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "scale_electrode_charges_cython", 0) < (0)) __PYX_ERR(0, 197, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("scale_electrode_charges_cython", 1, 3, 3, i); __PYX_ERR(0, 197, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 3)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 197, __pyx_L3_error)
-      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 197, __pyx_L3_error)
-      values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 197, __pyx_L3_error)
-    }
-    __pyx_v_electrode_atoms = values[0];
-    __pyx_v_nbondedForce = values[1];
-    __pyx_v_scale_factor = __Pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_scale_factor == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 202, __pyx_L3_error)
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("scale_electrode_charges_cython", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 197, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("electrode_charges_cython.scale_electrode_charges_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_10scale_electrode_charges_cython(__pyx_self, __pyx_v_electrode_atoms, __pyx_v_nbondedForce, __pyx_v_scale_factor);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_24electrode_charges_cython_10scale_electrode_charges_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, PyObject *__pyx_v_nbondedForce, double __pyx_v_scale_factor) {
-  Py_ssize_t __pyx_v_i;
-  Py_ssize_t __pyx_v_N;
-  PyObject *__pyx_v_atom = 0;
-  double __pyx_v_new_charge;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  Py_ssize_t __pyx_t_2;
-  Py_ssize_t __pyx_t_3;
-  PyObject *__pyx_t_4 = NULL;
-  PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  double __pyx_t_7;
-  PyObject *__pyx_t_8 = NULL;
-  size_t __pyx_t_9;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("scale_electrode_charges_cython", 0);
-
-  /* "electrode_charges_cython.pyx":210
- *     """
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)             # <<<<<<<<<<<<<<
- *     cdef object atom
- *     cdef double new_charge
-*/
-  __pyx_t_1 = PyObject_Length(__pyx_v_electrode_atoms); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 210, __pyx_L1_error)
-  __pyx_v_N = __pyx_t_1;
-
-  /* "electrode_charges_cython.pyx":214
- *     cdef double new_charge
- * 
- *     for i in range(N):             # <<<<<<<<<<<<<<
- *         atom = electrode_atoms[i]
- *         new_charge = atom.charge * scale_factor
-*/
-  __pyx_t_1 = __pyx_v_N;
-  __pyx_t_2 = __pyx_t_1;
-  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
-
-    /* "electrode_charges_cython.pyx":215
- * 
- *     for i in range(N):
- *         atom = electrode_atoms[i]             # <<<<<<<<<<<<<<
- *         new_charge = atom.charge * scale_factor
- *         atom.charge = new_charge
-*/
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_electrode_atoms, __pyx_v_i, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 215, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_XDECREF_SET(__pyx_v_atom, __pyx_t_4);
-    __pyx_t_4 = 0;
-
-    /* "electrode_charges_cython.pyx":216
- *     for i in range(N):
- *         atom = electrode_atoms[i]
- *         new_charge = atom.charge * scale_factor             # <<<<<<<<<<<<<<
- *         atom.charge = new_charge
- *         nbondedForce.setParticleParameters(atom.atom_index, new_charge, 1.0, 0.0)
-*/
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_charge); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 216, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_scale_factor); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 216, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = PyNumber_Multiply(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 216, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_7 = __Pyx_PyFloat_AsDouble(__pyx_t_6); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 216, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_v_new_charge = __pyx_t_7;
-
-    /* "electrode_charges_cython.pyx":217
- *         atom = electrode_atoms[i]
- *         new_charge = atom.charge * scale_factor
- *         atom.charge = new_charge             # <<<<<<<<<<<<<<
- *         nbondedForce.setParticleParameters(atom.atom_index, new_charge, 1.0, 0.0)
- * 
-*/
-    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_new_charge); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 217, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_charge, __pyx_t_6) < (0)) __PYX_ERR(0, 217, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-
-    /* "electrode_charges_cython.pyx":218
- *         new_charge = atom.charge * scale_factor
- *         atom.charge = new_charge
- *         nbondedForce.setParticleParameters(atom.atom_index, new_charge, 1.0, 0.0)             # <<<<<<<<<<<<<<
- * 
- * 
-*/
-    __pyx_t_5 = __pyx_v_nbondedForce;
-    __Pyx_INCREF(__pyx_t_5);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_atom_index); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 218, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_8 = PyFloat_FromDouble(__pyx_v_new_charge); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 218, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_9 = 0;
-    {
-      PyObject *__pyx_callargs[5] = {__pyx_t_5, __pyx_t_4, __pyx_t_8, __pyx_mstate_global->__pyx_float_1_0, __pyx_mstate_global->__pyx_float_0_0};
-      __pyx_t_6 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_setParticleParameters, __pyx_callargs+__pyx_t_9, (5-__pyx_t_9) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-      __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 218, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-    }
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  }
-
-  /* "electrode_charges_cython.pyx":197
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def scale_electrode_charges_cython(
-*/
-
-  /* function exit code */
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_AddTraceback("electrode_charges_cython.scale_electrode_charges_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_atom);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "electrode_charges_cython.pyx":221
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def get_total_charge_cython(electrode_atoms):
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_13get_total_charge_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_12get_total_charge_cython, "\n    \345\277\253\351\200\237\350\250\210\347\256\227 total charge\n    \n    \346\257\224 sum([atom.charge for atom in ...]) \345\277\253 3-5x\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_13get_total_charge_cython = {"get_total_charge_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_13get_total_charge_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_12get_total_charge_cython};
-static PyObject *__pyx_pw_24electrode_charges_cython_13get_total_charge_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_electrode_atoms = 0;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[1] = {0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_total_charge_cython (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_electrode_atoms,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 221, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 221, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_total_charge_cython", 0) < (0)) __PYX_ERR(0, 221, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_total_charge_cython", 1, 1, 1, i); __PYX_ERR(0, 221, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 1)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 221, __pyx_L3_error)
-    }
-    __pyx_v_electrode_atoms = values[0];
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_total_charge_cython", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 221, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("electrode_charges_cython.get_total_charge_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_12get_total_charge_cython(__pyx_self, __pyx_v_electrode_atoms);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_24electrode_charges_cython_12get_total_charge_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms) {
-  Py_ssize_t __pyx_v_i;
-  Py_ssize_t __pyx_v_N;
-  double __pyx_v_total_charge;
-  PyObject *__pyx_v_atom = 0;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  Py_ssize_t __pyx_t_2;
-  Py_ssize_t __pyx_t_3;
-  PyObject *__pyx_t_4 = NULL;
-  PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  double __pyx_t_7;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("get_total_charge_cython", 0);
-
-  /* "electrode_charges_cython.pyx":230
- *     """
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)             # <<<<<<<<<<<<<<
- *     cdef double total_charge = 0.0
- *     cdef object atom
-*/
-  __pyx_t_1 = PyObject_Length(__pyx_v_electrode_atoms); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 230, __pyx_L1_error)
-  __pyx_v_N = __pyx_t_1;
-
-  /* "electrode_charges_cython.pyx":231
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)
- *     cdef double total_charge = 0.0             # <<<<<<<<<<<<<<
- *     cdef object atom
- * 
-*/
-  __pyx_v_total_charge = 0.0;
-
-  /* "electrode_charges_cython.pyx":234
- *     cdef object atom
- * 
- *     for i in range(N):             # <<<<<<<<<<<<<<
- *         atom = electrode_atoms[i]
- *         total_charge += atom.charge
-*/
-  __pyx_t_1 = __pyx_v_N;
-  __pyx_t_2 = __pyx_t_1;
-  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
-
-    /* "electrode_charges_cython.pyx":235
- * 
- *     for i in range(N):
- *         atom = electrode_atoms[i]             # <<<<<<<<<<<<<<
- *         total_charge += atom.charge
- * 
-*/
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_electrode_atoms, __pyx_v_i, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 235, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_XDECREF_SET(__pyx_v_atom, __pyx_t_4);
-    __pyx_t_4 = 0;
-
-    /* "electrode_charges_cython.pyx":236
- *     for i in range(N):
- *         atom = electrode_atoms[i]
- *         total_charge += atom.charge             # <<<<<<<<<<<<<<
- * 
- *     return total_charge
-*/
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_total_charge); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 236, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_charge); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 236, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = PyNumber_InPlaceAdd(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 236, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_7 = __Pyx_PyFloat_AsDouble(__pyx_t_6); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 236, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_v_total_charge = __pyx_t_7;
-  }
-
-  /* "electrode_charges_cython.pyx":238
- *         total_charge += atom.charge
- * 
- *     return total_charge             # <<<<<<<<<<<<<<
- * 
- * 
-*/
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_6 = PyFloat_FromDouble(__pyx_v_total_charge); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 238, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_r = __pyx_t_6;
-  __pyx_t_6 = 0;
-  goto __pyx_L0;
-
-  /* "electrode_charges_cython.pyx":221
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def get_total_charge_cython(electrode_atoms):
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("electrode_charges_cython.get_total_charge_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_atom);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "electrode_charges_cython.pyx":241
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def compute_z_position_cython(electrode_atoms, positions_list):
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_15compute_z_position_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_14compute_z_position_cython, "\n    \345\277\253\351\200\237\350\250\210\347\256\227 electrode \345\271\263\345\235\207 z \344\275\215\347\275\256\n    \n    \347\224\250\346\226\274 compute_z_position() \346\226\271\346\263\225\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_15compute_z_position_cython = {"compute_z_position_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_15compute_z_position_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_14compute_z_position_cython};
-static PyObject *__pyx_pw_24electrode_charges_cython_15compute_z_position_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_electrode_atoms = 0;
-  PyObject *__pyx_v_positions_list = 0;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[2] = {0,0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("compute_z_position_cython (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_electrode_atoms,&__pyx_mstate_global->__pyx_n_u_positions_list,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 241, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  2:
-        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 241, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 241, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "compute_z_position_cython", 0) < (0)) __PYX_ERR(0, 241, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("compute_z_position_cython", 1, 2, 2, i); __PYX_ERR(0, 241, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 2)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 241, __pyx_L3_error)
-      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 241, __pyx_L3_error)
-    }
-    __pyx_v_electrode_atoms = values[0];
-    __pyx_v_positions_list = values[1];
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("compute_z_position_cython", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 241, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("electrode_charges_cython.compute_z_position_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_14compute_z_position_cython(__pyx_self, __pyx_v_electrode_atoms, __pyx_v_positions_list);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_24electrode_charges_cython_14compute_z_position_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, PyObject *__pyx_v_positions_list) {
-  Py_ssize_t __pyx_v_i;
-  Py_ssize_t __pyx_v_N;
-  double __pyx_v_z_sum;
-  PyObject *__pyx_v_atom = 0;
-  long __pyx_v_atom_idx;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  Py_ssize_t __pyx_t_2;
-  Py_ssize_t __pyx_t_3;
-  PyObject *__pyx_t_4 = NULL;
-  long __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  double __pyx_t_8;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("compute_z_position_cython", 0);
-
-  /* "electrode_charges_cython.pyx":250
- *     """
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)             # <<<<<<<<<<<<<<
- *     cdef double z_sum = 0.0
- *     cdef object atom
-*/
-  __pyx_t_1 = PyObject_Length(__pyx_v_electrode_atoms); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 250, __pyx_L1_error)
-  __pyx_v_N = __pyx_t_1;
-
-  /* "electrode_charges_cython.pyx":251
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)
- *     cdef double z_sum = 0.0             # <<<<<<<<<<<<<<
- *     cdef object atom
- *     cdef long atom_idx
-*/
-  __pyx_v_z_sum = 0.0;
-
-  /* "electrode_charges_cython.pyx":255
- *     cdef long atom_idx
- * 
- *     for i in range(N):             # <<<<<<<<<<<<<<
- *         atom = electrode_atoms[i]
- *         atom_idx = atom.atom_index
-*/
-  __pyx_t_1 = __pyx_v_N;
-  __pyx_t_2 = __pyx_t_1;
-  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
-
-    /* "electrode_charges_cython.pyx":256
- * 
- *     for i in range(N):
- *         atom = electrode_atoms[i]             # <<<<<<<<<<<<<<
- *         atom_idx = atom.atom_index
- *         z_sum += positions_list[atom_idx][2]._value
-*/
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_electrode_atoms, __pyx_v_i, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 256, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_XDECREF_SET(__pyx_v_atom, __pyx_t_4);
-    __pyx_t_4 = 0;
-
-    /* "electrode_charges_cython.pyx":257
- *     for i in range(N):
- *         atom = electrode_atoms[i]
- *         atom_idx = atom.atom_index             # <<<<<<<<<<<<<<
- *         z_sum += positions_list[atom_idx][2]._value
- * 
-*/
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_atom_index); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 257, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyLong_As_long(__pyx_t_4); if (unlikely((__pyx_t_5 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 257, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_v_atom_idx = __pyx_t_5;
-
-    /* "electrode_charges_cython.pyx":258
- *         atom = electrode_atoms[i]
- *         atom_idx = atom.atom_index
- *         z_sum += positions_list[atom_idx][2]._value             # <<<<<<<<<<<<<<
- * 
- *     return z_sum / N
-*/
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_z_sum); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 258, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_positions_list, __pyx_v_atom_idx, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 258, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_6, 2, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 258, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_value); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 258, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyNumber_InPlaceAdd(__pyx_t_4, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 258, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_8 = __Pyx_PyFloat_AsDouble(__pyx_t_7); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 258, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_v_z_sum = __pyx_t_8;
-  }
-
-  /* "electrode_charges_cython.pyx":260
- *         z_sum += positions_list[atom_idx][2]._value
- * 
- *     return z_sum / N             # <<<<<<<<<<<<<<
- * 
- * 
-*/
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_7 = PyFloat_FromDouble((__pyx_v_z_sum / ((double)__pyx_v_N))); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 260, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_r = __pyx_t_7;
-  __pyx_t_7 = 0;
-  goto __pyx_L0;
-
-  /* "electrode_charges_cython.pyx":241
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def compute_z_position_cython(electrode_atoms, positions_list):
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_AddTraceback("electrode_charges_cython.compute_z_position_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_atom);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "electrode_charges_cython.pyx":263
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def collect_electrode_charges_cython(
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_17collect_electrode_charges_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_16collect_electrode_charges_cython, "\n    \345\277\253\351\200\237\346\224\266\351\233\206 electrode charges\n    \n    \346\257\224 list comprehension \345\277\253 2-3x\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_17collect_electrode_charges_cython = {"collect_electrode_charges_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_17collect_electrode_charges_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_16collect_electrode_charges_cython};
-static PyObject *__pyx_pw_24electrode_charges_cython_17collect_electrode_charges_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_electrode_atoms = 0;
-  CYTHON_UNUSED PyObject *__pyx_v_nbondedForce = 0;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[2] = {0,0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("collect_electrode_charges_cython (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_electrode_atoms,&__pyx_mstate_global->__pyx_n_u_nbondedForce,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 263, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  2:
-        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 263, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 263, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "collect_electrode_charges_cython", 0) < (0)) __PYX_ERR(0, 263, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("collect_electrode_charges_cython", 1, 2, 2, i); __PYX_ERR(0, 263, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 2)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 263, __pyx_L3_error)
-      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 263, __pyx_L3_error)
-    }
-    __pyx_v_electrode_atoms = values[0];
-    __pyx_v_nbondedForce = values[1];
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("collect_electrode_charges_cython", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 263, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("electrode_charges_cython.collect_electrode_charges_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_16collect_electrode_charges_cython(__pyx_self, __pyx_v_electrode_atoms, __pyx_v_nbondedForce);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_24electrode_charges_cython_16collect_electrode_charges_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, CYTHON_UNUSED PyObject *__pyx_v_nbondedForce) {
-  Py_ssize_t __pyx_v_i;
-  Py_ssize_t __pyx_v_N;
-  PyArrayObject *__pyx_v_charges = 0;
-  PyObject *__pyx_v_atom = 0;
-  __Pyx_LocalBuf_ND __pyx_pybuffernd_charges;
-  __Pyx_Buffer __pyx_pybuffer_charges;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  size_t __pyx_t_8;
-  Py_ssize_t __pyx_t_9;
-  Py_ssize_t __pyx_t_10;
-  __pyx_t_24electrode_charges_cython_DTYPE_t __pyx_t_11;
-  Py_ssize_t __pyx_t_12;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("collect_electrode_charges_cython", 0);
-  __pyx_pybuffer_charges.pybuffer.buf = NULL;
-  __pyx_pybuffer_charges.refcount = 0;
-  __pyx_pybuffernd_charges.data = NULL;
-  __pyx_pybuffernd_charges.rcbuffer = &__pyx_pybuffer_charges;
-
-  /* "electrode_charges_cython.pyx":275
- *     """
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)             # <<<<<<<<<<<<<<
- *     cdef np.ndarray[DTYPE_t, ndim=1] charges = np.empty(N, dtype=np.float64)
- *     cdef object atom
-*/
-  __pyx_t_1 = PyObject_Length(__pyx_v_electrode_atoms); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 275, __pyx_L1_error)
-  __pyx_v_N = __pyx_t_1;
-
-  /* "electrode_charges_cython.pyx":276
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)
- *     cdef np.ndarray[DTYPE_t, ndim=1] charges = np.empty(N, dtype=np.float64)             # <<<<<<<<<<<<<<
- *     cdef object atom
- * 
-*/
-  __pyx_t_3 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 276, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_empty); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 276, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyLong_FromSsize_t(__pyx_v_N); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 276, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 276, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_float64); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 276, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_8 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_5))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_5);
-    assert(__pyx_t_3);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_5);
-    __Pyx_INCREF(__pyx_t_3);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_5, __pyx__function);
-    __pyx_t_8 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_3, __pyx_t_4};
-    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 276, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_dtype, __pyx_t_7, __pyx_t_6, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 276, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_5, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 276, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-  }
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_mstate_global->__pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 276, __pyx_L1_error)
-  {
-    __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_charges.rcbuffer->pybuffer, (PyObject*)((PyArrayObject *)__pyx_t_2), &__Pyx_TypeInfo_nn___pyx_t_24electrode_charges_cython_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 1, 0, __pyx_stack) == -1)) {
-      __pyx_v_charges = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_charges.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 276, __pyx_L1_error)
-    } else {__pyx_pybuffernd_charges.diminfo[0].strides = __pyx_pybuffernd_charges.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_charges.diminfo[0].shape = __pyx_pybuffernd_charges.rcbuffer->pybuffer.shape[0];
-    }
-  }
-  __pyx_v_charges = ((PyArrayObject *)__pyx_t_2);
-  __pyx_t_2 = 0;
-
-  /* "electrode_charges_cython.pyx":279
- *     cdef object atom
- * 
- *     for i in range(N):             # <<<<<<<<<<<<<<
- *         atom = electrode_atoms[i]
- *         charges[i] = atom.charge
-*/
-  __pyx_t_1 = __pyx_v_N;
-  __pyx_t_9 = __pyx_t_1;
-  for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
-    __pyx_v_i = __pyx_t_10;
-
-    /* "electrode_charges_cython.pyx":280
- * 
- *     for i in range(N):
- *         atom = electrode_atoms[i]             # <<<<<<<<<<<<<<
- *         charges[i] = atom.charge
- * 
-*/
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_electrode_atoms, __pyx_v_i, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 280, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_XDECREF_SET(__pyx_v_atom, __pyx_t_2);
-    __pyx_t_2 = 0;
-
-    /* "electrode_charges_cython.pyx":281
- *     for i in range(N):
- *         atom = electrode_atoms[i]
- *         charges[i] = atom.charge             # <<<<<<<<<<<<<<
- * 
- *     return charges
-*/
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_charge); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 281, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_11 = __Pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_11 == ((npy_float64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 281, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_12 = __pyx_v_i;
-    *__Pyx_BufPtrStrided1d(__pyx_t_24electrode_charges_cython_DTYPE_t *, __pyx_pybuffernd_charges.rcbuffer->pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_charges.diminfo[0].strides) = __pyx_t_11;
-  }
-
-  /* "electrode_charges_cython.pyx":283
- *         charges[i] = atom.charge
- * 
- *     return charges             # <<<<<<<<<<<<<<
- * 
- * 
-*/
-  __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF((PyObject *)__pyx_v_charges);
-  __pyx_r = ((PyObject *)__pyx_v_charges);
-  goto __pyx_L0;
-
-  /* "electrode_charges_cython.pyx":263
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def collect_electrode_charges_cython(
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
-    __Pyx_PyThreadState_declare
-    __Pyx_PyThreadState_assign
-    __Pyx_ErrFetch(&__pyx_type, &__pyx_value, &__pyx_tb);
-    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_charges.rcbuffer->pybuffer);
-  __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("electrode_charges_cython.collect_electrode_charges_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  goto __pyx_L2;
-  __pyx_L0:;
-  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_charges.rcbuffer->pybuffer);
-  __pyx_L2:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_charges);
-  __Pyx_XDECREF(__pyx_v_atom);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "electrode_charges_cython.pyx":286
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def initialize_electrode_charge_cython(
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_19initialize_electrode_charge_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_18initialize_electrode_charge_cython, "\n    \345\277\253\351\200\237\345\210\235\345\247\213\345\214\226 electrode charges\n    \n    \347\224\250\346\226\274 initialize_Charge() \346\226\271\346\263\225\n    \346\257\224 Python loop \345\277\253 2-3x\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_19initialize_electrode_charge_cython = {"initialize_electrode_charge_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_19initialize_electrode_charge_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_18initialize_electrode_charge_cython};
-static PyObject *__pyx_pw_24electrode_charges_cython_19initialize_electrode_charge_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_electrode_atoms = 0;
-  PyObject *__pyx_v_nbondedForce = 0;
-  double __pyx_v_charge_per_atom;
-  double __pyx_v_small_threshold;
-  double __pyx_v_sign;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[5] = {0,0,0,0,0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("initialize_electrode_charge_cython (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_electrode_atoms,&__pyx_mstate_global->__pyx_n_u_nbondedForce,&__pyx_mstate_global->__pyx_n_u_charge_per_atom,&__pyx_mstate_global->__pyx_n_u_small_threshold,&__pyx_mstate_global->__pyx_n_u_sign,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 286, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  5:
-        values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 286, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  4:
-        values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 286, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  3:
-        values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 286, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  2:
-        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 286, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 286, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "initialize_electrode_charge_cython", 0) < (0)) __PYX_ERR(0, 286, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 5; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("initialize_electrode_charge_cython", 1, 5, 5, i); __PYX_ERR(0, 286, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 5)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 286, __pyx_L3_error)
-      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 286, __pyx_L3_error)
-      values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 286, __pyx_L3_error)
-      values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 286, __pyx_L3_error)
-      values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 286, __pyx_L3_error)
-    }
-    __pyx_v_electrode_atoms = values[0];
-    __pyx_v_nbondedForce = values[1];
-    __pyx_v_charge_per_atom = __Pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_charge_per_atom == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 291, __pyx_L3_error)
-    __pyx_v_small_threshold = __Pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_small_threshold == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 292, __pyx_L3_error)
-    __pyx_v_sign = __Pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_sign == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 293, __pyx_L3_error)
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("initialize_electrode_charge_cython", 1, 5, 5, __pyx_nargs); __PYX_ERR(0, 286, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("electrode_charges_cython.initialize_electrode_charge_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_18initialize_electrode_charge_cython(__pyx_self, __pyx_v_electrode_atoms, __pyx_v_nbondedForce, __pyx_v_charge_per_atom, __pyx_v_small_threshold, __pyx_v_sign);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_24electrode_charges_cython_18initialize_electrode_charge_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, PyObject *__pyx_v_nbondedForce, double __pyx_v_charge_per_atom, double __pyx_v_small_threshold, double __pyx_v_sign) {
-  Py_ssize_t __pyx_v_i;
-  Py_ssize_t __pyx_v_N;
-  PyObject *__pyx_v_atom = 0;
-  double __pyx_v_q_i;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  Py_ssize_t __pyx_t_2;
-  Py_ssize_t __pyx_t_3;
-  PyObject *__pyx_t_4 = NULL;
-  int __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
-  size_t __pyx_t_9;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("initialize_electrode_charge_cython", 0);
-
-  /* "electrode_charges_cython.pyx":302
- *     """
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)             # <<<<<<<<<<<<<<
- *     cdef object atom
- *     cdef double q_i
-*/
-  __pyx_t_1 = PyObject_Length(__pyx_v_electrode_atoms); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 302, __pyx_L1_error)
-  __pyx_v_N = __pyx_t_1;
-
-  /* "electrode_charges_cython.pyx":306
- *     cdef double q_i
- * 
- *     for i in range(N):             # <<<<<<<<<<<<<<
- *         atom = electrode_atoms[i]
- *         q_i = charge_per_atom
-*/
-  __pyx_t_1 = __pyx_v_N;
-  __pyx_t_2 = __pyx_t_1;
-  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
-
-    /* "electrode_charges_cython.pyx":307
- * 
- *     for i in range(N):
- *         atom = electrode_atoms[i]             # <<<<<<<<<<<<<<
- *         q_i = charge_per_atom
- * 
-*/
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_electrode_atoms, __pyx_v_i, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 307, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_XDECREF_SET(__pyx_v_atom, __pyx_t_4);
-    __pyx_t_4 = 0;
-
-    /* "electrode_charges_cython.pyx":308
- *     for i in range(N):
- *         atom = electrode_atoms[i]
- *         q_i = charge_per_atom             # <<<<<<<<<<<<<<
- * 
- *         # Apply small threshold if charge is too small
-*/
-    __pyx_v_q_i = __pyx_v_charge_per_atom;
-
-    /* "electrode_charges_cython.pyx":311
- * 
- *         # Apply small threshold if charge is too small
- *         if fabs(q_i) < small_threshold:             # <<<<<<<<<<<<<<
- *             q_i = q_i + sign * small_threshold
- * 
-*/
-    __pyx_t_5 = (fabs(__pyx_v_q_i) < __pyx_v_small_threshold);
-    if (__pyx_t_5) {
-
-      /* "electrode_charges_cython.pyx":312
- *         # Apply small threshold if charge is too small
- *         if fabs(q_i) < small_threshold:
- *             q_i = q_i + sign * small_threshold             # <<<<<<<<<<<<<<
- * 
- *         atom.charge = q_i
-*/
-      __pyx_v_q_i = (__pyx_v_q_i + (__pyx_v_sign * __pyx_v_small_threshold));
-
-      /* "electrode_charges_cython.pyx":311
- * 
- *         # Apply small threshold if charge is too small
- *         if fabs(q_i) < small_threshold:             # <<<<<<<<<<<<<<
- *             q_i = q_i + sign * small_threshold
- * 
-*/
-    }
-
-    /* "electrode_charges_cython.pyx":314
- *             q_i = q_i + sign * small_threshold
- * 
- *         atom.charge = q_i             # <<<<<<<<<<<<<<
- *         nbondedForce.setParticleParameters(atom.atom_index, q_i, 1.0, 0.0)
- * 
-*/
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_q_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 314, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_charge, __pyx_t_4) < (0)) __PYX_ERR(0, 314, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-    /* "electrode_charges_cython.pyx":315
- * 
- *         atom.charge = q_i
- *         nbondedForce.setParticleParameters(atom.atom_index, q_i, 1.0, 0.0)             # <<<<<<<<<<<<<<
- * 
- * 
-*/
-    __pyx_t_6 = __pyx_v_nbondedForce;
-    __Pyx_INCREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_atom_index); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 315, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = PyFloat_FromDouble(__pyx_v_q_i); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 315, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_9 = 0;
-    {
-      PyObject *__pyx_callargs[5] = {__pyx_t_6, __pyx_t_7, __pyx_t_8, __pyx_mstate_global->__pyx_float_1_0, __pyx_mstate_global->__pyx_float_0_0};
-      __pyx_t_4 = __Pyx_PyObject_FastCallMethod(__pyx_mstate_global->__pyx_n_u_setParticleParameters, __pyx_callargs+__pyx_t_9, (5-__pyx_t_9) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 315, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_4);
-    }
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  }
-
-  /* "electrode_charges_cython.pyx":286
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def initialize_electrode_charge_cython(
-*/
-
-  /* function exit code */
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_AddTraceback("electrode_charges_cython.initialize_electrode_charge_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_atom);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "electrode_charges_cython.pyx":318
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def compute_buckyball_center_cython(electrode_atoms, positions_list):
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_21compute_buckyball_center_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_20compute_buckyball_center_cython, "\n    \345\277\253\351\200\237\350\250\210\347\256\227 buckyball \344\270\255\345\277\203\345\272\247\346\250\231\n    \n    \347\224\250\346\226\274 Buckyball_Virtual.__init__\n    \346\257\224 Python loop \345\277\253 3-4x\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_21compute_buckyball_center_cython = {"compute_buckyball_center_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_21compute_buckyball_center_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_20compute_buckyball_center_cython};
-static PyObject *__pyx_pw_24electrode_charges_cython_21compute_buckyball_center_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_electrode_atoms = 0;
-  PyObject *__pyx_v_positions_list = 0;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[2] = {0,0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("compute_buckyball_center_cython (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_electrode_atoms,&__pyx_mstate_global->__pyx_n_u_positions_list,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 318, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  2:
-        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 318, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 318, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "compute_buckyball_center_cython", 0) < (0)) __PYX_ERR(0, 318, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("compute_buckyball_center_cython", 1, 2, 2, i); __PYX_ERR(0, 318, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 2)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 318, __pyx_L3_error)
-      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 318, __pyx_L3_error)
-    }
-    __pyx_v_electrode_atoms = values[0];
-    __pyx_v_positions_list = values[1];
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("compute_buckyball_center_cython", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 318, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("electrode_charges_cython.compute_buckyball_center_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_20compute_buckyball_center_cython(__pyx_self, __pyx_v_electrode_atoms, __pyx_v_positions_list);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_24electrode_charges_cython_20compute_buckyball_center_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, PyObject *__pyx_v_positions_list) {
-  Py_ssize_t __pyx_v_i;
-  Py_ssize_t __pyx_v_N;
-  double __pyx_v_cx;
-  double __pyx_v_cy;
-  double __pyx_v_cz;
-  PyObject *__pyx_v_atom = 0;
-  long __pyx_v_atom_idx;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  Py_ssize_t __pyx_t_2;
-  Py_ssize_t __pyx_t_3;
-  PyObject *__pyx_t_4 = NULL;
-  long __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  double __pyx_t_8;
-  PyObject *__pyx_t_9 = NULL;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("compute_buckyball_center_cython", 0);
-
-  /* "electrode_charges_cython.pyx":328
- *     """
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)             # <<<<<<<<<<<<<<
- *     cdef double cx = 0.0, cy = 0.0, cz = 0.0
- *     cdef object atom
-*/
-  __pyx_t_1 = PyObject_Length(__pyx_v_electrode_atoms); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 328, __pyx_L1_error)
-  __pyx_v_N = __pyx_t_1;
-
-  /* "electrode_charges_cython.pyx":329
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)
- *     cdef double cx = 0.0, cy = 0.0, cz = 0.0             # <<<<<<<<<<<<<<
- *     cdef object atom
- *     cdef long atom_idx
-*/
-  __pyx_v_cx = 0.0;
-  __pyx_v_cy = 0.0;
-  __pyx_v_cz = 0.0;
-
-  /* "electrode_charges_cython.pyx":333
- *     cdef long atom_idx
- * 
- *     for i in range(N):             # <<<<<<<<<<<<<<
- *         atom = electrode_atoms[i]
- *         atom_idx = atom.atom_index
-*/
-  __pyx_t_1 = __pyx_v_N;
-  __pyx_t_2 = __pyx_t_1;
-  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
-
-    /* "electrode_charges_cython.pyx":334
- * 
- *     for i in range(N):
- *         atom = electrode_atoms[i]             # <<<<<<<<<<<<<<
- *         atom_idx = atom.atom_index
- *         cx += positions_list[atom_idx][0]._value
-*/
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_electrode_atoms, __pyx_v_i, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 334, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_XDECREF_SET(__pyx_v_atom, __pyx_t_4);
-    __pyx_t_4 = 0;
-
-    /* "electrode_charges_cython.pyx":335
- *     for i in range(N):
- *         atom = electrode_atoms[i]
- *         atom_idx = atom.atom_index             # <<<<<<<<<<<<<<
- *         cx += positions_list[atom_idx][0]._value
- *         cy += positions_list[atom_idx][1]._value
-*/
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_atom_index); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 335, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyLong_As_long(__pyx_t_4); if (unlikely((__pyx_t_5 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 335, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_v_atom_idx = __pyx_t_5;
-
-    /* "electrode_charges_cython.pyx":336
- *         atom = electrode_atoms[i]
- *         atom_idx = atom.atom_index
- *         cx += positions_list[atom_idx][0]._value             # <<<<<<<<<<<<<<
- *         cy += positions_list[atom_idx][1]._value
- *         cz += positions_list[atom_idx][2]._value
-*/
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_cx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 336, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_positions_list, __pyx_v_atom_idx, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 336, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_6, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 336, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_value); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 336, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyNumber_InPlaceAdd(__pyx_t_4, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 336, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_8 = __Pyx_PyFloat_AsDouble(__pyx_t_7); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 336, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_v_cx = __pyx_t_8;
-
-    /* "electrode_charges_cython.pyx":337
- *         atom_idx = atom.atom_index
- *         cx += positions_list[atom_idx][0]._value
- *         cy += positions_list[atom_idx][1]._value             # <<<<<<<<<<<<<<
- *         cz += positions_list[atom_idx][2]._value
- * 
-*/
-    __pyx_t_7 = PyFloat_FromDouble(__pyx_v_cy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 337, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_positions_list, __pyx_v_atom_idx, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 337, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 337, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_value); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 337, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyNumber_InPlaceAdd(__pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 337, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_8 = __Pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 337, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_v_cy = __pyx_t_8;
-
-    /* "electrode_charges_cython.pyx":338
- *         cx += positions_list[atom_idx][0]._value
- *         cy += positions_list[atom_idx][1]._value
- *         cz += positions_list[atom_idx][2]._value             # <<<<<<<<<<<<<<
- * 
- *     return (cx / N, cy / N, cz / N)
-*/
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_cz); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 338, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_positions_list, __pyx_v_atom_idx, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 338, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_6, 2, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 338, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_value); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 338, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyNumber_InPlaceAdd(__pyx_t_4, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 338, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_8 = __Pyx_PyFloat_AsDouble(__pyx_t_7); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 338, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_v_cz = __pyx_t_8;
-  }
-
-  /* "electrode_charges_cython.pyx":340
- *         cz += positions_list[atom_idx][2]._value
- * 
- *     return (cx / N, cy / N, cz / N)             # <<<<<<<<<<<<<<
- * 
- * 
-*/
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_7 = PyFloat_FromDouble((__pyx_v_cx / ((double)__pyx_v_N))); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 340, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_6 = PyFloat_FromDouble((__pyx_v_cy / ((double)__pyx_v_N))); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 340, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_4 = PyFloat_FromDouble((__pyx_v_cz / ((double)__pyx_v_N))); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 340, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 340, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_GIVEREF(__pyx_t_7);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7) != (0)) __PYX_ERR(0, 340, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_6);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_6) != (0)) __PYX_ERR(0, 340, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_4);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_t_4) != (0)) __PYX_ERR(0, 340, __pyx_L1_error);
-  __pyx_t_7 = 0;
-  __pyx_t_6 = 0;
-  __pyx_t_4 = 0;
-  __pyx_r = __pyx_t_9;
-  __pyx_t_9 = 0;
-  goto __pyx_L0;
-
-  /* "electrode_charges_cython.pyx":318
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def compute_buckyball_center_cython(electrode_atoms, positions_list):
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_9);
-  __Pyx_AddTraceback("electrode_charges_cython.compute_buckyball_center_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_atom);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "electrode_charges_cython.pyx":343
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def set_normal_vectors_cython(electrode_atoms):
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_23set_normal_vectors_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_22set_normal_vectors_cython, "\n    \345\277\253\351\200\237\350\250\255\347\275\256 electrode \346\263\225\345\220\221\351\207\217 (\345\205\250\351\203\250\346\214\207\345\220\221 +Z)\n    \n    \347\224\250\346\226\274 Conductor_Virtual.set_normal_vector()\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_23set_normal_vectors_cython = {"set_normal_vectors_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_23set_normal_vectors_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_22set_normal_vectors_cython};
-static PyObject *__pyx_pw_24electrode_charges_cython_23set_normal_vectors_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_electrode_atoms = 0;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[1] = {0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("set_normal_vectors_cython (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_electrode_atoms,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 343, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 343, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "set_normal_vectors_cython", 0) < (0)) __PYX_ERR(0, 343, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("set_normal_vectors_cython", 1, 1, 1, i); __PYX_ERR(0, 343, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 1)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 343, __pyx_L3_error)
-    }
-    __pyx_v_electrode_atoms = values[0];
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("set_normal_vectors_cython", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 343, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("electrode_charges_cython.set_normal_vectors_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_22set_normal_vectors_cython(__pyx_self, __pyx_v_electrode_atoms);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_24electrode_charges_cython_22set_normal_vectors_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms) {
-  Py_ssize_t __pyx_v_i;
-  Py_ssize_t __pyx_v_N;
-  PyObject *__pyx_v_atom = 0;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  Py_ssize_t __pyx_t_2;
-  Py_ssize_t __pyx_t_3;
-  PyObject *__pyx_t_4 = NULL;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("set_normal_vectors_cython", 0);
-
-  /* "electrode_charges_cython.pyx":352
- *     """
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)             # <<<<<<<<<<<<<<
- *     cdef object atom
- * 
-*/
-  __pyx_t_1 = PyObject_Length(__pyx_v_electrode_atoms); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 352, __pyx_L1_error)
-  __pyx_v_N = __pyx_t_1;
-
-  /* "electrode_charges_cython.pyx":355
- *     cdef object atom
- * 
- *     for i in range(N):             # <<<<<<<<<<<<<<
- *         atom = electrode_atoms[i]
- *         atom.nx = 0.0
-*/
-  __pyx_t_1 = __pyx_v_N;
-  __pyx_t_2 = __pyx_t_1;
-  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
-
-    /* "electrode_charges_cython.pyx":356
- * 
- *     for i in range(N):
- *         atom = electrode_atoms[i]             # <<<<<<<<<<<<<<
- *         atom.nx = 0.0
- *         atom.ny = 0.0
-*/
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_electrode_atoms, __pyx_v_i, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 356, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_XDECREF_SET(__pyx_v_atom, __pyx_t_4);
-    __pyx_t_4 = 0;
-
-    /* "electrode_charges_cython.pyx":357
- *     for i in range(N):
- *         atom = electrode_atoms[i]
- *         atom.nx = 0.0             # <<<<<<<<<<<<<<
- *         atom.ny = 0.0
- *         atom.nz = 1.0
-*/
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_nx, __pyx_mstate_global->__pyx_float_0_0) < (0)) __PYX_ERR(0, 357, __pyx_L1_error)
-
-    /* "electrode_charges_cython.pyx":358
- *         atom = electrode_atoms[i]
- *         atom.nx = 0.0
- *         atom.ny = 0.0             # <<<<<<<<<<<<<<
- *         atom.nz = 1.0
- * 
-*/
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_ny, __pyx_mstate_global->__pyx_float_0_0) < (0)) __PYX_ERR(0, 358, __pyx_L1_error)
-
-    /* "electrode_charges_cython.pyx":359
- *         atom.nx = 0.0
- *         atom.ny = 0.0
- *         atom.nz = 1.0             # <<<<<<<<<<<<<<
- * 
- * 
-*/
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_nz, __pyx_mstate_global->__pyx_float_1_0) < (0)) __PYX_ERR(0, 359, __pyx_L1_error)
-  }
-
-  /* "electrode_charges_cython.pyx":343
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def set_normal_vectors_cython(electrode_atoms):
-*/
-
-  /* function exit code */
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("electrode_charges_cython.set_normal_vectors_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_atom);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "electrode_charges_cython.pyx":362
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def compute_buckyball_radius_cython(
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_25compute_buckyball_radius_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_24compute_buckyball_radius_cython, "\n    \350\250\210\347\256\227 buckyball \345\215\212\345\276\221 (\345\276\236\347\254\254\344\270\200\345\200\213\345\216\237\345\255\220)\n    \n    \347\224\250\346\226\274 Buckyball_Virtual.__init__\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_25compute_buckyball_radius_cython = {"compute_buckyball_radius_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_25compute_buckyball_radius_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_24compute_buckyball_radius_cython};
-static PyObject *__pyx_pw_24electrode_charges_cython_25compute_buckyball_radius_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_electrode_atoms = 0;
-  PyObject *__pyx_v_positions_list = 0;
-  double __pyx_v_cx;
-  double __pyx_v_cy;
-  double __pyx_v_cz;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[5] = {0,0,0,0,0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("compute_buckyball_radius_cython (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_electrode_atoms,&__pyx_mstate_global->__pyx_n_u_positions_list,&__pyx_mstate_global->__pyx_n_u_cx,&__pyx_mstate_global->__pyx_n_u_cy,&__pyx_mstate_global->__pyx_n_u_cz,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 362, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  5:
-        values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 362, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  4:
-        values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 362, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  3:
-        values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 362, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  2:
-        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 362, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 362, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "compute_buckyball_radius_cython", 0) < (0)) __PYX_ERR(0, 362, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 5; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("compute_buckyball_radius_cython", 1, 5, 5, i); __PYX_ERR(0, 362, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 5)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 362, __pyx_L3_error)
-      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 362, __pyx_L3_error)
-      values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 362, __pyx_L3_error)
-      values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 362, __pyx_L3_error)
-      values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 362, __pyx_L3_error)
-    }
-    __pyx_v_electrode_atoms = values[0];
-    __pyx_v_positions_list = values[1];
-    __pyx_v_cx = __Pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_cx == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 367, __pyx_L3_error)
-    __pyx_v_cy = __Pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_cy == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 368, __pyx_L3_error)
-    __pyx_v_cz = __Pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_cz == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 369, __pyx_L3_error)
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("compute_buckyball_radius_cython", 1, 5, 5, __pyx_nargs); __PYX_ERR(0, 362, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("electrode_charges_cython.compute_buckyball_radius_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_24compute_buckyball_radius_cython(__pyx_self, __pyx_v_electrode_atoms, __pyx_v_positions_list, __pyx_v_cx, __pyx_v_cy, __pyx_v_cz);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_24electrode_charges_cython_24compute_buckyball_radius_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, PyObject *__pyx_v_positions_list, double __pyx_v_cx, double __pyx_v_cy, double __pyx_v_cz) {
-  PyObject *__pyx_v_atom = 0;
-  long __pyx_v_atom_idx;
-  double __pyx_v_dx;
-  double __pyx_v_dy;
-  double __pyx_v_dz;
-  double __pyx_v_radius;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  long __pyx_t_2;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  double __pyx_t_5;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("compute_buckyball_radius_cython", 0);
-
-  /* "electrode_charges_cython.pyx":381
- * 
- *     # Get first atom
- *     atom = electrode_atoms[0]             # <<<<<<<<<<<<<<
- *     atom_idx = atom.atom_index
- * 
-*/
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_electrode_atoms, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 381, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_atom = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "electrode_charges_cython.pyx":382
- *     # Get first atom
- *     atom = electrode_atoms[0]
- *     atom_idx = atom.atom_index             # <<<<<<<<<<<<<<
- * 
- *     dx = positions_list[atom_idx][0]._value - cx
-*/
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_atom_index); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 382, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyLong_As_long(__pyx_t_1); if (unlikely((__pyx_t_2 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 382, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_atom_idx = __pyx_t_2;
-
-  /* "electrode_charges_cython.pyx":384
- *     atom_idx = atom.atom_index
- * 
- *     dx = positions_list[atom_idx][0]._value - cx             # <<<<<<<<<<<<<<
- *     dy = positions_list[atom_idx][1]._value - cy
- *     dz = positions_list[atom_idx][2]._value - cz
-*/
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_positions_list, __pyx_v_atom_idx, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 384, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 384, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 384, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cx); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 384, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyNumber_Subtract(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 384, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 384, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_v_dx = __pyx_t_5;
-
-  /* "electrode_charges_cython.pyx":385
- * 
- *     dx = positions_list[atom_idx][0]._value - cx
- *     dy = positions_list[atom_idx][1]._value - cy             # <<<<<<<<<<<<<<
- *     dz = positions_list[atom_idx][2]._value - cz
- * 
-*/
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_positions_list, __pyx_v_atom_idx, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 385, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_4, 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 385, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_value); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 385, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 385, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyNumber_Subtract(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 385, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 385, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_dy = __pyx_t_5;
-
-  /* "electrode_charges_cython.pyx":386
- *     dx = positions_list[atom_idx][0]._value - cx
- *     dy = positions_list[atom_idx][1]._value - cy
- *     dz = positions_list[atom_idx][2]._value - cz             # <<<<<<<<<<<<<<
- * 
- *     radius = sqrt(dx*dx + dy*dy + dz*dz)
-*/
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_positions_list, __pyx_v_atom_idx, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 2, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 386, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cz); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 386, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyNumber_Subtract(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 386, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 386, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_v_dz = __pyx_t_5;
-
-  /* "electrode_charges_cython.pyx":388
- *     dz = positions_list[atom_idx][2]._value - cz
- * 
- *     radius = sqrt(dx*dx + dy*dy + dz*dz)             # <<<<<<<<<<<<<<
- * 
- *     return radius
-*/
-  __pyx_v_radius = sqrt((((__pyx_v_dx * __pyx_v_dx) + (__pyx_v_dy * __pyx_v_dy)) + (__pyx_v_dz * __pyx_v_dz)));
-
-  /* "electrode_charges_cython.pyx":390
- *     radius = sqrt(dx*dx + dy*dy + dz*dz)
- * 
- *     return radius             # <<<<<<<<<<<<<<
- * 
- * 
-*/
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_radius); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 390, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_r = __pyx_t_4;
-  __pyx_t_4 = 0;
-  goto __pyx_L0;
-
-  /* "electrode_charges_cython.pyx":362
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def compute_buckyball_radius_cython(
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("electrode_charges_cython.compute_buckyball_radius_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_atom);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "electrode_charges_cython.pyx":393
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def compute_normal_vectors_buckyball_cython(
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_24electrode_charges_cython_27compute_normal_vectors_buckyball_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_24electrode_charges_cython_26compute_normal_vectors_buckyball_cython, "\n    \350\250\210\347\256\227 buckyball \346\257\217\345\200\213\345\216\237\345\255\220\347\232\204\346\263\225\345\220\221\351\207\217 (\345\276\236\344\270\255\345\277\203\346\214\207\345\220\221\345\216\237\345\255\220)\n    \n    \347\224\250\346\226\274 Buckyball_Virtual.__init__\n    \346\257\224 Python loop \345\277\253 3-5x\n    ");
-static PyMethodDef __pyx_mdef_24electrode_charges_cython_27compute_normal_vectors_buckyball_cython = {"compute_normal_vectors_buckyball_cython", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_24electrode_charges_cython_27compute_normal_vectors_buckyball_cython, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_24electrode_charges_cython_26compute_normal_vectors_buckyball_cython};
-static PyObject *__pyx_pw_24electrode_charges_cython_27compute_normal_vectors_buckyball_cython(PyObject *__pyx_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_electrode_atoms = 0;
-  PyObject *__pyx_v_positions_list = 0;
-  double __pyx_v_cx;
-  double __pyx_v_cy;
-  double __pyx_v_cz;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[5] = {0,0,0,0,0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("compute_normal_vectors_buckyball_cython (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_electrode_atoms,&__pyx_mstate_global->__pyx_n_u_positions_list,&__pyx_mstate_global->__pyx_n_u_cx,&__pyx_mstate_global->__pyx_n_u_cy,&__pyx_mstate_global->__pyx_n_u_cz,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 393, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  5:
-        values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 393, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  4:
-        values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 393, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  3:
-        values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 393, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  2:
-        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 393, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 393, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "compute_normal_vectors_buckyball_cython", 0) < (0)) __PYX_ERR(0, 393, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 5; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("compute_normal_vectors_buckyball_cython", 1, 5, 5, i); __PYX_ERR(0, 393, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 5)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 393, __pyx_L3_error)
-      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 393, __pyx_L3_error)
-      values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 393, __pyx_L3_error)
-      values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 393, __pyx_L3_error)
-      values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 393, __pyx_L3_error)
-    }
-    __pyx_v_electrode_atoms = values[0];
-    __pyx_v_positions_list = values[1];
-    __pyx_v_cx = __Pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_cx == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 398, __pyx_L3_error)
-    __pyx_v_cy = __Pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_cy == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 399, __pyx_L3_error)
-    __pyx_v_cz = __Pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_cz == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 400, __pyx_L3_error)
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("compute_normal_vectors_buckyball_cython", 1, 5, 5, __pyx_nargs); __PYX_ERR(0, 393, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("electrode_charges_cython.compute_normal_vectors_buckyball_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_24electrode_charges_cython_26compute_normal_vectors_buckyball_cython(__pyx_self, __pyx_v_electrode_atoms, __pyx_v_positions_list, __pyx_v_cx, __pyx_v_cy, __pyx_v_cz);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_24electrode_charges_cython_26compute_normal_vectors_buckyball_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_electrode_atoms, PyObject *__pyx_v_positions_list, double __pyx_v_cx, double __pyx_v_cy, double __pyx_v_cz) {
-  Py_ssize_t __pyx_v_i;
-  Py_ssize_t __pyx_v_N;
-  PyObject *__pyx_v_atom = 0;
-  long __pyx_v_atom_idx;
-  double __pyx_v_dx;
-  double __pyx_v_dy;
-  double __pyx_v_dz;
-  double __pyx_v_norm;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  Py_ssize_t __pyx_t_2;
-  Py_ssize_t __pyx_t_3;
-  PyObject *__pyx_t_4 = NULL;
-  long __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  double __pyx_t_8;
-  int __pyx_t_9;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("compute_normal_vectors_buckyball_cython", 0);
-
-  /* "electrode_charges_cython.pyx":409
- *     """
- *     cdef Py_ssize_t i
- *     cdef Py_ssize_t N = len(electrode_atoms)             # <<<<<<<<<<<<<<
- *     cdef object atom
- *     cdef long atom_idx
-*/
-  __pyx_t_1 = PyObject_Length(__pyx_v_electrode_atoms); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 409, __pyx_L1_error)
-  __pyx_v_N = __pyx_t_1;
-
-  /* "electrode_charges_cython.pyx":414
- *     cdef double dx, dy, dz, norm
- * 
- *     for i in range(N):             # <<<<<<<<<<<<<<
- *         atom = electrode_atoms[i]
- *         atom_idx = atom.atom_index
-*/
-  __pyx_t_1 = __pyx_v_N;
-  __pyx_t_2 = __pyx_t_1;
-  for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
-
-    /* "electrode_charges_cython.pyx":415
- * 
- *     for i in range(N):
- *         atom = electrode_atoms[i]             # <<<<<<<<<<<<<<
- *         atom_idx = atom.atom_index
- * 
-*/
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_electrode_atoms, __pyx_v_i, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 415, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_XDECREF_SET(__pyx_v_atom, __pyx_t_4);
-    __pyx_t_4 = 0;
-
-    /* "electrode_charges_cython.pyx":416
- *     for i in range(N):
- *         atom = electrode_atoms[i]
- *         atom_idx = atom.atom_index             # <<<<<<<<<<<<<<
- * 
- *         # Vector from center to atom
-*/
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_atom_index); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 416, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyLong_As_long(__pyx_t_4); if (unlikely((__pyx_t_5 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 416, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_v_atom_idx = __pyx_t_5;
-
-    /* "electrode_charges_cython.pyx":419
- * 
- *         # Vector from center to atom
- *         dx = positions_list[atom_idx][0]._value - cx             # <<<<<<<<<<<<<<
- *         dy = positions_list[atom_idx][1]._value - cy
- *         dz = positions_list[atom_idx][2]._value - cz
-*/
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_positions_list, __pyx_v_atom_idx, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 419, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 419, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_value); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 419, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_cx); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 419, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyNumber_Subtract(__pyx_t_4, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 419, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_8 = __Pyx_PyFloat_AsDouble(__pyx_t_7); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 419, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_v_dx = __pyx_t_8;
-
-    /* "electrode_charges_cython.pyx":420
- *         # Vector from center to atom
- *         dx = positions_list[atom_idx][0]._value - cx
- *         dy = positions_list[atom_idx][1]._value - cy             # <<<<<<<<<<<<<<
- *         dz = positions_list[atom_idx][2]._value - cz
- * 
-*/
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_positions_list, __pyx_v_atom_idx, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 420, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 420, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_value); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 420, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_cy); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 420, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_4 = PyNumber_Subtract(__pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 420, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_8 = __Pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 420, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_v_dy = __pyx_t_8;
-
-    /* "electrode_charges_cython.pyx":421
- *         dx = positions_list[atom_idx][0]._value - cx
- *         dy = positions_list[atom_idx][1]._value - cy
- *         dz = positions_list[atom_idx][2]._value - cz             # <<<<<<<<<<<<<<
- * 
- *         # Normalize
-*/
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_positions_list, __pyx_v_atom_idx, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 421, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_4, 2, long, 1, __Pyx_PyLong_From_long, 0, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 421, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_value); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 421, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_cz); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 421, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyNumber_Subtract(__pyx_t_4, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 421, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_8 = __Pyx_PyFloat_AsDouble(__pyx_t_7); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 421, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_v_dz = __pyx_t_8;
-
-    /* "electrode_charges_cython.pyx":424
- * 
- *         # Normalize
- *         norm = sqrt(dx*dx + dy*dy + dz*dz)             # <<<<<<<<<<<<<<
- * 
- *         if norm > 1e-10:
-*/
-    __pyx_v_norm = sqrt((((__pyx_v_dx * __pyx_v_dx) + (__pyx_v_dy * __pyx_v_dy)) + (__pyx_v_dz * __pyx_v_dz)));
-
-    /* "electrode_charges_cython.pyx":426
- *         norm = sqrt(dx*dx + dy*dy + dz*dz)
- * 
- *         if norm > 1e-10:             # <<<<<<<<<<<<<<
- *             atom.nx = dx / norm
- *             atom.ny = dy / norm
-*/
-    __pyx_t_9 = (__pyx_v_norm > 1e-10);
-    if (__pyx_t_9) {
-
-      /* "electrode_charges_cython.pyx":427
- * 
- *         if norm > 1e-10:
- *             atom.nx = dx / norm             # <<<<<<<<<<<<<<
- *             atom.ny = dy / norm
- *             atom.nz = dz / norm
-*/
-      __pyx_t_7 = PyFloat_FromDouble((__pyx_v_dx / __pyx_v_norm)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 427, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      if (__Pyx_PyObject_SetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_nx, __pyx_t_7) < (0)) __PYX_ERR(0, 427, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-
-      /* "electrode_charges_cython.pyx":428
- *         if norm > 1e-10:
- *             atom.nx = dx / norm
- *             atom.ny = dy / norm             # <<<<<<<<<<<<<<
- *             atom.nz = dz / norm
- *         else:
-*/
-      __pyx_t_7 = PyFloat_FromDouble((__pyx_v_dy / __pyx_v_norm)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 428, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      if (__Pyx_PyObject_SetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_ny, __pyx_t_7) < (0)) __PYX_ERR(0, 428, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-
-      /* "electrode_charges_cython.pyx":429
- *             atom.nx = dx / norm
- *             atom.ny = dy / norm
- *             atom.nz = dz / norm             # <<<<<<<<<<<<<<
- *         else:
- *             # Fallback for degenerate case
-*/
-      __pyx_t_7 = PyFloat_FromDouble((__pyx_v_dz / __pyx_v_norm)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 429, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      if (__Pyx_PyObject_SetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_nz, __pyx_t_7) < (0)) __PYX_ERR(0, 429, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-
-      /* "electrode_charges_cython.pyx":426
- *         norm = sqrt(dx*dx + dy*dy + dz*dz)
- * 
- *         if norm > 1e-10:             # <<<<<<<<<<<<<<
- *             atom.nx = dx / norm
- *             atom.ny = dy / norm
-*/
-      goto __pyx_L5;
-    }
-
-    /* "electrode_charges_cython.pyx":432
- *         else:
- *             # Fallback for degenerate case
- *             atom.nx = 0.0             # <<<<<<<<<<<<<<
- *             atom.ny = 0.0
- *             atom.nz = 1.0
-*/
-    /*else*/ {
-      if (__Pyx_PyObject_SetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_nx, __pyx_mstate_global->__pyx_float_0_0) < (0)) __PYX_ERR(0, 432, __pyx_L1_error)
-
-      /* "electrode_charges_cython.pyx":433
- *             # Fallback for degenerate case
- *             atom.nx = 0.0
- *             atom.ny = 0.0             # <<<<<<<<<<<<<<
- *             atom.nz = 1.0
-*/
-      if (__Pyx_PyObject_SetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_ny, __pyx_mstate_global->__pyx_float_0_0) < (0)) __PYX_ERR(0, 433, __pyx_L1_error)
-
-      /* "electrode_charges_cython.pyx":434
- *             atom.nx = 0.0
- *             atom.ny = 0.0
- *             atom.nz = 1.0             # <<<<<<<<<<<<<<
-*/
-      if (__Pyx_PyObject_SetAttrStr(__pyx_v_atom, __pyx_mstate_global->__pyx_n_u_nz, __pyx_mstate_global->__pyx_float_1_0) < (0)) __PYX_ERR(0, 434, __pyx_L1_error)
-    }
-    __pyx_L5:;
-  }
-
-  /* "electrode_charges_cython.pyx":393
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def compute_normal_vectors_buckyball_cython(
-*/
-
-  /* function exit code */
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_AddTraceback("electrode_charges_cython.compute_normal_vectors_buckyball_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_atom);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -24324,7 +21361,7 @@ namespace {
   {
       PyModuleDef_HEAD_INIT,
       "electrode_charges_cython",
-      __pyx_k_electrode_charges_cython_pyx_Cy, /* m_doc */
+      __pyx_k_electrode_charges_cython_pyx_GO, /* m_doc */
     #if CYTHON_USE_MODULE_STATE
       sizeof(__pyx_mstatetype), /* m_size */
     #else
@@ -25120,184 +22157,64 @@ __Pyx_RefNannySetupContext("PyInit_electrode_charges_cython", 0);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_Enum, __pyx_t_5) < (0)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "electrode_charges_cython.pyx":15
+  /* "electrode_charges_cython.pyx":16
  * """
  * 
  * import numpy as np             # <<<<<<<<<<<<<<
  * cimport numpy as np
  * cimport cython
 */
-  __pyx_t_5 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_numpy, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_numpy, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 16, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_np, __pyx_t_5) < (0)) __PYX_ERR(0, 15, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_np, __pyx_t_5) < (0)) __PYX_ERR(0, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "electrode_charges_cython.pyx":24
- * ctypedef np.int32_t ITYPE_t
- * 
- * @cython.boundscheck(False)  #             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)   #
- * @cython.cdivision(True)      # C
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_1compute_electrode_charges_cython, 0, __pyx_mstate_global->__pyx_n_u_compute_electrode_charges_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 24, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_compute_electrode_charges_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 24, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "electrode_charges_cython.pyx":97
- * 
- * 
+  /* "electrode_charges_cython.pyx":30
+ * #  C-level  memoryviews API
+ * #=========================================================================
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  * @cython.wraparound(False)
  * @cython.cdivision(True)
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_3compute_analytic_charge_contribution_cython, 0, __pyx_mstate_global->__pyx_n_u_compute_analytic_charge_contribu, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_1compute_electrode_charges_cython, 0, __pyx_mstate_global->__pyx_n_u_compute_electrode_charges_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_compute_analytic_charge_contribu, __pyx_t_5) < (0)) __PYX_ERR(0, 97, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_compute_electrode_charges_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "electrode_charges_cython.pyx":133
- * 
- * 
+  /* "electrode_charges_cython.pyx":112
+ * #  C-level  API
+ * #=========================================================================
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  * @cython.wraparound(False)
- * def extract_z_coordinates_cython(positions_list):
+ * @cython.cdivision(True)
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_5extract_z_coordinates_cython, 0, __pyx_mstate_global->__pyx_n_u_extract_z_coordinates_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_3scale_charges_inplace_cython, 0, __pyx_mstate_global->__pyx_n_u_scale_charges_inplace_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 112, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_extract_z_coordinates_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 133, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_scale_charges_inplace_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 112, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "electrode_charges_cython.pyx":151
- * 
- * 
+  /* "electrode_charges_cython.pyx":147
+ * #  C-level  API
+ * #=========================================================================
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  * @cython.wraparound(False)
- * def extract_forces_z_cython(forces_list):
+ * @cython.cdivision(True)
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_7extract_forces_z_cython, 0, __pyx_mstate_global->__pyx_n_u_extract_forces_z_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 151, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_5initialize_charges_cython, 0, __pyx_mstate_global->__pyx_n_u_initialize_charges_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_extract_forces_z_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 151, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_initialize_charges_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "electrode_charges_cython.pyx":169
- * 
- * 
+  /* "electrode_charges_cython.pyx":195
+ * #  C-level  API
+ * #=========================================================================
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  * @cython.wraparound(False)
- * def update_openmm_charges_batch(
+ * @cython.cdivision(True)
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_9update_openmm_charges_batch, 0, __pyx_mstate_global->__pyx_n_u_update_openmm_charges_batch, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_7compute_analytic_contribution_cython, 0, __pyx_mstate_global->__pyx_n_u_compute_analytic_contribution_cy, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_update_openmm_charges_batch, __pyx_t_5) < (0)) __PYX_ERR(0, 169, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "electrode_charges_cython.pyx":197
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def scale_electrode_charges_cython(
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_11scale_electrode_charges_cython, 0, __pyx_mstate_global->__pyx_n_u_scale_electrode_charges_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 197, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_scale_electrode_charges_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 197, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "electrode_charges_cython.pyx":221
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def get_total_charge_cython(electrode_atoms):
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_13get_total_charge_cython, 0, __pyx_mstate_global->__pyx_n_u_get_total_charge_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 221, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_get_total_charge_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 221, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "electrode_charges_cython.pyx":241
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def compute_z_position_cython(electrode_atoms, positions_list):
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_15compute_z_position_cython, 0, __pyx_mstate_global->__pyx_n_u_compute_z_position_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_compute_z_position_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 241, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "electrode_charges_cython.pyx":263
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def collect_electrode_charges_cython(
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_17collect_electrode_charges_cython, 0, __pyx_mstate_global->__pyx_n_u_collect_electrode_charges_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 263, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_collect_electrode_charges_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 263, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "electrode_charges_cython.pyx":286
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def initialize_electrode_charge_cython(
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_19initialize_electrode_charge_cython, 0, __pyx_mstate_global->__pyx_n_u_initialize_electrode_charge_cyth, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 286, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_initialize_electrode_charge_cyth, __pyx_t_5) < (0)) __PYX_ERR(0, 286, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "electrode_charges_cython.pyx":318
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def compute_buckyball_center_cython(electrode_atoms, positions_list):
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_21compute_buckyball_center_cython, 0, __pyx_mstate_global->__pyx_n_u_compute_buckyball_center_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 318, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_compute_buckyball_center_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 318, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "electrode_charges_cython.pyx":343
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def set_normal_vectors_cython(electrode_atoms):
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_23set_normal_vectors_cython, 0, __pyx_mstate_global->__pyx_n_u_set_normal_vectors_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 343, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_set_normal_vectors_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 343, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "electrode_charges_cython.pyx":362
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def compute_buckyball_radius_cython(
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_25compute_buckyball_radius_cython, 0, __pyx_mstate_global->__pyx_n_u_compute_buckyball_radius_cython, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[12])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 362, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_compute_buckyball_radius_cython, __pyx_t_5) < (0)) __PYX_ERR(0, 362, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "electrode_charges_cython.pyx":393
- * 
- * 
- * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
- * @cython.wraparound(False)
- * def compute_normal_vectors_buckyball_cython(
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_24electrode_charges_cython_27compute_normal_vectors_buckyball_cython, 0, __pyx_mstate_global->__pyx_n_u_compute_normal_vectors_buckyball, NULL, __pyx_mstate_global->__pyx_n_u_electrode_charges_cython, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[13])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 393, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_compute_normal_vectors_buckyball, __pyx_t_5) < (0)) __PYX_ERR(0, 393, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_compute_analytic_contribution_cy, __pyx_t_5) < (0)) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
   /* "electrode_charges_cython.pyx":1
@@ -25416,40 +22333,26 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_and, sizeof(__pyx_k_and), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_and */
   {__pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 1, 1}, /* PyObject cname: __pyx_n_u_asyncio_coroutines */
   {__pyx_k_at_0x, sizeof(__pyx_k_at_0x), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_at_0x */
-  {__pyx_k_atom, sizeof(__pyx_k_atom), 0, 1, 1}, /* PyObject cname: __pyx_n_u_atom */
   {__pyx_k_atom_idx, sizeof(__pyx_k_atom_idx), 0, 1, 1}, /* PyObject cname: __pyx_n_u_atom_idx */
-  {__pyx_k_atom_index, sizeof(__pyx_k_atom_index), 0, 1, 1}, /* PyObject cname: __pyx_n_u_atom_index */
   {__pyx_k_base, sizeof(__pyx_k_base), 0, 1, 1}, /* PyObject cname: __pyx_n_u_base */
   {__pyx_k_c, sizeof(__pyx_k_c), 0, 1, 1}, /* PyObject cname: __pyx_n_u_c */
-  {__pyx_k_charge, sizeof(__pyx_k_charge), 0, 1, 1}, /* PyObject cname: __pyx_n_u_charge */
+  {__pyx_k_c_charges, sizeof(__pyx_k_c_charges), 0, 1, 1}, /* PyObject cname: __pyx_n_u_c_charges */
+  {__pyx_k_c_indices, sizeof(__pyx_k_c_indices), 0, 1, 1}, /* PyObject cname: __pyx_n_u_c_indices */
   {__pyx_k_charge_per_atom, sizeof(__pyx_k_charge_per_atom), 0, 1, 1}, /* PyObject cname: __pyx_n_u_charge_per_atom */
-  {__pyx_k_charges, sizeof(__pyx_k_charges), 0, 1, 1}, /* PyObject cname: __pyx_n_u_charges */
   {__pyx_k_class, sizeof(__pyx_k_class), 0, 1, 1}, /* PyObject cname: __pyx_n_u_class */
   {__pyx_k_class_getitem, sizeof(__pyx_k_class_getitem), 0, 1, 1}, /* PyObject cname: __pyx_n_u_class_getitem */
   {__pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cline_in_traceback */
-  {__pyx_k_collect_electrode_charges_cython, sizeof(__pyx_k_collect_electrode_charges_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_collect_electrode_charges_cython */
   {__pyx_k_collections_abc, sizeof(__pyx_k_collections_abc), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_collections_abc */
-  {__pyx_k_compute_analytic_charge_contribu, sizeof(__pyx_k_compute_analytic_charge_contribu), 0, 1, 1}, /* PyObject cname: __pyx_n_u_compute_analytic_charge_contribu */
-  {__pyx_k_compute_buckyball_center_cython, sizeof(__pyx_k_compute_buckyball_center_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_compute_buckyball_center_cython */
-  {__pyx_k_compute_buckyball_radius_cython, sizeof(__pyx_k_compute_buckyball_radius_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_compute_buckyball_radius_cython */
+  {__pyx_k_compute_analytic_contribution_cy, sizeof(__pyx_k_compute_analytic_contribution_cy), 0, 1, 1}, /* PyObject cname: __pyx_n_u_compute_analytic_contribution_cy */
   {__pyx_k_compute_electrode_charges_cython, sizeof(__pyx_k_compute_electrode_charges_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_compute_electrode_charges_cython */
-  {__pyx_k_compute_normal_vectors_buckyball, sizeof(__pyx_k_compute_normal_vectors_buckyball), 0, 1, 1}, /* PyObject cname: __pyx_n_u_compute_normal_vectors_buckyball */
-  {__pyx_k_compute_z_position_cython, sizeof(__pyx_k_compute_z_position_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_compute_z_position_cython */
   {__pyx_k_contiguous_and_direct, sizeof(__pyx_k_contiguous_and_direct), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_contiguous_and_direct */
   {__pyx_k_contiguous_and_indirect, sizeof(__pyx_k_contiguous_and_indirect), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_contiguous_and_indirect */
   {__pyx_k_contribution, sizeof(__pyx_k_contribution), 0, 1, 1}, /* PyObject cname: __pyx_n_u_contribution */
   {__pyx_k_count, sizeof(__pyx_k_count), 0, 1, 1}, /* PyObject cname: __pyx_n_u_count */
-  {__pyx_k_cx, sizeof(__pyx_k_cx), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cx */
-  {__pyx_k_cy, sizeof(__pyx_k_cy), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cy */
-  {__pyx_k_cz, sizeof(__pyx_k_cz), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cz */
   {__pyx_k_dict, sizeof(__pyx_k_dict), 0, 1, 1}, /* PyObject cname: __pyx_n_u_dict */
   {__pyx_k_disable, sizeof(__pyx_k_disable), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_disable */
   {__pyx_k_dtype, sizeof(__pyx_k_dtype), 0, 1, 1}, /* PyObject cname: __pyx_n_u_dtype */
   {__pyx_k_dtype_is_object, sizeof(__pyx_k_dtype_is_object), 0, 1, 1}, /* PyObject cname: __pyx_n_u_dtype_is_object */
-  {__pyx_k_dx, sizeof(__pyx_k_dx), 0, 1, 1}, /* PyObject cname: __pyx_n_u_dx */
-  {__pyx_k_dy, sizeof(__pyx_k_dy), 0, 1, 1}, /* PyObject cname: __pyx_n_u_dy */
-  {__pyx_k_dz, sizeof(__pyx_k_dz), 0, 1, 1}, /* PyObject cname: __pyx_n_u_dz */
-  {__pyx_k_electrode_atoms, sizeof(__pyx_k_electrode_atoms), 0, 1, 1}, /* PyObject cname: __pyx_n_u_electrode_atoms */
   {__pyx_k_electrode_charges_cython, sizeof(__pyx_k_electrode_charges_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_electrode_charges_cython */
   {__pyx_k_electrode_charges_cython_pyx, sizeof(__pyx_k_electrode_charges_cython_pyx), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_electrode_charges_cython_pyx */
   {__pyx_k_empty, sizeof(__pyx_k_empty), 0, 1, 1}, /* PyObject cname: __pyx_n_u_empty */
@@ -25457,17 +22360,13 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_encode, sizeof(__pyx_k_encode), 0, 1, 1}, /* PyObject cname: __pyx_n_u_encode */
   {__pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_enumerate */
   {__pyx_k_error, sizeof(__pyx_k_error), 0, 1, 1}, /* PyObject cname: __pyx_n_u_error */
-  {__pyx_k_extract_forces_z_cython, sizeof(__pyx_k_extract_forces_z_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_extract_forces_z_cython */
-  {__pyx_k_extract_z_coordinates_cython, sizeof(__pyx_k_extract_z_coordinates_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_extract_z_coordinates_cython */
   {__pyx_k_flags, sizeof(__pyx_k_flags), 0, 1, 1}, /* PyObject cname: __pyx_n_u_flags */
   {__pyx_k_float64, sizeof(__pyx_k_float64), 0, 1, 1}, /* PyObject cname: __pyx_n_u_float64 */
-  {__pyx_k_forces_list, sizeof(__pyx_k_forces_list), 0, 1, 1}, /* PyObject cname: __pyx_n_u_forces_list */
   {__pyx_k_forces_z, sizeof(__pyx_k_forces_z), 0, 1, 1}, /* PyObject cname: __pyx_n_u_forces_z */
   {__pyx_k_format, sizeof(__pyx_k_format), 0, 1, 1}, /* PyObject cname: __pyx_n_u_format */
   {__pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 1, 1}, /* PyObject cname: __pyx_n_u_fortran */
   {__pyx_k_func, sizeof(__pyx_k_func), 0, 1, 1}, /* PyObject cname: __pyx_n_u_func */
   {__pyx_k_gc, sizeof(__pyx_k_gc), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_gc */
-  {__pyx_k_get_total_charge_cython, sizeof(__pyx_k_get_total_charge_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_get_total_charge_cython */
   {__pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_getstate */
   {__pyx_k_got, sizeof(__pyx_k_got), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_got */
   {__pyx_k_got_differing_extents_in_dimensi, sizeof(__pyx_k_got_differing_extents_in_dimensi), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_got_differing_extents_in_dimensi */
@@ -25476,7 +22375,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_import, sizeof(__pyx_k_import), 0, 1, 1}, /* PyObject cname: __pyx_n_u_import */
   {__pyx_k_index, sizeof(__pyx_k_index), 0, 1, 1}, /* PyObject cname: __pyx_n_u_index */
   {__pyx_k_indices, sizeof(__pyx_k_indices), 0, 1, 1}, /* PyObject cname: __pyx_n_u_indices */
-  {__pyx_k_initialize_electrode_charge_cyth, sizeof(__pyx_k_initialize_electrode_charge_cyth), 0, 1, 1}, /* PyObject cname: __pyx_n_u_initialize_electrode_charge_cyth */
+  {__pyx_k_initialize_charges_cython, sizeof(__pyx_k_initialize_charges_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_initialize_charges_cython */
   {__pyx_k_initializing, sizeof(__pyx_k_initializing), 0, 1, 1}, /* PyObject cname: __pyx_n_u_initializing */
   {__pyx_k_is_coroutine, sizeof(__pyx_k_is_coroutine), 0, 1, 1}, /* PyObject cname: __pyx_n_u_is_coroutine */
   {__pyx_k_isenabled, sizeof(__pyx_k_isenabled), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_isenabled */
@@ -25488,49 +22387,38 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_module, sizeof(__pyx_k_module), 0, 1, 1}, /* PyObject cname: __pyx_n_u_module */
   {__pyx_k_name, sizeof(__pyx_k_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_name */
   {__pyx_k_name_2, sizeof(__pyx_k_name_2), 0, 1, 1}, /* PyObject cname: __pyx_n_u_name_2 */
-  {__pyx_k_nbondedForce, sizeof(__pyx_k_nbondedForce), 0, 1, 1}, /* PyObject cname: __pyx_n_u_nbondedForce */
   {__pyx_k_ndim, sizeof(__pyx_k_ndim), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ndim */
   {__pyx_k_new, sizeof(__pyx_k_new), 0, 1, 1}, /* PyObject cname: __pyx_n_u_new */
-  {__pyx_k_new_charge, sizeof(__pyx_k_new_charge), 0, 1, 1}, /* PyObject cname: __pyx_n_u_new_charge */
   {__pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_no_default___reduce___due_to_non */
-  {__pyx_k_norm, sizeof(__pyx_k_norm), 0, 1, 1}, /* PyObject cname: __pyx_n_u_norm */
   {__pyx_k_np, sizeof(__pyx_k_np), 0, 1, 1}, /* PyObject cname: __pyx_n_u_np */
   {__pyx_k_numpy, sizeof(__pyx_k_numpy), 0, 1, 1}, /* PyObject cname: __pyx_n_u_numpy */
   {__pyx_k_numpy__core_multiarray_failed_to, sizeof(__pyx_k_numpy__core_multiarray_failed_to), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_numpy__core_multiarray_failed_to */
   {__pyx_k_numpy__core_umath_failed_to_impo, sizeof(__pyx_k_numpy__core_umath_failed_to_impo), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_numpy__core_umath_failed_to_impo */
-  {__pyx_k_nx, sizeof(__pyx_k_nx), 0, 1, 1}, /* PyObject cname: __pyx_n_u_nx */
-  {__pyx_k_ny, sizeof(__pyx_k_ny), 0, 1, 1}, /* PyObject cname: __pyx_n_u_ny */
-  {__pyx_k_nz, sizeof(__pyx_k_nz), 0, 1, 1}, /* PyObject cname: __pyx_n_u_nz */
   {__pyx_k_obj, sizeof(__pyx_k_obj), 0, 1, 1}, /* PyObject cname: __pyx_n_u_obj */
   {__pyx_k_object, sizeof(__pyx_k_object), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_object */
   {__pyx_k_pack, sizeof(__pyx_k_pack), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pack */
   {__pyx_k_pickle, sizeof(__pyx_k_pickle), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pickle */
   {__pyx_k_pop, sizeof(__pyx_k_pop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pop */
-  {__pyx_k_positions_list, sizeof(__pyx_k_positions_list), 0, 1, 1}, /* PyObject cname: __pyx_n_u_positions_list */
   {__pyx_k_prefactor, sizeof(__pyx_k_prefactor), 0, 1, 1}, /* PyObject cname: __pyx_n_u_prefactor */
   {__pyx_k_pyx_checksum, sizeof(__pyx_k_pyx_checksum), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_checksum */
   {__pyx_k_pyx_state, sizeof(__pyx_k_pyx_state), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_state */
   {__pyx_k_pyx_type, sizeof(__pyx_k_pyx_type), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_type */
   {__pyx_k_pyx_unpickle_Enum, sizeof(__pyx_k_pyx_unpickle_Enum), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_unpickle_Enum */
   {__pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyx_vtable */
-  {__pyx_k_q, sizeof(__pyx_k_q), 0, 1, 1}, /* PyObject cname: __pyx_n_u_q */
   {__pyx_k_q_i, sizeof(__pyx_k_q_i), 0, 1, 1}, /* PyObject cname: __pyx_n_u_q_i */
   {__pyx_k_q_i_old, sizeof(__pyx_k_q_i_old), 0, 1, 1}, /* PyObject cname: __pyx_n_u_q_i_old */
   {__pyx_k_q_new, sizeof(__pyx_k_q_new), 0, 1, 1}, /* PyObject cname: __pyx_n_u_q_new */
   {__pyx_k_q_new_view, sizeof(__pyx_k_q_new_view), 0, 1, 1}, /* PyObject cname: __pyx_n_u_q_new_view */
   {__pyx_k_q_old, sizeof(__pyx_k_q_old), 0, 1, 1}, /* PyObject cname: __pyx_n_u_q_old */
   {__pyx_k_qualname, sizeof(__pyx_k_qualname), 0, 1, 1}, /* PyObject cname: __pyx_n_u_qualname */
-  {__pyx_k_radius, sizeof(__pyx_k_radius), 0, 1, 1}, /* PyObject cname: __pyx_n_u_radius */
   {__pyx_k_range, sizeof(__pyx_k_range), 0, 1, 1}, /* PyObject cname: __pyx_n_u_range */
   {__pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 1, 1}, /* PyObject cname: __pyx_n_u_reduce */
   {__pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_reduce_cython */
   {__pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 1, 1}, /* PyObject cname: __pyx_n_u_reduce_ex */
   {__pyx_k_register, sizeof(__pyx_k_register), 0, 1, 1}, /* PyObject cname: __pyx_n_u_register */
-  {__pyx_k_scale_electrode_charges_cython, sizeof(__pyx_k_scale_electrode_charges_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_scale_electrode_charges_cython */
+  {__pyx_k_scale_charges_inplace_cython, sizeof(__pyx_k_scale_charges_inplace_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_scale_charges_inplace_cython */
   {__pyx_k_scale_factor, sizeof(__pyx_k_scale_factor), 0, 1, 1}, /* PyObject cname: __pyx_n_u_scale_factor */
-  {__pyx_k_setParticleParameters, sizeof(__pyx_k_setParticleParameters), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setParticleParameters */
   {__pyx_k_set_name, sizeof(__pyx_k_set_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_set_name */
-  {__pyx_k_set_normal_vectors_cython, sizeof(__pyx_k_set_normal_vectors_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_set_normal_vectors_cython */
   {__pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate */
   {__pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 1, 1}, /* PyObject cname: __pyx_n_u_setstate_cython */
   {__pyx_k_shape, sizeof(__pyx_k_shape), 0, 1, 1}, /* PyObject cname: __pyx_n_u_shape */
@@ -25547,21 +22435,16 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_struct, sizeof(__pyx_k_struct), 0, 1, 1}, /* PyObject cname: __pyx_n_u_struct */
   {__pyx_k_test, sizeof(__pyx_k_test), 0, 1, 1}, /* PyObject cname: __pyx_n_u_test */
   {__pyx_k_threshold_check, sizeof(__pyx_k_threshold_check), 0, 1, 1}, /* PyObject cname: __pyx_n_u_threshold_check */
-  {__pyx_k_total_charge, sizeof(__pyx_k_total_charge), 0, 1, 1}, /* PyObject cname: __pyx_n_u_total_charge */
   {__pyx_k_unable_to_allocate_array_data, sizeof(__pyx_k_unable_to_allocate_array_data), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_unable_to_allocate_array_data */
   {__pyx_k_unable_to_allocate_shape_and_str, sizeof(__pyx_k_unable_to_allocate_shape_and_str), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_unable_to_allocate_shape_and_str */
   {__pyx_k_unpack, sizeof(__pyx_k_unpack), 0, 1, 1}, /* PyObject cname: __pyx_n_u_unpack */
   {__pyx_k_update, sizeof(__pyx_k_update), 0, 1, 1}, /* PyObject cname: __pyx_n_u_update */
-  {__pyx_k_update_openmm_charges_batch, sizeof(__pyx_k_update_openmm_charges_batch), 0, 1, 1}, /* PyObject cname: __pyx_n_u_update_openmm_charges_batch */
-  {__pyx_k_value, sizeof(__pyx_k_value), 0, 1, 1}, /* PyObject cname: __pyx_n_u_value */
   {__pyx_k_voltage_term, sizeof(__pyx_k_voltage_term), 0, 1, 1}, /* PyObject cname: __pyx_n_u_voltage_term */
   {__pyx_k_x, sizeof(__pyx_k_x), 0, 1, 1}, /* PyObject cname: __pyx_n_u_x */
   {__pyx_k_z_atom, sizeof(__pyx_k_z_atom), 0, 1, 1}, /* PyObject cname: __pyx_n_u_z_atom */
-  {__pyx_k_z_coords, sizeof(__pyx_k_z_coords), 0, 1, 1}, /* PyObject cname: __pyx_n_u_z_coords */
   {__pyx_k_z_distance, sizeof(__pyx_k_z_distance), 0, 1, 1}, /* PyObject cname: __pyx_n_u_z_distance */
   {__pyx_k_z_opposite, sizeof(__pyx_k_z_opposite), 0, 1, 1}, /* PyObject cname: __pyx_n_u_z_opposite */
   {__pyx_k_z_positions, sizeof(__pyx_k_z_positions), 0, 1, 1}, /* PyObject cname: __pyx_n_u_z_positions */
-  {__pyx_k_z_sum, sizeof(__pyx_k_z_sum), 0, 1, 1}, /* PyObject cname: __pyx_n_u_z_sum */
   {0, 0, 0, 0, 0}
 };
 /* InitStrings.proto */
@@ -25571,7 +22454,7 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, c
 
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 75, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_range); if (!__pyx_builtin_range) __PYX_ERR(0, 85, __pyx_L1_error)
   __pyx_builtin___import__ = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_import); if (!__pyx_builtin___import__) __PYX_ERR(1, 101, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 139, __pyx_L1_error)
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(1, 154, __pyx_L1_error)
@@ -25641,8 +22524,6 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   __pyx_mstate->__pyx_umethod_PyDict_Type_pop.type = (PyObject*)&PyDict_Type;
   __pyx_mstate->__pyx_umethod_PyDict_Type_pop.method_name = &__pyx_mstate->__pyx_n_u_pop;
   if (__Pyx_InitStrings(__pyx_string_tab, __pyx_mstate->__pyx_string_tab, __pyx_string_tab_encodings) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  __pyx_mstate->__pyx_float_0_0 = PyFloat_FromDouble(0.0); if (unlikely(!__pyx_mstate->__pyx_float_0_0)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_mstate->__pyx_float_1_0 = PyFloat_FromDouble(1.0); if (unlikely(!__pyx_mstate->__pyx_float_1_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_0 = PyLong_FromLong(0); if (unlikely(!__pyx_mstate->__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_1 = PyLong_FromLong(1); if (unlikely(!__pyx_mstate->__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_mstate->__pyx_int_112105877 = PyLong_FromLong(112105877L); if (unlikely(!__pyx_mstate->__pyx_int_112105877)) __PYX_ERR(0, 1, __pyx_L1_error)
@@ -25661,7 +22542,7 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
             unsigned int num_kwonly_args : 1;
             unsigned int nlocals : 5;
             unsigned int flags : 10;
-            unsigned int first_line : 9;
+            unsigned int first_line : 8;
             unsigned int line_table_length : 12;
         } __Pyx_PyCode_New_function_description;
 /* NewCodeObj.proto */
@@ -25679,74 +22560,24 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {8, 0, 0, 16, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 24, 155};
+    const __Pyx_PyCode_New_function_description descr = {8, 0, 0, 16, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 30, 155};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_forces_z, __pyx_mstate->__pyx_n_u_q_old, __pyx_mstate->__pyx_n_u_indices, __pyx_mstate->__pyx_n_u_prefactor, __pyx_mstate->__pyx_n_u_voltage_term, __pyx_mstate->__pyx_n_u_threshold_check, __pyx_mstate->__pyx_n_u_small_threshold, __pyx_mstate->__pyx_n_u_sign, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_atom_idx, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_q_i_old, __pyx_mstate->__pyx_n_u_Ez_external, __pyx_mstate->__pyx_n_u_q_i, __pyx_mstate->__pyx_n_u_q_new, __pyx_mstate->__pyx_n_u_q_new_view};
-    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_compute_electrode_charges_cython, __pyx_k_V_1A_RvQc_r_U_1_7_1_q_4q_1_Rq_j, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_compute_electrode_charges_cython, __pyx_k_1A_RvQc_r_U_1_7_1_q_4q_1_Rq_j_4, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 11, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 97, 102};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_z_positions, __pyx_mstate->__pyx_n_u_charges, __pyx_mstate->__pyx_n_u_indices, __pyx_mstate->__pyx_n_u_z_opposite, __pyx_mstate->__pyx_n_u_Lcell, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_atom_idx, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_z_atom, __pyx_mstate->__pyx_n_u_z_distance, __pyx_mstate->__pyx_n_u_contribution};
-    __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_compute_analytic_charge_contribu, __pyx_k_1A_q_U_1_7_1_AQ_WBa_b_2V3awaq_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 112, 43};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_c_charges, __pyx_mstate->__pyx_n_u_scale_factor, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N};
+    __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_scale_charges_inplace_cython, __pyx_k_0_q_U_1_y_Ba, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 133, 65};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_positions_list, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_z_coords};
-    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_extract_z_coordinates_cython, __pyx_k_1A_0_F_A_U_1_nARq_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 147, 70};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_c_charges, __pyx_mstate->__pyx_n_u_charge_per_atom, __pyx_mstate->__pyx_n_u_small_threshold, __pyx_mstate->__pyx_n_u_sign, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_q_i};
+    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_initialize_charges_cython, __pyx_k_q_U_1_a_4q_Rq_b_Rq_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 151, 65};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_forces_list, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_forces_z};
-    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_extract_forces_z_cython, __pyx_k_1A_0_F_A_U_1_k_ARq_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 169, 73};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_nbondedForce, __pyx_mstate->__pyx_n_u_electrode_atoms, __pyx_mstate->__pyx_n_u_charges, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_q, __pyx_mstate->__pyx_n_u_atom};
-    __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_update_openmm_charges_batch, __pyx_k_1A_U_1_aq_G1A_Ja_4_CuA, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 197, 71};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_electrode_atoms, __pyx_mstate->__pyx_n_u_nbondedForce, __pyx_mstate->__pyx_n_u_scale_factor, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_atom, __pyx_mstate->__pyx_n_u_new_charge};
-    __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_scale_electrode_charges_cython, __pyx_k_1A_U_1_aq_T_1_Ja_4_L_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 221, 52};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_electrode_atoms, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_total_charge, __pyx_mstate->__pyx_n_u_atom};
-    __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_get_total_charge_cython, __pyx_k_1A_q_U_1_aq_A_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 241, 71};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_electrode_atoms, __pyx_mstate->__pyx_n_u_positions_list, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_z_sum, __pyx_mstate->__pyx_n_u_atom, __pyx_mstate->__pyx_n_u_atom_idx};
-    __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_compute_z_position_cython, __pyx_k_1A_U_1_aq_4q_q_A_6_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 263, 68};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_electrode_atoms, __pyx_mstate->__pyx_n_u_nbondedForce, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_charges, __pyx_mstate->__pyx_n_u_atom};
-    __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_collect_electrode_charges_cython, __pyx_k_1A_r_q_6_1_U_1_aq_q_T_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 9, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 286, 93};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_electrode_atoms, __pyx_mstate->__pyx_n_u_nbondedForce, __pyx_mstate->__pyx_n_u_charge_per_atom, __pyx_mstate->__pyx_n_u_small_threshold, __pyx_mstate->__pyx_n_u_sign, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_atom, __pyx_mstate->__pyx_n_u_q_i};
-    __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_initialize_electrode_charge_cyth, __pyx_k_1A_U_1_aq_a_4q_Rq_b_Rq_Ja_4_E_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 9, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 318, 117};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_electrode_atoms, __pyx_mstate->__pyx_n_u_positions_list, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_cx, __pyx_mstate->__pyx_n_u_cy, __pyx_mstate->__pyx_n_u_cz, __pyx_mstate->__pyx_n_u_atom, __pyx_mstate->__pyx_n_u_atom_idx};
-    __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_compute_buckyball_center_cython, __pyx_k_1A_Zz_U_1_aq_4q_nAYar_nAYar_nAY, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 343, 56};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_electrode_atoms, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_atom};
-    __pyx_mstate_global->__pyx_codeobj_tab[11] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_set_normal_vectors_cython, __pyx_k_1A_U_1_aq_F_F_F, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[11])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 11, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 362, 111};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_electrode_atoms, __pyx_mstate->__pyx_n_u_positions_list, __pyx_mstate->__pyx_n_u_cx, __pyx_mstate->__pyx_n_u_cy, __pyx_mstate->__pyx_n_u_cz, __pyx_mstate->__pyx_n_u_atom, __pyx_mstate->__pyx_n_u_atom_idx, __pyx_mstate->__pyx_n_u_dx, __pyx_mstate->__pyx_n_u_dy, __pyx_mstate->__pyx_n_u_dz, __pyx_mstate->__pyx_n_u_radius};
-    __pyx_mstate_global->__pyx_codeobj_tab[12] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_compute_buckyball_radius_cython, __pyx_k_1_t1_q_HBa_q_HBa_q_HBa_T_AS_AS, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[12])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 13, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 393, 197};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_electrode_atoms, __pyx_mstate->__pyx_n_u_positions_list, __pyx_mstate->__pyx_n_u_cx, __pyx_mstate->__pyx_n_u_cy, __pyx_mstate->__pyx_n_u_cz, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_atom, __pyx_mstate->__pyx_n_u_atom_idx, __pyx_mstate->__pyx_n_u_dx, __pyx_mstate->__pyx_n_u_dy, __pyx_mstate->__pyx_n_u_dz, __pyx_mstate->__pyx_n_u_norm};
-    __pyx_mstate_global->__pyx_codeobj_tab[13] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_compute_normal_vectors_buckyball, __pyx_k_1A_U_1_aq_4q_1IQb_1IQb_1IQb_t1B, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[13])) goto bad;
+    const __Pyx_PyCode_New_function_description descr = {5, 0, 0, 11, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 195, 105};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_z_positions, __pyx_mstate->__pyx_n_u_c_indices, __pyx_mstate->__pyx_n_u_c_charges, __pyx_mstate->__pyx_n_u_z_opposite, __pyx_mstate->__pyx_n_u_Lcell, __pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_atom_idx, __pyx_mstate->__pyx_n_u_N, __pyx_mstate->__pyx_n_u_z_atom, __pyx_mstate->__pyx_n_u_z_distance, __pyx_mstate->__pyx_n_u_contribution};
+    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_electrode_charges_cython_pyx, __pyx_mstate->__pyx_n_u_compute_analytic_contribution_cy, __pyx_k_J_q_q_U_1_9AQ_AQ_WBa_b_BgS_1_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;
@@ -29182,16 +26013,6 @@ fail:;
   __Pyx_SafeReleaseBuffer(buf);
   return -1;
 }
-
-/* PyObjectSetAttrStr */
-  #if CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value) {
-    PyTypeObject* tp = Py_TYPE(obj);
-    if (likely(tp->tp_setattro))
-        return tp->tp_setattro(obj, attr_name, value);
-    return PyObject_SetAttr(obj, attr_name, value);
-}
-#endif
 
 /* CallTypeTraverse */
   #if !CYTHON_USE_TYPE_SPECS || (!CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x03090000)

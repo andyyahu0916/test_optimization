@@ -3,7 +3,7 @@
 OpenMM Fixed-Voltage MD Simulation
 Refactored from original with Linus principles:
 - Config-driven (no hardcoding)
-- Support 3 MM versions (original/optimized/cython)
+- Support 2 MM versions (original/cython)
 - Zero functionality removal
 - Clean structure
 """
@@ -88,12 +88,6 @@ try:
         from MM_classes_CYTHON import *
         from Fixed_Voltage_routines_CYTHON import *
         print("✓ Cython version loaded successfully")
-
-    elif mm_version == 'optimized':
-        print("📊 Attempting to use NumPy optimized version...")
-        from MM_classes_OPTIMIZED import *
-        from Fixed_Voltage_routines_OPTIMIZED import *
-        print("✓ Optimized version loaded successfully")
 
     else:  # original
         print("🐍 Using original Python version")

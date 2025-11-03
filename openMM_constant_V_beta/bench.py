@@ -24,10 +24,6 @@ print("   (1) 黃金標準 (Original)")
 import MM_classes as MM_Orig_Module
 import Fixed_Voltage_routines as FV_Orig_Module
 
-print("   (2) 錯誤的快取版 (OPTIMIZED)")
-import MM_classes_OPTIMIZED as MM_Opt_Module
-import Fixed_Voltage_routines_OPTIMIZED as FV_Opt_Module
-
 print("   (3) 你的最終版 (CYTHON)")
 import MM_classes_CYTHON as MM_Cython_Module
 import Fixed_Voltage_routines_CYTHON as FV_Cython_Module
@@ -133,9 +129,6 @@ def main():
     print("... 正在設定 (1/3) Original MMsys...")
     MM_Orig = setup_simulation(MM_Orig_Module, FV_Orig_Module)
     
-    print("... 正在設定 (2/3) OPTIMIZED MMsys...")
-    MM_Opt = setup_simulation(MM_Opt_Module, FV_Opt_Module)
-    
     print("... 正在設定 (3/3) CYTHON MMsys...")
     MM_Cython = setup_simulation(MM_Cython_Module, FV_Cython_Module)
 
@@ -147,7 +140,6 @@ def main():
     )
     
     # 「實用主義」：強制所有版本 100% 從同一個「髒」狀態開始
-    MM_Opt.simmd.context.setState(saved_state)
     MM_Cython.simmd.context.setState(saved_state)
     
     print("✅ 狀態 100% 同步。")
@@ -159,9 +151,6 @@ def main():
     # 「好品味」：我們必須*呼叫*函式來獲取結果
     MM_Orig.Poisson_solver_fixed_voltage(Niterations=N_ITERATIONS)
     q_orig = get_charges(MM_Orig)
-
-    MM_Opt.Poisson_solver_fixed_voltage(Niterations=N_ITERATIONS)
-    q_opt = get_charges(MM_Opt)
 
     MM_Cython.Poisson_solver_fixed_voltage(Niterations=N_ITERATIONS)
     q_cython = get_charges(MM_Cython)
@@ -175,24 +164,12 @@ def main():
         diff = np.max(np.abs(q_orig - q_cython))
         print(f"   (最大誤差: {diff})")
 
-    # 驗證 P10 BUG (OPTIMIZED 必須 100% *不*匹配 Original)
-    try:
-        assert not np.allclose(q_orig, q_opt, atol=1e-8)
-        print("✅ 【準】 P10 BUG 獵殺成功：OPTIMIZED != Original (這是好事！)")
-    except AssertionError:
-        print("⚠️ 【準】 P10 BUG 似乎消失了？：OPTIMIZED == Original")
-
-    print("="*60)
-
     # --- 2. 速度比較 (P1 熱迴圈 壓榨) ---
     print(f"🔥 2. 速度比較 (N_iter={N_ITERATIONS}, N_runs={N_TIMEIT_RUNS})")
 
     # 「大道至簡」：timeit setup 100% 只做「還原」
     setup_orig = "MM_Orig.simmd.context.setState(saved_state)"
     stmt_orig = f"MM_Orig.Poisson_solver_fixed_voltage(Niterations={N_ITERATIONS})"
-
-    setup_opt = "MM_Opt.simmd.context.setState(saved_state)"
-    stmt_opt = f"MM_Opt.Poisson_solver_fixed_voltage(Niterations={N_ITERATIONS})"
 
     setup_cython = "MM_Cython.simmd.context.setState(saved_state)"
     stmt_cython = f"MM_Cython.Poisson_solver_fixed_voltage(Niterations={N_ITERATIONS})"
@@ -201,26 +178,14 @@ def main():
     print(f"... 正在執行 Original (x{N_TIMEIT_RUNS})...")
     t_orig = timeit.timeit(stmt_orig, setup=setup_orig, globals=locals(), number=N_TIMEIT_RUNS) / N_TIMEIT_RUNS
 
-    print(f"... 正在執行 OPTIMIZED (x{N_TIMEIT_RUNS})...")
-    t_opt = timeit.timeit(stmt_opt, setup=setup_opt, globals=locals(), number=N_TIMEIT_RUNS) / N_TIMEIT_RUNS
-
     print(f"... 正在執行 CYTHON (x{N_TIMEIT_RUNS})...")
     t_cython = timeit.timeit(stmt_cython, setup=setup_cython, globals=locals(), number=N_TIMEIT_RUNS) / N_TIMEIT_RUNS
 
     print("="*60)
     print(f"🔥 3. 最終結果 (Poisson Solver Call)")
     print(f"   🐍 Original:  {t_orig * 1000:.4f} ms")
-    print(f"   📊 OPTIMIZED: {t_opt * 1000:.4f} ms  (加速: {t_orig / t_opt:.2f}x)")
     print(f"   🔥 CYTHON:    {t_cython * 1000:.4f} ms  (加速: {t_orig / t_cython:.2f}x)")
     print("="*60)
-
-    if (t_cython < t_opt) and (t_opt < t_orig):
-        print("✅ 【快】 P1 壓榨成功：CYTHON < OPTIMIZED < Original")
-    else:
-        print("⚠️ 【快】 警告：CYTHON 並非最快！")
-        
-    print("\n😎 上工了。")
-
 
 if __name__ == "__main__":
     # --- 3. 規模變化 ---

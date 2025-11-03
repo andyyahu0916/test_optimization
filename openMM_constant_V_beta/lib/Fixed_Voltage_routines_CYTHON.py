@@ -110,18 +110,19 @@ class Conductor_Virtual(object):
 
         self.Natoms = len(self.electrode_atoms)
 
+        # 🔥 GOOD TASTE: Create C-level arrays as Single Source of Truth
+        # 從 Python 物件列表一次性提取資料，存入 C 級陣列
+        # 這是電荷的「唯一真實來源」，atom.charge 只是 Python-side 的快取
+        self.c_indices = numpy.array([atom.atom_index for atom in self.electrode_atoms], dtype=numpy.int32)
+        self.c_charges = numpy.array([atom.charge for atom in self.electrode_atoms], dtype=numpy.float64)
+
 
     #******************************************
-    # 🔥 CYTHON OPTIMIZED: get_total_charge (2-3x speedup)
+    # 🔥 GOOD TASTE: get_total_charge - NumPy 完勝
+    # NumPy.sum 已經是 C 實現，無需 Cython
     def get_total_charge( self ):
-        if CYTHON_AVAILABLE:
-            return ec_cython.get_total_charge_cython(self.electrode_atoms)
-        else:
-            # Fallback
-            sumQ = 0.0
-            for atom in self.electrode_atoms:
-                sumQ += atom.charge
-            return sumQ
+        # 直接在 C 陣列上操作，零 Python 負擔
+        return numpy.sum(self.c_charges)
 
 
     #*********************************************
@@ -182,7 +183,9 @@ class Electrode_Virtual(Conductor_Virtual):
 
 
     #*************************
-    # 🔥 CYTHON OPTIMIZED: initialize_Charge
+    # 🔥 GOOD TASTE: initialize_Charge - 計算/同步分離
+    # Step 1: 計算 (C-level)
+    # Step 2: 同步 (Python API)
     def initialize_Charge( self, Lgap, Lcell, MMsys):
         sign=1.0
         if self.electrode_type == 'anode':
@@ -193,12 +196,33 @@ class Electrode_Virtual(Conductor_Virtual):
             print( "adding small value to initial charges in initialize_Charge routine for small Voltage input..." )
             flag_small=True
 
-        for atom in self.electrode_atoms:
-            q_i = sign / ( 4.0 * numpy.pi ) * self.area_atom * (self.Voltage / Lgap + self.Voltage / Lcell) * conversion_KjmolNm_Au
+        # --- STEP 1: 計算 (在 C 陣列上操作) ---
+        # 計算每個原子的基礎電荷
+        q_i = sign / ( 4.0 * numpy.pi ) * self.area_atom * (self.Voltage / Lgap + self.Voltage / Lcell) * conversion_KjmolNm_Au
+
+        if CYTHON_AVAILABLE:
+            # 使用 Cython 函數填充 c_charges
+            ec_cython.initialize_charges_cython(
+                self.c_charges,
+                q_i,
+                MMsys.small_threshold,
+                sign
+            )
+        else:
+            # NumPy 備案
+            self.c_charges.fill(q_i)
             if flag_small:
-               q_i = q_i + sign * MMsys.small_threshold
-            atom.charge = q_i
-            MMsys.nbondedForce.setParticleParameters(atom.atom_index, q_i, 1.0 , 0.0)
+                self.c_charges += sign * MMsys.small_threshold
+
+        # --- STEP 2: 同步 (Python 層，無法避免的 API 呼叫) ---
+        # 這是你唯一應該呼叫 API 的地方
+        for i in range(self.Natoms):
+            idx = self.c_indices[i]
+            q = self.c_charges[i]
+            MMsys.nbondedForce.setParticleParameters(idx, q, 1.0, 0.0)
+            
+            # (可選) 更新 Python 物件快取，以防萬一
+            self.electrode_atoms[i].charge = q
 
         MMsys.nbondedForce.updateParametersInContext(MMsys.simmd.context)
 
@@ -206,6 +230,9 @@ class Electrode_Virtual(Conductor_Virtual):
     #**************************
     # 🔥 RESTORED TO GOLDEN STANDARD: compute_Electrode_charge_analytic
     # No cache, direct getParticleParameters - "Good Taste"
+    #**************************
+    # 🔥 GOOD TASTE REFACTORED: compute_Electrode_charge_analytic
+    # 使用 Cython 進行 C-level 陣列計算，移除所有 getParticleParameters API 呼叫
     def compute_Electrode_charge_analytic( self, MMsys , positions, Conductor_list, z_opposite ):
         sign=1.0
         if self.electrode_type == 'anode':
@@ -213,28 +240,67 @@ class Electrode_Virtual(Conductor_Virtual):
 
         self.Q_analytic = sign / ( 4.0 * numpy.pi ) * self.sheet_area * (self.Voltage / MMsys.Lgap + self.Voltage / MMsys.Lcell) * conversion_KjmolNm_Au
 
-        #********** Image charge contribution: direct getParticleParameters (no cache!)
-        for index in MMsys.electrolyte_atom_indices:
-            (q_i, sig, eps) = MMsys.nbondedForce.getParticleParameters(index)
-            z_atom = positions[index][2]._value
-            z_distance = abs(z_atom - z_opposite)
-            self.Q_analytic += (z_distance / MMsys.Lcell) * (- q_i._value)
+        # 🔥 獲取 z_positions (處理不同的 positions 格式)
+        # 理想情況下，這應該在 Poisson_solver 中只做一次並傳入
+        if hasattr(positions, '_value'):
+            # OpenMM Vec3 列表帶單位 (慢速路徑，但為了相容)
+            z_positions_np = numpy.array([pos[2]._value for pos in positions])
+        elif isinstance(positions, numpy.ndarray):
+            # NumPy 陣列 (快速路徑)
+            if positions.ndim == 2:
+                # N x 3 陣列
+                z_col = positions[:, 2]
+                # 檢查是否有單位
+                if hasattr(z_col[0], '_value'):
+                    z_positions_np = numpy.array([z._value for z in z_col])
+                else:
+                    z_positions_np = z_col
+            else:
+                # 1D 陣列？不太可能
+                z_positions_np = positions
+        else:
+            # OpenMM Vec3 列表無單位
+            z_positions_np = numpy.array([pos[2] for pos in positions])
 
-        #********* Conductors: direct getParticleParameters (no cache!)
+        #********** 步驟 1: 電解質貢獻 (C-level, 無 API 呼叫!)
+        if CYTHON_AVAILABLE:
+            self.Q_analytic += ec_cython.compute_analytic_contribution_cython(
+                z_positions_np,
+                MMsys.electrolyte_c_indices,  # 來自 initialize_electrolyte
+                MMsys.electrolyte_c_charges,  # 來自 initialize_electrolyte
+                z_opposite,
+                MMsys.Lcell
+            )
+        else:
+            # NumPy Fallback (仍然是 C-level，但稍慢)
+            z_atoms = z_positions_np[MMsys.electrolyte_c_indices]
+            z_distances = numpy.abs(z_atoms - z_opposite)
+            self.Q_analytic += numpy.sum((z_distances / MMsys.Lcell) * (-MMsys.electrolyte_c_charges))
+
+        #********* 步驟 2: 導體貢獻 (C-level, 無 API 呼叫!)
         if Conductor_list:
             for Conductor in Conductor_list:
-                for atom in Conductor.electrode_atoms:
-                    index = atom.atom_index
-                    (q_i, sig, eps) = MMsys.nbondedForce.getParticleParameters(index)
-                    z_atom = positions[index][2]._value
-                    z_distance = abs(z_atom - z_opposite)
-                    self.Q_analytic += (z_distance / MMsys.Lcell) * (- q_i._value)
+                if CYTHON_AVAILABLE:
+                    self.Q_analytic += ec_cython.compute_analytic_contribution_cython(
+                        z_positions_np,
+                        Conductor.c_indices,  # 早已存在
+                        Conductor.c_charges,  # 早已存在
+                        z_opposite,
+                        MMsys.Lcell
+                    )
+                else:
+                    # NumPy Fallback
+                    z_atoms = z_positions_np[Conductor.c_indices]
+                    z_distances = numpy.abs(z_atoms - z_opposite)
+                    self.Q_analytic += numpy.sum((z_distances / MMsys.Lcell) * (-Conductor.c_charges))
 
 
     #****************************
-    # 🔥 P1b.3 CYTHON OPTIMIZED: Scale_charges_analytic
+    # 🔥 GOOD TASTE: Scale_charges_analytic - 計算/同步分離
+    # Step 1: 計算 (C-level)
+    # Step 2: 同步 (Python API)
     def Scale_charges_analytic( self, MMsys , print_flag = False ):
-        Q_numeric = self.get_total_charge()  # P1b.1 Cython optimized
+        Q_numeric = self.get_total_charge()  # NumPy sum (C-level)
 
         if print_flag :
             print( "Q_numeric , Q_analytic charges on " , self.electrode_type , Q_numeric , self.Q_analytic )
@@ -243,20 +309,21 @@ class Electrode_Virtual(Conductor_Virtual):
         if abs(Q_numeric) > MMsys.small_threshold:
             scale_factor = self.Q_analytic / Q_numeric
 
-        # 🔥 P1b.3: Cython optimization in hot loop!
+        # --- STEP 1: 計算 (在 C 陣列上操作) ---
         if scale_factor > 0.0:
             if CYTHON_AVAILABLE:
-                # 100% Cython C loop
-                ec_cython.scale_electrode_charges_cython(
-                    self.electrode_atoms,
-                    MMsys.nbondedForce,
-                    scale_factor
-                )
+                # 使用 Cython 就地縮放 c_charges
+                ec_cython.scale_charges_inplace_cython(self.c_charges, scale_factor)
             else:
-                # Python fallback
-                for atom in self.electrode_atoms:
-                    atom.charge = atom.charge * scale_factor
-                    MMsys.nbondedForce.setParticleParameters(atom.atom_index, atom.charge, 1.0 , 0.0)
+                # NumPy 備案（也是 C-level）
+                self.c_charges *= scale_factor
+
+            # --- STEP 2: 同步 (Python 層，無法避免的 API 呼叫) ---
+            for i in range(self.Natoms):
+                idx = self.c_indices[i]
+                q = self.c_charges[i]
+                MMsys.nbondedForce.setParticleParameters(idx, q, 1.0, 0.0)
+                self.electrode_atoms[i].charge = q  # 更新 Python 快取
 
 
     def set_z_pos(self, z):
@@ -289,22 +356,18 @@ class Buckyball_Virtual(Conductor_Virtual):
                        atom_object = atom_MM( element.symbol , q_i._value , atom.index )
                        self.electrode_atoms_real.append( atom_object )
 
-       # 🔥 CYTHON OPTIMIZED: Center computation
+       # � PYTHON: Center computation (不關鍵，保持簡單)
        state = MMsys.simmd.context.getState(getEnergy=False,getForces=False,getVelocities=False,getPositions=True)
        positions = state.getPositions()
 
-       if CYTHON_AVAILABLE:
-           self.r_center = list(ec_cython.compute_buckyball_center_cython(self.electrode_atoms, positions))
-       else:
-           # Fallback
-           self.r_center = [ 0.0 , 0.0 , 0.0 ]
-           for atom in self.electrode_atoms:
-               self.r_center[0] += positions[atom.atom_index][0]._value
-               self.r_center[1] += positions[atom.atom_index][1]._value
-               self.r_center[2] += positions[atom.atom_index][2]._value
-           self.r_center[0] = self.r_center[0] / self.Natoms
-           self.r_center[1] = self.r_center[1] / self.Natoms
-           self.r_center[2] = self.r_center[2] / self.Natoms
+       self.r_center = [ 0.0 , 0.0 , 0.0 ]
+       for atom in self.electrode_atoms:
+           self.r_center[0] += positions[atom.atom_index][0]._value
+           self.r_center[1] += positions[atom.atom_index][1]._value
+           self.r_center[2] += positions[atom.atom_index][2]._value
+       self.r_center[0] = self.r_center[0] / self.Natoms
+       self.r_center[1] = self.r_center[1] / self.Natoms
+       self.r_center[2] = self.r_center[2] / self.Natoms
 
        # Compute radius (Python loop - not critical)
        self.radius=0.0
@@ -316,20 +379,13 @@ class Buckyball_Virtual(Conductor_Virtual):
            break
        self.area_atom = 4.0 * numpy.pi * self.radius**2 / self.Natoms
 
-       # 🔥 CYTHON OPTIMIZED: Normal vectors
-       if CYTHON_AVAILABLE:
-           ec_cython.compute_normal_vectors_buckyball_cython(
-               self.electrode_atoms, positions,
-               self.r_center[0], self.r_center[1], self.r_center[2]
-           )
-       else:
-           # Fallback
-           for atom in self.electrode_atoms:
-               nx = positions[atom.atom_index][0]._value - self.r_center[0]
-               ny = positions[atom.atom_index][1]._value - self.r_center[1]
-               nz = positions[atom.atom_index][2]._value - self.r_center[2]
-               norm = sqrt( nx**2 + ny**2 + nz**2)
-               atom.nx = nx / norm ; atom.ny = ny / norm ; atom.nz = nz / norm
+       # � PYTHON: Normal vectors (不關鍵，保持簡單)
+       for atom in self.electrode_atoms:
+           nx = positions[atom.atom_index][0]._value - self.r_center[0]
+           ny = positions[atom.atom_index][1]._value - self.r_center[1]
+           nz = positions[atom.atom_index][2]._value - self.r_center[2]
+           norm = sqrt( nx**2 + ny**2 + nz**2)
+           atom.nx = nx / norm ; atom.ny = ny / norm ; atom.nz = nz / norm
 
        self.find_contact_neighbor_conductor( positions , self.r_center , MMsys )
 
@@ -340,40 +396,12 @@ class Buckyball_Virtual(Conductor_Virtual):
             sumQ += atom.charge
         return sumQ
 
-
-    #****************************
-    # 🔥 P14 FIX + P1b.3 OPTIMIZATION: Scale_charges_analytic
-    # This routine scales all electrode atom charges such
-    # that analytic normalization condition is satisfied.
-    #***************************
-    def Scale_charges_analytic( self, MMsys , print_flag = False ):
-        Q_numeric = self.get_total_charge()  # P1b.1 Cython optimized
-
-        if print_flag :
-            print( "Q_numeric , Q_analytic charges on " , self.electrode_type , Q_numeric , self.Q_analytic )
-
-        scale_factor = -1
-        if abs(Q_numeric) > MMsys.small_threshold:
-            scale_factor = self.Q_analytic / Q_numeric
-
-        # 🔥 P1b.3: Cython optimization in hot loop!
-        if scale_factor > 0.0:
-            if CYTHON_AVAILABLE:
-                # 100% Cython C loop
-                ec_cython.scale_electrode_charges_cython(
-                    self.electrode_atoms,
-                    MMsys.nbondedForce,
-                    scale_factor
-                )
-            else:
-                # Python fallback
-                for atom in self.electrode_atoms:
-                    atom.charge = atom.charge * scale_factor
-                    MMsys.nbondedForce.setParticleParameters(atom.atom_index, atom.charge, 1.0 , 0.0)
+    # 🔥 GOOD TASTE: Scale_charges_analytic 繼承自 Electrode_Virtual
+    # 不需要在此重複定義，parent class 的實現已經完美
 
 
 #*************************
-# Nanotube_Virtual - Python only (P7 Gap Year)
+# Nanotube_Virtual - GOOD TASTE VERSION
 #*************************
 class Nanotube_Virtual(Conductor_Virtual):
     def __init__(self, electrode_identifier, electrode_type, Voltage, MMsys, chain_flag, exclude_element, axis ):
@@ -456,33 +484,5 @@ class Nanotube_Virtual(Conductor_Virtual):
             sumQ += atom.charge
         return sumQ
 
-
-    #****************************
-    # 🔥 P14 FIX + P1b.3 OPTIMIZATION: Scale_charges_analytic
-    # This routine scales all electrode atom charges such
-    # that analytic normalization condition is satisfied.
-    #***************************
-    def Scale_charges_analytic( self, MMsys , print_flag = False ):
-        Q_numeric = self.get_total_charge()  # P1b.1 Cython optimized
-
-        if print_flag :
-            print( "Q_numeric , Q_analytic charges on " , self.electrode_type , Q_numeric , self.Q_analytic )
-
-        scale_factor = -1
-        if abs(Q_numeric) > MMsys.small_threshold:
-            scale_factor = self.Q_analytic / Q_numeric
-
-        # 🔥 P1b.3: Cython optimization in hot loop!
-        if scale_factor > 0.0:
-            if CYTHON_AVAILABLE:
-                # 100% Cython C loop
-                ec_cython.scale_electrode_charges_cython(
-                    self.electrode_atoms,
-                    MMsys.nbondedForce,
-                    scale_factor
-                )
-            else:
-                # Python fallback
-                for atom in self.electrode_atoms:
-                    atom.charge = atom.charge * scale_factor
-                    MMsys.nbondedForce.setParticleParameters(atom.atom_index, atom.charge, 1.0 , 0.0)
+    # 🔥 GOOD TASTE: Scale_charges_analytic 繼承自 Electrode_Virtual
+    # 不需要在此重複定義，parent class 的實現已經完美

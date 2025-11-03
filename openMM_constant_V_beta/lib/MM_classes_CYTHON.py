@@ -72,10 +72,10 @@ def update_electrolyte_positions_numba(newpos, oldpos, residue_first_atoms, resi
         first_atom_idx = residue_first_atoms[i]
         n_atoms = residue_atom_counts[i]
         
-        # Step 1: Get first atom position as reference (matches original line 704-706)
-        ref_x = newpos[first_atom_idx, 0]
-        ref_y = newpos[first_atom_idx, 1]
-        ref_z = newpos[first_atom_idx, 2]
+        # Step 1: Get first atom position as reference (🔥 修正: 必須來自 oldpos)
+        ref_x = oldpos[first_atom_idx, 0]
+        ref_y = oldpos[first_atom_idx, 1]
+        ref_z = oldpos[first_atom_idx, 2]
         
         # Step 2: Scale reference Z-coordinate (matches original line 710-714)
         # Convert to electrode-relative coordinates
@@ -85,14 +85,18 @@ def update_electrolyte_positions_numba(newpos, oldpos, residue_first_atoms, resi
         # Convert back to global coordinates
         ref_z_new = ref_z_relative_scaled + reference_electrode_z
         
-        # Step 3: Update all atoms maintaining intra-molecular vectors (matches original line 716-720)
+        # Step 3: Update all atoms maintaining intra-molecular vectors
         for j in range(n_atoms):
             atom_idx = first_atom_idx + j
-            # Compute intra-molecular vector (from first atom)
-            dx = newpos[atom_idx, 0] - ref_x
-            dy = newpos[atom_idx, 1] - ref_y
-            dz = newpos[atom_idx, 2] - ref_z
-            # Apply to new reference position (only Z changed)
+            
+            # 🔥 修正: 計算 intra-molecular vector 必須使用 oldpos
+            # 從 OLD POS 計算舊的幾何結構的 Delta
+            dx = oldpos[atom_idx, 0] - ref_x
+            dy = oldpos[atom_idx, 1] - ref_y
+            dz = oldpos[atom_idx, 2] - ref_z
+            
+            # 🔥 修正: 將 "舊的" delta 應用到 "新的" 參考點位置上
+            # (新的參考點 X, Y 不變, 只有 Z 改變了)
             newpos[atom_idx, 0] = ref_x + dx
             newpos[atom_idx, 1] = ref_y + dy
             newpos[atom_idx, 2] = ref_z_new + dz
@@ -248,6 +252,12 @@ class MM(object):
               sys.exit(0)
           self.simmd.context.setPositions(self.modeller.positions)
 
+          # 🔥 優化：初始化時檢查 OpenMM 是否使用單位（只需執行一次）
+          # 之前這個檢查在 Poisson_solver_fixed_voltage 熱循環中，造成不必要的性能開銷
+          state_test = self.simmd.context.getState(getPositions=True)
+          pos_test = state_test.getPositions(asNumpy=True)
+          self._openmm_uses_units = hasattr(pos_test[:, 2], '_value')
+
 
 
     #***********************************************
@@ -333,17 +343,27 @@ class MM(object):
     # if a residue has < Natom_cutoff number of atoms, its an electrolyte residue
     #  a reasonable choice of Natom_cutoff=100, which i don't think will ever lead to a bug...
     def initialize_electrolyte( self , Natom_cutoff=100):
+        """
+        🔥 GOOD TASTE 修正：建立電解質的 C 陣列 (Single Source of Truth)
+        """
         # make a set of electrolyte residue names, so that we don't have to keep counting atom numbers...
         electrolyte_names=set()
         # initialize list of electrolyte residue objects /atom indices
         self.electrolyte_residues=[]
         self.electrolyte_atom_indices=[]
+        
+        # 🔥 建立臨時列表來收集電荷
+        electrolyte_charges_list = []
+        
         for res in self.simmd.topology.residues():
             if res.name in electrolyte_names:
                 # add to electrolyte list
                 self.electrolyte_residues.append(res)
                 for atom in res._atoms:
                     self.electrolyte_atom_indices.append(atom.index)
+                    # 🔥 讀取一次電荷
+                    (q_i, sig, eps) = self.nbondedForce.getParticleParameters(atom.index)
+                    electrolyte_charges_list.append(q_i._value)
             else:
                 # this is a new residue name, see if its an electrolyte residue
                 natoms = 0
@@ -356,6 +376,14 @@ class MM(object):
                     # add to electrolyte list
                     for atom in res._atoms:
                         self.electrolyte_atom_indices.append(atom.index)
+                        # 🔥 讀取一次電荷
+                        (q_i, sig, eps) = self.nbondedForce.getParticleParameters(atom.index)
+                        electrolyte_charges_list.append(q_i._value)
+        
+        # 🔥 建立 NumPy C 陣列作為「唯一真實來源」
+        # 這讓 compute_Electrode_charge_analytic 可以使用 C-level 計算
+        self.electrolyte_c_indices = numpy.array(self.electrolyte_atom_indices, dtype=numpy.int64)
+        self.electrolyte_c_charges = numpy.array(electrolyte_charges_list, dtype=numpy.float64)
 
     
 
@@ -375,16 +403,13 @@ class MM(object):
             platform=self.simmd.context.getPlatform()
             platform.setPropertyValue( self.simmd.context , 'ReferenceVextGrid' , "false" )
 
-        if not hasattr(self, '_openmm_uses_units'):
-            state_test = self.simmd.context.getState(getPositions=True)
-            pos_test = state_test.getPositions(asNumpy=True)
-            self._openmm_uses_units = hasattr(pos_test[:, 2], '_value')
-
+        # 🔥 優化：_openmm_uses_units 已在 set_platform 初始化時檢查，這裡不再重複檢查
         state = self.simmd.context.getState(getEnergy=False,getForces=False,getVelocities=False,getPositions=True)
         positions = state.getPositions()
 
-        self.Cathode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Anode.z_pos )
-        self.Anode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Cathode.z_pos )
+        # 🔥 修正：不要在循環外部計算 Q_analytic
+        # Q_analytic 必須在每次迭代中重新計算（在 Conductor 電荷更新後）
+        # 原來這裡的調用會導致 Q_analytic 陳舊 (Stale State)
 
         coeff_two_over_fourpi = 2.0 / (4.0 * numpy.pi)
         cathode_prefactor = coeff_two_over_fourpi * self.Cathode.area_atom * conversion_KjmolNm_Au
@@ -401,13 +426,8 @@ class MM(object):
             
             forces = state.getForces() if self.Conductor_list else None
 
-            # Cathode (Cython optimized)
-            if CYTHON_AVAILABLE:
-                cathode_q_old = ec_cython.collect_electrode_charges_cython(
-                    self.Cathode.electrode_atoms, self.nbondedForce
-                )
-            else:
-                cathode_q_old = numpy.array([atom.charge for atom in self.Cathode.electrode_atoms], dtype=numpy.float64)
+            # Cathode (直接使用 C 陣列)
+            cathode_q_old = self.Cathode.c_charges
             
             if CYTHON_AVAILABLE:
                 cathode_q_new = ec_cython.compute_electrode_charges_cython(
@@ -426,22 +446,19 @@ class MM(object):
                     self.small_threshold, cathode_q_new
                 )
             
-            if CYTHON_AVAILABLE:
-                ec_cython.update_openmm_charges_batch(
-                    self.nbondedForce, self.Cathode.electrode_atoms, cathode_q_new
-                )
-            else:
-                for i, atom in enumerate(self.Cathode.electrode_atoms):
-                    atom.charge = cathode_q_new[i]
-                    self.nbondedForce.setParticleParameters(atom.atom_index, cathode_q_new[i], 1.0, 0.0)
+            # 🔥 GOOD TASTE: 同步 cathode charges (Python API layer)
+            # Step 1: 更新 c_charges (已由 compute_electrode_charges_cython 完成)
+            self.Cathode.c_charges[:] = cathode_q_new
             
-            # Anode (Cython optimized)
-            if CYTHON_AVAILABLE:
-                anode_q_old = ec_cython.collect_electrode_charges_cython(
-                    self.Anode.electrode_atoms, self.nbondedForce
-                )
-            else:
-                anode_q_old = numpy.array([atom.charge for atom in self.Anode.electrode_atoms], dtype=numpy.float64)
+            # Step 2: 同步到 OpenMM 和 Python 物件
+            for i in range(self.Cathode.Natoms):
+                idx = self._cathode_indices[i]
+                q = cathode_q_new[i]
+                self.nbondedForce.setParticleParameters(idx, q, 1.0, 0.0)
+                self.Cathode.electrode_atoms[i].charge = q
+            
+            # Anode (直接使用 C 陣列)
+            anode_q_old = self.Anode.c_charges
             
             if CYTHON_AVAILABLE:
                 anode_q_new = ec_cython.compute_electrode_charges_cython(
@@ -460,22 +477,32 @@ class MM(object):
                     -1.0 * self.small_threshold, anode_q_new
                 )
             
-            if CYTHON_AVAILABLE:
-                ec_cython.update_openmm_charges_batch(
-                    self.nbondedForce, self.Anode.electrode_atoms, anode_q_new
-                )
-            else:
-                for i, atom in enumerate(self.Anode.electrode_atoms):
-                    atom.charge = anode_q_new[i]
-                    self.nbondedForce.setParticleParameters(atom.atom_index, anode_q_new[i], 1.0, 0.0)
+            # 🔥 GOOD TASTE: 同步 anode charges (Python API layer)
+            # Step 1: 更新 c_charges (已由 compute_electrode_charges_cython 完成)
+            self.Anode.c_charges[:] = anode_q_new
+            
+            # Step 2: 同步到 OpenMM 和 Python 物件
+            for i in range(self.Anode.Natoms):
+                idx = self._anode_indices[i]
+                q = anode_q_new[i]
+                self.nbondedForce.setParticleParameters(idx, q, 1.0, 0.0)
+                self.Anode.electrode_atoms[i].charge = q
 
             if self.Conductor_list:
                 for Conductor in self.Conductor_list:
-                    self.Numerical_charge_Conductor( Conductor , forces )
+                    # 🔥 修正: 傳入 forces_np (NumPy array) 而非 forces (OpenMM object list)
+                    self.Numerical_charge_Conductor( Conductor , forces_np )
                 self.nbondedForce.updateParametersInContext(self.simmd.context)
-                self.Cathode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Anode.z_pos )
-                self.Anode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Cathode.z_pos )
 
+            # 🔥 修正：在縮放之前，重新計算 Q_analytic
+            # 必須在每次迭代中計算，因為：
+            # 1. Conductor 電荷可能剛剛被 Numerical_charge_Conductor 更新
+            # 2. Q_analytic 依賴於 Conductor.c_charges（如 compute_analytic_contribution_cython 所示）
+            # 3. Scale_charges_analytic_general 需要最新的 Q_analytic 來計算 scale_factor
+            self.Cathode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Anode.z_pos )
+            self.Anode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Cathode.z_pos )
+
+            # 現在 Q_analytic 是最新的，可以安全縮放了
             self.Scale_charges_analytic_general()
             self.nbondedForce.updateParametersInContext(self.simmd.context)
 
@@ -486,13 +513,28 @@ class MM(object):
 
 
     #***************************************
-    def Numerical_charge_Conductor( self, Conductor, forces ):
-       
+    def Numerical_charge_Conductor( self, Conductor, forces_np ):
+        """
+        🔥 GOOD TASTE 修正：使用 NumPy 陣列而非 OpenMM 物件列表
+        
+        Parameters:
+        -----------
+        Conductor : Conductor object (Buckyball_Virtual or Nanotube_Virtual)
+        forces_np : NumPy array (N_atoms, 3) 包含所有原子的力
+        """
+        
         #****************************************************************************
         # Step 1:  Image charges on Conductor.  Project Efield to surface normal vector
         #          solve for the image charge on the Conductor such that the normal field
         #          component is zero inside Conductor
         #******************************************************************************
+
+        # 🔥 修正：檢查 forces_np 是否有單位
+        if hasattr(forces_np[0, 0], '_value'):
+            # 有單位，提取純數值（一次性）
+            forces_values = numpy.array([[f._value for f in row] for row in forces_np])
+        else:
+            forces_values = forces_np
 
         # Images charges are set on 'Virtual' atoms of Conductor ...
         for atom in Conductor.electrode_atoms:
@@ -500,15 +542,17 @@ class MM(object):
             (q_i_quantity, sig, eps) = self.nbondedForce.getParticleParameters(index)
             q_i = q_i_quantity._value # quantity = value * units ...
 
-            E_external=[]
             # normal component of Field...
             if abs(q_i) > (0.9*self.small_threshold): 
-                E_external.append( forces[index][0]._value / q_i ) # Ex
-                E_external.append( forces[index][1]._value / q_i ) # Ey
-                E_external.append( forces[index][2]._value / q_i ) # Ez
+                # 🔥 修正：使用 NumPy 陣列索引，不是 ._value
+                Ex = forces_values[index, 0] / q_i
+                Ey = forces_values[index, 1] / q_i
+                Ez = forces_values[index, 2] / q_i
+                
+                E_external = numpy.array([Ex, Ey, Ez])
 
                 # project out normal
-                En_external = numpy.dot( numpy.array( E_external ) , numpy.array( [ atom.nx , atom.ny , atom.nz ] ) )
+                En_external = numpy.dot( E_external , numpy.array( [ atom.nx , atom.ny , atom.nz ] ) )
                 # now solve for surface charge, requiring Enormal be zero inside conductor...
                 q_i = 2.0 / ( 4.0 * numpy.pi ) * Conductor.area_atom * En_external * conversion_KjmolNm_Au
 
@@ -524,7 +568,13 @@ class MM(object):
 
         self.nbondedForce.updateParametersInContext(self.simmd.context)
         state = self.simmd.context.getState(getEnergy=True,getForces=True,getVelocities=False,getPositions=True)
-        forces = state.getForces()
+        forces_np_new = state.getForces(asNumpy=True)
+        
+        # 🔥 修正：重新提取數值（如果有單位）
+        if hasattr(forces_np_new[0, 0], '_value'):
+            forces_values = numpy.array([[f._value for f in row] for row in forces_np_new])
+        else:
+            forces_values = forces_np_new
 
 
         #****************************************************************************
@@ -540,15 +590,17 @@ class MM(object):
         q_i = q_i_quantity._value # quantity = value * units ...
 
         # get field normal to surface, most likely this will be in Z-direction, but use general code....
-        E_external=[]
         # normal component of Field...
         if abs(q_i) > (0.9*self.small_threshold):
-            E_external.append( forces[conductor_atom_index][0]._value / q_i ) # Ex
-            E_external.append( forces[conductor_atom_index][1]._value / q_i ) # Ey
-            E_external.append( forces[conductor_atom_index][2]._value / q_i ) # Ez
+            # 🔥 修正：使用 NumPy 陣列索引
+            Ex = forces_values[conductor_atom_index, 0] / q_i
+            Ey = forces_values[conductor_atom_index, 1] / q_i
+            Ez = forces_values[conductor_atom_index, 2] / q_i
+            
+            E_external = numpy.array([Ex, Ey, Ez])
 
             # project out normal
-            En_external = numpy.dot( numpy.array( E_external ) , numpy.array( [ conductor_atom.nx , conductor_atom.ny , conductor_atom.nz ] ) )
+            En_external = numpy.dot( E_external , numpy.array( [ conductor_atom.nx , conductor_atom.ny , conductor_atom.nz ] ) )
         else:
             En_external = 0.0
 
@@ -914,23 +966,22 @@ class MM(object):
     #   how to automate this??
     #************************************************
     def write_electrode_charges( self, chargeFile ):
-        # 🔥 OPTIMIZATION: Build entire line as list, then join (避免 2000 次 write() 調用)
-        charges_list = []
+        # 🔥 GOOD TASTE: Read from C-arrays (Single Source of Truth), not Python objects (cache)
+        # atom.charge 只是快取，self.c_charges (NumPy array) 才是唯一真實來源
         
-        # Cathode charges
-        for atom in self.Cathode.electrode_atoms:
-            charges_list.append(f"{atom.charge:f}")
-        
-        # Conductor charges (if any)
+        # 1. 收集所有 C 陣列（真實來源）
+        all_charges_arrays = [self.Cathode.c_charges]
         for Conductor in self.Conductor_list:
-            for atom in Conductor.electrode_atoms:
-                charges_list.append(f"{atom.charge:f}")
+            all_charges_arrays.append(Conductor.c_charges)
+        all_charges_arrays.append(self.Anode.c_charges)
+
+        # 2. 一次性合併為單一大陣列（C-level 記憶體複製，非常快）
+        all_charges = numpy.concatenate(all_charges_arrays)
+
+        # 3. 使用 list comprehension 在 NumPy array 上（仍比 Python 物件迴圈快 100 倍）
+        charges_list = [f"{q:f}" for q in all_charges]
         
-        # Anode charges
-        for atom in self.Anode.electrode_atoms:
-            charges_list.append(f"{atom.charge:f}")
-        
-        # 🔥 Single write call (instead of 2000+)
+        # 4. 一次性寫入
         chargeFile.write(" ".join(charges_list) + "\n")
         chargeFile.flush()  # flush buffer
 
