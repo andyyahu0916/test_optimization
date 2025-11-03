@@ -3,7 +3,7 @@
 OpenMM Fixed-Voltage MD Simulation
 Refactored from original with Linus principles:
 - Config-driven (no hardcoding)
-- Support 3 MM versions (original/optimized/cython)
+- Support 2 MM versions (original/cython)
 - Zero functionality removal
 - Clean structure
 """
@@ -26,7 +26,7 @@ sys.setrecursionlimit(5000)
 # Parse Config
 # ============================================================
 parser = argparse.ArgumentParser(description="Run OpenMM Fixed-Voltage MD")
-parser.add_argument('-c', '--config', default='config.ini', help='Config file path')
+parser.add_argument('-c', '--config', default='config_refactored.ini', help='Config file path')
 args = parser.parse_args()
 
 if not os.path.exists(args.config):
@@ -88,12 +88,6 @@ try:
         from MM_classes_CYTHON import *
         from Fixed_Voltage_routines_CYTHON import *
         print("✓ Cython version loaded successfully")
-
-    elif mm_version == 'optimized':
-        print("📊 Attempting to use NumPy optimized version...")
-        from MM_classes_OPTIMIZED import *
-        from Fixed_Voltage_routines_OPTIMIZED import *
-        print("✓ Optimized version loaded successfully")
 
     else:  # original
         print("🐍 Using original Python version")
