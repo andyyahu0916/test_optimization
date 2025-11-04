@@ -25,11 +25,11 @@ conda install -c nvidia -c conda-forge \
     -y
 
 # 2. 環境變數（永久寫入環境）
-conda env config vars set \
-    PATH="$CONDA_PREFIX/bin:$PATH" \
-    LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH" \
-    CUDA_HOME="$CONDA_PREFIX" \
-    OPENMM_CUDA_COMPILER="$CONDA_PREFIX/bin/nvcc"
+#conda env config vars set \
+    #PATH="$CONDA_PREFIX/bin:$PATH" \
+    #LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH" \
+    #CUDA_HOME="$CONDA_PREFIX" \
+    #OPENMM_CUDA_COMPILER="$CONDA_PREFIX/bin/nvcc"
 
 # 重啟環境變數（或重新 activate 環境）
 conda deactivate
