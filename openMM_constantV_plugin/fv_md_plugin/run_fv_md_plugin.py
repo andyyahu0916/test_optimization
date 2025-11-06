@@ -78,6 +78,22 @@ def setup_system(pdb_file, residue_xml_files, forcefield_xml_files):
         rigidWater=True
     )
 
+    # Step 7: [CRITICAL] Set periodic boundary conditions for bonded forces
+    # This is essential for graphene electrodes that span periodic boundaries
+    # Without this, graphene bonds crossing PBC will have incorrect forces
+    print("Setting periodic boundary conditions for bonded forces (graphene)...")
+    from openmm import HarmonicBondForce, HarmonicAngleForce, PeriodicTorsionForce, RBTorsionForce
+    for i in range(system.getNumForces()):
+        f = system.getForce(i)
+        if (
+            isinstance(f, HarmonicBondForce) or
+            isinstance(f, HarmonicAngleForce) or
+            isinstance(f, PeriodicTorsionForce) or
+            isinstance(f, RBTorsionForce)
+        ):
+            f.setUsesPeriodicBoundaryConditions(True)
+    print("✓ Periodic bonded forces enabled.")
+
     # Find NonbondedForce
     nonbonded = None
     for force in system.getForces():

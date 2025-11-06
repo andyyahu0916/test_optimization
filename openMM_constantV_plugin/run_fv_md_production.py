@@ -48,6 +48,7 @@ from run_fv_md_plugin import (
     identify_electrolyte_atoms,
     initialize_constantv_plugin
 )
+from exclusions import apply_all_exclusions
 
 def main():
     parser = argparse.ArgumentParser(description="Production FV-MD with ConstantVPlugin")
@@ -130,6 +131,24 @@ def main():
         modeller.topology,
         all_electrode_atoms,
         include_drude=True  # CRITICAL for correct physics
+    )
+
+    # ========================================================================
+    # Apply Force Field Exclusions (CRITICAL!)
+    # ========================================================================
+    # This MUST be done after system creation but BEFORE plugin initialization.
+    # Without these exclusions, electrode atoms would interact with each other
+    # through BOTH NonbondedForce AND ConstantVPlugin, causing double-counting
+    # and completely incorrect physics.
+    print("\n" + "="*70)
+    print("APPLYING FORCE FIELD EXCLUSIONS")
+    print("="*70)
+    apply_all_exclusions(
+        system,
+        modeller.topology,
+        cathode_atoms,
+        anode_atoms,
+        apply_sapt=True  # Set to False if not using SAPT-FF
     )
 
     # ========================================================================

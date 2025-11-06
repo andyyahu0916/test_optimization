@@ -1,7 +1,0 @@
-ConstantVPluginWrapper.cpp
-constantvplugin.py
-setup.py
-constantvplugin.egg-info/PKG-INFO
-constantvplugin.egg-info/SOURCES.txt
-constantvplugin.egg-info/dependency_links.txt
-constantvplugin.egg-info/top_level.txt

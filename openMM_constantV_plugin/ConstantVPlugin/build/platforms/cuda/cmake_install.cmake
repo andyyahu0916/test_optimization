@@ -37,9 +37,9 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
-# Set path to fallback-tool for dependency-resolution.
+# Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-objdump")
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
@@ -62,10 +62,10 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
      NOT IS_SYMLINK "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libConstantVPluginCUDA.so")
     file(RPATH_CHANGE
          FILE "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libConstantVPluginCUDA.so"
-         OLD_RPATH "/home/andy/miniforge3/envs/cuda/lib/plugins:/home/andy/test_optimization/openMM_constantV_plugin/ConstantVPlugin/build:"
+         OLD_RPATH "/home/andy/miniforge3/envs/cuda/lib:/home/andy/miniforge3/envs/cuda/lib/plugins:/home/andy/test_optimization/openMM_constantV_plugin/ConstantVPlugin/build:"
          NEW_RPATH "")
     if(CMAKE_INSTALL_DO_STRIP)
-      execute_process(COMMAND "/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-strip" "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libConstantVPluginCUDA.so")
+      execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libConstantVPluginCUDA.so")
     endif()
   endif()
 endif()
@@ -77,9 +77,3 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
   include("/home/andy/test_optimization/openMM_constantV_plugin/ConstantVPlugin/build/platforms/cuda/CMakeFiles/ConstantVPluginCUDA.dir/install-cxx-module-bmi-noconfig.cmake" OPTIONAL)
 endif()
 
-string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
-       "${CMAKE_INSTALL_MANIFEST_FILES}")
-if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/home/andy/test_optimization/openMM_constantV_plugin/ConstantVPlugin/build/platforms/cuda/install_local_manifest.txt"
-     "${CMAKE_INSTALL_MANIFEST_CONTENT}")
-endif()

@@ -55,6 +55,7 @@ anode_index = 1,3
 ✅ **Electrodes frozen** (mass=0, required for C_inv validity)
 ✅ **Config-driven** workflow (just edit .ini file)
 ✅ **Auto-detection** of best platform (CUDA/Reference)
+✅ **Force field exclusions** applied (CRITICAL - prevents double-counting)
 
 ---
 
@@ -64,6 +65,9 @@ anode_index = 1,3
 - `precompute_cinv.py` - Compute C_inv matrix
 - `config_refactored.ini` - Configuration
 - `test_production_ready.py` - Run tests
+- `test_exclusions.py` - Test force field exclusions
+- `fv_md_plugin/exclusions.py` - Exclusions implementation
+- `EXCLUSIONS_CRITICAL_FIX.md` - Documentation of critical fix
 - `PRODUCTION_READY.md` - Full documentation
 
 ---

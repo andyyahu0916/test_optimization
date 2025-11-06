@@ -385,7 +385,11 @@ class MM(object):
         self.electrolyte_c_indices = numpy.array(self.electrolyte_atom_indices, dtype=numpy.int64)
         self.electrolyte_c_charges = numpy.array(electrolyte_charges_list, dtype=numpy.float64)
 
-    
+    def update_electrolyte_charges(self):
+        """Updates the electrolyte charge array to reflect the current system state."""
+        for i, idx in enumerate(self.electrolyte_c_indices):
+            (q_i, sig, eps) = self.nbondedForce.getParticleParameters(int(idx))
+            self.electrolyte_c_charges[i] = q_i._value
 
 
 
@@ -397,119 +401,105 @@ class MM(object):
     # 🔥 CYTHON OPTIMIZED: Fixed-Voltage Poisson Solver
     #************************************************
     def Poisson_solver_fixed_voltage(self, Niterations=3):
-        """Cython-optimized Poisson solver - P14 No Cache Version"""
-        
-        if self.QMMM :
-            platform=self.simmd.context.getPlatform()
-            platform.setPropertyValue( self.simmd.context , 'ReferenceVextGrid' , "false" )
+        """
+        Corrected Poisson solver implementing the proper SCF protocol.
+        - Fetches current system state (positions/forces) at the start of each iteration.
+        - Recalculates forces after every charge modification (cathode, anode, each conductor).
+        """
+        # 🔥 修復 1: 每次呼叫前更新電解質電荷
+        self.update_electrolyte_charges()
 
-        # 🔥 優化：_openmm_uses_units 已在 set_platform 初始化時檢查，這裡不再重複檢查
-        state = self.simmd.context.getState(getEnergy=False,getForces=False,getVelocities=False,getPositions=True)
-        positions = state.getPositions()
+        if self.QMMM:
+            platform = self.simmd.context.getPlatform()
+            platform.setPropertyValue(self.simmd.context, 'ReferenceVextGrid', "false")
 
-        # 🔥 修正：不要在循環外部計算 Q_analytic
-        # Q_analytic 必須在每次迭代中重新計算（在 Conductor 電荷更新後）
-        # 原來這裡的調用會導致 Q_analytic 陳舊 (Stale State)
-
+        # Pre-calculate constants outside the loop
         coeff_two_over_fourpi = 2.0 / (4.0 * numpy.pi)
         cathode_prefactor = coeff_two_over_fourpi * self.Cathode.area_atom * conversion_KjmolNm_Au
         anode_prefactor = -coeff_two_over_fourpi * self.Anode.area_atom * conversion_KjmolNm_Au
         voltage_term_cathode = self.Cathode.Voltage / self.Lgap
         voltage_term_anode = self.Anode.Voltage / self.Lgap
         threshold_check = 0.9 * self.small_threshold
-        
+
         for i_iter in range(Niterations):
-            state = self.simmd.context.getState(getEnergy=False,getForces=True,getVelocities=False,getPositions=False)
-            
+            # 1. Get CURRENT state at the beginning of the iteration
+            state = self.simmd.context.getState(getPositions=True, getForces=True)
+            positions = state.getPositions() # Keep positions constant for one full SCF iteration
             forces_np = state.getForces(asNumpy=True)
             forces_z = forces_np[:, 2]._value if self._openmm_uses_units else forces_np[:, 2]
-            
-            forces = state.getForces() if self.Conductor_list else None
 
-            # Cathode (直接使用 C 陣列)
+            # 2. Update Cathode
             cathode_q_old = self.Cathode.c_charges
-            
             if CYTHON_AVAILABLE:
                 cathode_q_new = ec_cython.compute_electrode_charges_cython(
                     forces_z, cathode_q_old, self._cathode_indices,
                     cathode_prefactor, voltage_term_cathode,
                     threshold_check, self.small_threshold, 1.0
                 )
-            else:
-                cathode_Ez = numpy.where(
-                    numpy.abs(cathode_q_old) > threshold_check,
-                    forces_z[self._cathode_indices] / cathode_q_old, 0.0
-                )
+            else: # Numpy fallback
+                cathode_Ez = numpy.where(numpy.abs(cathode_q_old) > threshold_check, forces_z[self._cathode_indices] / cathode_q_old, 0.0)
                 cathode_q_new = cathode_prefactor * (voltage_term_cathode + cathode_Ez)
-                cathode_q_new = numpy.where(
-                    numpy.abs(cathode_q_new) < self.small_threshold,
-                    self.small_threshold, cathode_q_new
-                )
+                cathode_q_new = numpy.where(numpy.abs(cathode_q_new) < self.small_threshold, self.small_threshold, cathode_q_new)
             
-            # 🔥 GOOD TASTE: 同步 cathode charges (Python API layer)
-            # Step 1: 更新 c_charges (已由 compute_electrode_charges_cython 完成)
             self.Cathode.c_charges[:] = cathode_q_new
-            
-            # Step 2: 同步到 OpenMM 和 Python 物件
             for i in range(self.Cathode.Natoms):
-                idx = self._cathode_indices[i]
-                q = cathode_q_new[i]
-                self.nbondedForce.setParticleParameters(idx, q, 1.0, 0.0)
-                self.Cathode.electrode_atoms[i].charge = q
-            
-            # Anode (直接使用 C 陣列)
+                self.nbondedForce.setParticleParameters(self._cathode_indices[i], cathode_q_new[i], 1.0, 0.0)
+                self.Cathode.electrode_atoms[i].charge = cathode_q_new[i]
+
+            # 3. RECALCULATE forces after cathode update
+            self.nbondedForce.updateParametersInContext(self.simmd.context)
+            state = self.simmd.context.getState(getForces=True)
+            forces_np = state.getForces(asNumpy=True)
+            forces_z = forces_np[:, 2]._value if self._openmm_uses_units else forces_np[:, 2]
+
+            # 4. Update Anode
             anode_q_old = self.Anode.c_charges
-            
             if CYTHON_AVAILABLE:
                 anode_q_new = ec_cython.compute_electrode_charges_cython(
                     forces_z, anode_q_old, self._anode_indices,
                     anode_prefactor, voltage_term_anode,
                     threshold_check, self.small_threshold, -1.0
                 )
-            else:
-                anode_Ez = numpy.where(
-                    numpy.abs(anode_q_old) > threshold_check,
-                    forces_z[self._anode_indices] / anode_q_old, 0.0
-                )
+            else: # Numpy fallback
+                anode_Ez = numpy.where(numpy.abs(anode_q_old) > threshold_check, forces_z[self._anode_indices] / anode_q_old, 0.0)
                 anode_q_new = anode_prefactor * (voltage_term_anode + anode_Ez)
-                anode_q_new = numpy.where(
-                    numpy.abs(anode_q_new) < self.small_threshold,
-                    -1.0 * self.small_threshold, anode_q_new
-                )
-            
-            # 🔥 GOOD TASTE: 同步 anode charges (Python API layer)
-            # Step 1: 更新 c_charges (已由 compute_electrode_charges_cython 完成)
+                anode_q_new = numpy.where(numpy.abs(anode_q_new) < self.small_threshold, -1.0 * self.small_threshold, anode_q_new)
+
             self.Anode.c_charges[:] = anode_q_new
-            
-            # Step 2: 同步到 OpenMM 和 Python 物件
             for i in range(self.Anode.Natoms):
-                idx = self._anode_indices[i]
-                q = anode_q_new[i]
-                self.nbondedForce.setParticleParameters(idx, q, 1.0, 0.0)
-                self.Anode.electrode_atoms[i].charge = q
+                self.nbondedForce.setParticleParameters(self._anode_indices[i], anode_q_new[i], 1.0, 0.0)
+                self.Anode.electrode_atoms[i].charge = anode_q_new[i]
 
+            # 5. Handle conductors ONE AT A TIME with force recalculation
             if self.Conductor_list:
-                for Conductor in self.Conductor_list:
-                    # 🔥 修正: 傳入 forces_np (NumPy array) 而非 forces (OpenMM object list)
-                    self.Numerical_charge_Conductor( Conductor , forces_np )
+                # Recalculate forces before starting conductor loop
                 self.nbondedForce.updateParametersInContext(self.simmd.context)
+                
+                for Conductor in self.Conductor_list:
+                    # Get FRESH forces for this conductor
+                    state = self.simmd.context.getState(getForces=True)
+                    forces_np_conductor = state.getForces(asNumpy=True)
+                    
+                    self.Numerical_charge_Conductor(Conductor, forces_np_conductor)
+                    
+                    # RECALCULATE forces after EACH conductor update
+                    self.nbondedForce.updateParametersInContext(self.simmd.context)
 
-            # 🔥 修正：在縮放之前，重新計算 Q_analytic
-            # 必須在每次迭代中計算，因為：
-            # 1. Conductor 電荷可能剛剛被 Numerical_charge_Conductor 更新
-            # 2. Q_analytic 依賴於 Conductor.c_charges（如 compute_analytic_contribution_cython 所示）
-            # 3. Scale_charges_analytic_general 需要最新的 Q_analytic 來計算 scale_factor
-            self.Cathode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Anode.z_pos )
-            self.Anode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Cathode.z_pos )
+            # 6. Analytic Correction (after all charges in the iteration are updated)
+            # Use the positions from the start of this iteration
+            self.Cathode.compute_Electrode_charge_analytic(self, positions, self.Conductor_list, z_opposite=self.Anode.z_pos)
+            self.Anode.compute_Electrode_charge_analytic(self, positions, self.Conductor_list, z_opposite=self.Cathode.z_pos)
 
-            # 現在 Q_analytic 是最新的，可以安全縮放了
             self.Scale_charges_analytic_general()
+            
+            # Final update for this iteration
             self.nbondedForce.updateParametersInContext(self.simmd.context)
 
-        self.Scale_charges_analytic_general( print_flag = True )
+        # After loop, for printing converged charges
+        self.Scale_charges_analytic_general(print_flag=True)
 
-        if self.QMMM :
-            platform.setPropertyValue( self.simmd.context , 'ReferenceVextGrid' , "true" )
+        if self.QMMM:
+            platform.setPropertyValue(self.simmd.context, 'ReferenceVextGrid', "true")
 
 
     #***************************************
@@ -646,6 +636,9 @@ class MM(object):
             q_i = q_i_quantity._value +  dq_atom
             atom.charge = q_i
             self.nbondedForce.setParticleParameters(index, q_i, sig , eps)
+        
+        # 🔥 修復 2: 確保導體電荷更新後同步到 OpenMM
+        self.nbondedForce.updateParametersInContext(self.simmd.context)
 
 
 

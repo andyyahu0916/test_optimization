@@ -43,6 +43,9 @@ echo "======================================================================"
 echo "Config: $CONFIG"
 echo "C_inv file: $CINV_FILE"
 echo ""
+echo "IMPORTANT: This version includes CRITICAL force field exclusions fix."
+echo "           See EXCLUSIONS_CRITICAL_FIX.md for details."
+echo ""
 
 # Check if config exists
 if [ ! -f "$CONFIG" ]; then
