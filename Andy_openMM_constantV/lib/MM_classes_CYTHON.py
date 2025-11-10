@@ -406,9 +406,6 @@ class MM(object):
         - Fetches current system state (positions/forces) at the start of each iteration.
         - Recalculates forces after every charge modification (cathode, anode, each conductor).
         """
-        # 🔥 修復 1: 每次呼叫前更新電解質電荷
-        self.update_electrolyte_charges()
-
         if self.QMMM:
             platform = self.simmd.context.getPlatform()
             platform.setPropertyValue(self.simmd.context, 'ReferenceVextGrid', "false")
@@ -422,6 +419,9 @@ class MM(object):
         threshold_check = 0.9 * self.small_threshold
 
         for i_iter in range(Niterations):
+            # 🔥 修復：每次迭代都更新電解質電荷，確保使用最新的系統狀態
+            # 這對於極化模型和正確的 SCF 自洽性至關重要
+            self.update_electrolyte_charges()
             # 1. Get CURRENT state at the beginning of the iteration
             state = self.simmd.context.getState(getPositions=True, getForces=True)
             positions = state.getPositions() # Keep positions constant for one full SCF iteration
@@ -470,10 +470,11 @@ class MM(object):
                 self.nbondedForce.setParticleParameters(self._anode_indices[i], anode_q_new[i], 1.0, 0.0)
                 self.Anode.electrode_atoms[i].charge = anode_q_new[i]
 
+            # 🔥 修復：確保 Anode 更新後同步到 context（無論是否有導體）
+            self.nbondedForce.updateParametersInContext(self.simmd.context)
+
             # 5. Handle conductors ONE AT A TIME with force recalculation
             if self.Conductor_list:
-                # Recalculate forces before starting conductor loop
-                self.nbondedForce.updateParametersInContext(self.simmd.context)
                 
                 for Conductor in self.Conductor_list:
                     # Get FRESH forces for this conductor

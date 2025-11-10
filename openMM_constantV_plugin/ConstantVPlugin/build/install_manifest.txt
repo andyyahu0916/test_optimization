@@ -1,6 +1,6 @@
 /home/andy/miniforge3/envs/cuda/include/ConstantVForce.h
+/home/andy/miniforge3/envs/cuda/include/ConstantVIntegrator.h
 /home/andy/miniforge3/envs/cuda/include/ConstantVKernels.h
 /home/andy/miniforge3/envs/cuda/include/internal/ConstantVForceImpl.h
 /home/andy/miniforge3/envs/cuda/lib/plugins/libConstantVPluginReference.so
-/home/andy/miniforge3/envs/cuda/lib/plugins/libConstantVPluginCUDA.so
 /home/andy/miniforge3/envs/cuda/lib/libConstantVPlugin.so

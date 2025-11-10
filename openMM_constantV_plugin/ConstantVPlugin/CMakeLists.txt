@@ -64,8 +64,8 @@ INSTALL(FILES ${API_ONLY_INCLUDE_FILES_INTERNAL} DESTINATION include/internal)
 # Build Reference platform
 ADD_SUBDIRECTORY(platforms/reference)
 
-# Build CUDA platform
-ADD_SUBDIRECTORY(platforms/cuda)
+# Build CUDA platform (暂时禁用，等Reference测试通过后再翻译)
+# ADD_SUBDIRECTORY(platforms/cuda)
 
 # Build Python bindings
 FIND_PROGRAM(PYTHON_EXECUTABLE python)

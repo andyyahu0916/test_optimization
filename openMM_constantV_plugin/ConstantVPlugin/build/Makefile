@@ -67,8 +67,8 @@ CMAKE_BINARY_DIR = /home/andy/test_optimization/openMM_constantV_plugin/Constant
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake cache editor..."
+	/home/andy/miniforge3/envs/cuda/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -188,19 +188,6 @@ ConstantVPluginReference/fast:
 .PHONY : ConstantVPluginReference/fast
 
 #=============================================================================
-# Target rules for targets named ConstantVPluginCUDA
-
-# Build rule for target.
-ConstantVPluginCUDA: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ConstantVPluginCUDA
-.PHONY : ConstantVPluginCUDA
-
-# fast build rule for target.
-ConstantVPluginCUDA/fast:
-	$(MAKE) $(MAKESILENT) -f platforms/cuda/CMakeFiles/ConstantVPluginCUDA.dir/build.make platforms/cuda/CMakeFiles/ConstantVPluginCUDA.dir/build
-.PHONY : ConstantVPluginCUDA/fast
-
-#=============================================================================
 # Target rules for targets named PythonInstall
 
 # Build rule for target.
@@ -236,6 +223,30 @@ openmmapi/src/ConstantVForce.s: openmmapi/src/ConstantVForce.cpp.s
 openmmapi/src/ConstantVForce.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVPlugin.dir/build.make CMakeFiles/ConstantVPlugin.dir/openmmapi/src/ConstantVForce.cpp.s
 .PHONY : openmmapi/src/ConstantVForce.cpp.s
+
+openmmapi/src/ConstantVIntegrator.o: openmmapi/src/ConstantVIntegrator.cpp.o
+.PHONY : openmmapi/src/ConstantVIntegrator.o
+
+# target to build an object file
+openmmapi/src/ConstantVIntegrator.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVPlugin.dir/build.make CMakeFiles/ConstantVPlugin.dir/openmmapi/src/ConstantVIntegrator.cpp.o
+.PHONY : openmmapi/src/ConstantVIntegrator.cpp.o
+
+openmmapi/src/ConstantVIntegrator.i: openmmapi/src/ConstantVIntegrator.cpp.i
+.PHONY : openmmapi/src/ConstantVIntegrator.i
+
+# target to preprocess a source file
+openmmapi/src/ConstantVIntegrator.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVPlugin.dir/build.make CMakeFiles/ConstantVPlugin.dir/openmmapi/src/ConstantVIntegrator.cpp.i
+.PHONY : openmmapi/src/ConstantVIntegrator.cpp.i
+
+openmmapi/src/ConstantVIntegrator.s: openmmapi/src/ConstantVIntegrator.cpp.s
+.PHONY : openmmapi/src/ConstantVIntegrator.s
+
+# target to generate assembly for a file
+openmmapi/src/ConstantVIntegrator.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVPlugin.dir/build.make CMakeFiles/ConstantVPlugin.dir/openmmapi/src/ConstantVIntegrator.cpp.s
+.PHONY : openmmapi/src/ConstantVIntegrator.cpp.s
 
 openmmapi/src/internal/ConstantVForceImpl.o: openmmapi/src/internal/ConstantVForceImpl.cpp.o
 .PHONY : openmmapi/src/internal/ConstantVForceImpl.o
@@ -275,11 +286,13 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... PythonInstall"
 	@echo "... ConstantVPlugin"
-	@echo "... ConstantVPluginCUDA"
 	@echo "... ConstantVPluginReference"
 	@echo "... openmmapi/src/ConstantVForce.o"
 	@echo "... openmmapi/src/ConstantVForce.i"
 	@echo "... openmmapi/src/ConstantVForce.s"
+	@echo "... openmmapi/src/ConstantVIntegrator.o"
+	@echo "... openmmapi/src/ConstantVIntegrator.i"
+	@echo "... openmmapi/src/ConstantVIntegrator.s"
 	@echo "... openmmapi/src/internal/ConstantVForceImpl.o"
 	@echo "... openmmapi/src/internal/ConstantVForceImpl.i"
 	@echo "... openmmapi/src/internal/ConstantVForceImpl.s"

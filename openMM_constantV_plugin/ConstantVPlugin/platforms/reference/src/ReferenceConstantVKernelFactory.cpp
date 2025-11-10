@@ -16,6 +16,7 @@ extern "C" OPENMM_EXPORT void registerKernelFactories() {
         if (dynamic_cast<ReferencePlatform*>(&platform) != NULL) {
             ReferenceConstantVKernelFactory* factory = new ReferenceConstantVKernelFactory();
             platform.registerKernelFactory(CalcConstantVKernel::Name(), factory);
+            platform.registerKernelFactory(IntegrateConstantVStepKernel::Name(), factory);
         }
     }
 }
@@ -28,5 +29,7 @@ KernelImpl* ReferenceConstantVKernelFactory::createKernelImpl(std::string name, 
     ReferencePlatform::PlatformData& data = *static_cast<ReferencePlatform::PlatformData*>(context.getPlatformData());
     if (name == CalcConstantVKernel::Name())
         return new ReferenceCalcConstantVKernel(name, platform);
+    if (name == IntegrateConstantVStepKernel::Name())
+        return new ReferenceIntegrateConstantVStepKernel(name, platform);
     throw OpenMMException((std::string("Tried to create kernel with illegal kernel name '")+name+"'").c_str());
 }

@@ -39,7 +39,7 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/usr/bin/objdump")
+  set(CMAKE_OBJDUMP "/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-objdump")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
@@ -62,10 +62,10 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
      NOT IS_SYMLINK "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libConstantVPluginReference.so")
     file(RPATH_CHANGE
          FILE "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libConstantVPluginReference.so"
-         OLD_RPATH "/home/andy/miniforge3/envs/cuda/lib:/home/andy/miniforge3/envs/cuda/lib/plugins:/home/andy/test_optimization/openMM_constantV_plugin/ConstantVPlugin/build:"
+         OLD_RPATH "/home/andy/miniforge3/envs/cuda/lib/plugins:/home/andy/test_optimization/openMM_constantV_plugin/ConstantVPlugin/build:"
          NEW_RPATH "")
     if(CMAKE_INSTALL_DO_STRIP)
-      execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libConstantVPluginReference.so")
+      execute_process(COMMAND "/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-strip" "$ENV{DESTDIR}/home/andy/miniforge3/envs/cuda/lib/plugins/libConstantVPluginReference.so")
     endif()
   endif()
 endif()
