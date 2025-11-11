@@ -21,6 +21,7 @@ set(CONSTANTVPLUGIN_HEADER_DIR "${CMAKE_SOURCE_DIR}/openmmapi/include")
 set(CONSTANTVPLUGIN_LIBRARY_DIR "${CMAKE_BINARY_DIR}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
 add_custom_command(TARGET PythonInstall
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/helpers.py" "${CMAKE_CURRENT_BINARY_DIR}/constantvplugin_helpers.py"
     COMMAND "${PYTHON_EXECUTABLE}" setup.py build
     COMMAND "${PYTHON_EXECUTABLE}" setup.py install
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"

@@ -9,6 +9,24 @@ LINK_DIRECTORIES("${OPENMM_DIR}/lib" "${OPENMM_DIR}/lib/plugins")
 
 SET(CMAKE_CXX_STANDARD 11)
 
+# Set build type to Release for optimizations
+IF(NOT CMAKE_BUILD_TYPE)
+    SET(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+ENDIF()
+
+# Compiler optimization flags
+SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -ffast-math -funroll-loops")
+
+# OpenMP support
+FIND_PACKAGE(OpenMP)
+IF(OPENMP_FOUND)
+    MESSAGE(STATUS "OpenMP found! Enabling parallel optimization")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+ELSE()
+    MESSAGE(WARNING "OpenMP not found, building without parallel support")
+ENDIF()
+
 IF(APPLE)
     SET(CMAKE_INSTALL_NAME_DIR "@rpath")
     SET(EXTRA_COMPILE_FLAGS "-msse2 -stdlib=libc++")
@@ -64,8 +82,8 @@ INSTALL(FILES ${API_ONLY_INCLUDE_FILES_INTERNAL} DESTINATION include/internal)
 # Build Reference platform
 ADD_SUBDIRECTORY(platforms/reference)
 
-# Build CUDA platform (暂时禁用，等Reference测试通过后再翻译)
-# ADD_SUBDIRECTORY(platforms/cuda)
+# Build CUDA platform (Reference -> CUDA translation completed)
+ADD_SUBDIRECTORY(platforms/cuda)
 
 # Build Python bindings
 FIND_PROGRAM(PYTHON_EXECUTABLE python)

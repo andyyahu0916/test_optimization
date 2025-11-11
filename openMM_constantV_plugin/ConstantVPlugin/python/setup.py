@@ -25,6 +25,6 @@ extension = Extension(name='_constantvplugin',
 
 setup(name='constantvplugin',
       version='1.0',
-      py_modules=['constantvplugin'],
+      py_modules=['constantvplugin', 'constantvplugin_helpers'],
       ext_modules=[extension],
      )

@@ -65,6 +65,9 @@ private:
     std::vector<double> particleSigmas;
     std::vector<double> particleEpsilons;
 
+    // Lazy initialization flag (deferred from initialize() to execute())
+    bool chargesInitialized;
+
     // ═══════════════════════════════════════════════════════════
     // 辅助函数（对应教授的类方法）
     // ═══════════════════════════════════════════════════════════
@@ -100,6 +103,14 @@ private:
         double Q_analytic,
         bool printFlag = false
     );
+
+private:
+    /**
+     * Initialize electrode charges (deferred from initialize() to first execute())
+     * This follows OpenMM plugin contract: initialize() must be side-effect free
+     * @param context  OpenMM context (needed for updateParametersInContext)
+     */
+    void initializeElectrodeCharges(OpenMM::ContextImpl& context);
 };
 
 // ═══════════════════════════════════════════════════════════

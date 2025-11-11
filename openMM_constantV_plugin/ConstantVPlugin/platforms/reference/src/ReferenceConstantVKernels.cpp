@@ -67,6 +67,8 @@ static constexpr double SMALL_THRESHOLD = 1e-6;
 // ═══════════════════════════════════════════════════════════
 
 void ReferenceCalcConstantVKernel::initialize(const System& system, const ConstantVForce& force) {
+    // Initialize lazy flag
+    chargesInitialized = false;
     // ═══════════════════════════════════════════════════════════
     // 从Force获取参数（教授算法需要的所有参数）
     // ═══════════════════════════════════════════════════════════
@@ -161,14 +163,23 @@ void ReferenceCalcConstantVKernel::initialize(const System& system, const Consta
     nIterations = force.getNumIterations();
 
     // ═══════════════════════════════════════════════════════════
-    // 修復Bug #6: 計算並設置初始電荷
-    // 對應Python: initialize_Charge() in Fixed_Voltage_routines.py:278-303
+    // OpenMM Plugin Contract: initialize() must be side-effect free!
+    // Charge initialization is DEFERRED to first execute() call
+    // (See initializeElectrodeCharges() below)
     // ═══════════════════════════════════════════════════════════
+}
 
+// ═══════════════════════════════════════════════════════════
+// initializeElectrodeCharges() - 初始化電極電荷（延遲到execute()）
+// 對應Python: initialize_Charge() in Fixed_Voltage_routines.py:278-303
+// OpenMM Plugin Contract: This must be called from execute(), NOT initialize()!
+// ═══════════════════════════════════════════════════════════
+
+void ReferenceCalcConstantVKernel::initializeElectrodeCharges(ContextImpl& context) {
     // Line 286-288: 檢查電壓是否很小
     bool flag_small = false;
     if (fabs(voltage) < 0.01) {
-        std::cout << "adding small value to initial charges in initialize_Charge routine for small Voltage input..." << std::endl;
+        std::cout << "[Reference] Adding small value to initial charges for small Voltage input..." << std::endl;
         flag_small = true;
     }
 
@@ -201,6 +212,13 @@ void ReferenceCalcConstantVKernel::initialize(const System& system, const Consta
         currentCharges[atomIdx] = q_i;
         nonbondedForce->setParticleParameters(atomIdx, q_i, 1.0, 0.0);
     }
+
+    // ✅ CRITICAL: Update OpenMM's internal state!
+    // Without this, NonbondedForce won't see the updated charges
+    nonbondedForce->updateParametersInContext(context.getOwner());
+
+    chargesInitialized = true;
+    std::cout << "[Reference] Electrode charges initialized and context updated" << std::endl;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -311,8 +329,18 @@ double ReferenceCalcConstantVKernel::execute(
     bool includeForces,
     bool includeEnergy
 ) {
+    // Lazy initialization on first execute() call
+    // This follows OpenMM plugin contract: initialize() must be side-effect free
+    if (!chargesInitialized) {
+        std::cout << "[Reference] First execute() call - initializing electrode charges" << std::endl;
+        initializeElectrodeCharges(context);  // Pass context for updateParametersInContext()
+    }
+
     const int N_cathode = cathodeAtomIndices.size();
     const int N_anode = anodeAtomIndices.size();
+
+    std::cout << "[Reference Debug] execute() called, N_cathode=" << N_cathode
+              << ", N_anode=" << N_anode << std::endl;
 
     if (N_cathode == 0 && N_anode == 0)
         return 0.0;
@@ -326,21 +354,28 @@ double ReferenceCalcConstantVKernel::execute(
     // state = self.simmd.context.getState(getEnergy=False, getForces=False,
     //                                    getVelocities=False, getPositions=True)
     // positions = state.getPositions()
+    std::cout << "[Reference Debug] Phase 0: Getting positions..." << std::endl;
     vector<RealVec>& positions = extractPositions(context);
+    std::cout << "[Reference Debug] Positions obtained, size=" << positions.size() << std::endl;
 
     // Line 298-300: 计算解析总电荷（完全照抄）
     // self.Cathode.compute_Electrode_charge_analytic(self, positions, self.Conductor_list,
     //                                                z_opposite=self.Anode.z_pos)
     // self.Anode.compute_Electrode_charge_analytic(self, positions, self.Conductor_list,
     //                                              z_opposite=self.Cathode.z_pos)
+    std::cout << "[Reference Debug] Computing cathode analytic charge..." << std::endl;
     computeElectrodeChargeAnalytic(
         cathodeAtomIndices, positions, "cathode",
         z_anode, Q_analytic_cathode
     );
+    std::cout << "[Reference Debug] Cathode Q_analytic=" << Q_analytic_cathode << std::endl;
+
+    std::cout << "[Reference Debug] Computing anode analytic charge..." << std::endl;
     computeElectrodeChargeAnalytic(
         anodeAtomIndices, positions, "anode",
         z_cathode, Q_analytic_anode
     );
+    std::cout << "[Reference Debug] Anode Q_analytic=" << Q_analytic_anode << std::endl;
 
     // ═══════════════════════════════════════════════════════════
     // 阶段1：SCF迭代主循环
@@ -349,7 +384,9 @@ double ReferenceCalcConstantVKernel::execute(
 
     // Line 310: 开始SCF迭代（完全照抄）
     // for i_iter in range(Niterations):
+    std::cout << "[Reference Debug] Starting SCF iterations (nIterations=" << nIterations << ")..." << std::endl;
     for (int iter = 0; iter < nIterations; iter++) {
+        std::cout << "[Reference Debug] SCF iteration " << iter << "/" << nIterations << std::endl;
 
         // ───────────────────────────────────────────────────────
         // Line 313-314: 获取力（完全照抄）
@@ -357,14 +394,18 @@ double ReferenceCalcConstantVKernel::execute(
         // state = self.simmd.context.getState(getEnergy=True, getForces=True,
         //                                    getVelocities=False, getPositions=True)
         // forces = state.getForces()
+        std::cout << "[Reference Debug] Getting state (forces+positions)..." << std::endl;
         State state = context.getOwner().getState(State::Forces | State::Positions);
+        std::cout << "[Reference Debug] State obtained" << std::endl;
         const vector<Vec3>& forces = state.getForces();
+        std::cout << "[Reference Debug] Forces size=" << forces.size() << std::endl;
 
         // ═══════════════════════════════════════════════════════
         // Line 321-335: 更新阴极电荷（完全照抄）
         // ═══════════════════════════════════════════════════════
 
         // for atom in self.Cathode.electrode_atoms:
+        std::cout << "[Reference Debug] Updating cathode charges..." << std::endl;
         for (size_t i = 0; i < cathodeAtomIndices.size(); i++) {
             int atomIdx = cathodeAtomIndices[i];
 
@@ -406,6 +447,7 @@ double ReferenceCalcConstantVKernel::execute(
         // ═══════════════════════════════════════════════════════
 
         // for atom in self.Anode.electrode_atoms:
+        std::cout << "[Reference Debug] Updating anode charges..." << std::endl;
         for (size_t i = 0; i < anodeAtomIndices.size(); i++) {
             int atomIdx = anodeAtomIndices[i];
 
@@ -451,23 +493,30 @@ double ReferenceCalcConstantVKernel::execute(
         // Line 362-363: Green's校正（完全照抄）
         // ═══════════════════════════════════════════════════════
         // self.Scale_charges_analytic_general()
+        std::cout << "[Reference Debug] Scaling charges (Green's correction)..." << std::endl;
         scaleChargesAnalytic(cathodeAtomIndices, Q_analytic_cathode, false);
         scaleChargesAnalytic(anodeAtomIndices, Q_analytic_anode, false);
+        std::cout << "[Reference Debug] Charges scaled" << std::endl;
 
         // ═══════════════════════════════════════════════════════
         // Line 365: 更新OpenMM context（完全照抄）
         // ═══════════════════════════════════════════════════════
         // self.nbondedForce.updateParametersInContext(self.simmd.context)
+        std::cout << "[Reference Debug] Calling updateParametersInContext..." << std::endl;
         nonbondedForce->updateParametersInContext(context.getOwner());
+        std::cout << "[Reference Debug] updateParametersInContext completed" << std::endl;
     }
+    std::cout << "[Reference Debug] SCF iterations completed" << std::endl;
 
     // ───────────────────────────────────────────────────────
     // Line 367-368: 最后一次打印（完全照抄）
     // ───────────────────────────────────────────────────────
     // self.Scale_charges_analytic_general(print_flag=True)
+    std::cout << "[Reference Debug] Final scaling with print..." << std::endl;
     scaleChargesAnalytic(cathodeAtomIndices, Q_analytic_cathode, true);
     scaleChargesAnalytic(anodeAtomIndices, Q_analytic_anode, true);
 
+    std::cout << "[Reference Debug] execute() finished successfully" << std::endl;
     return 0.0;  // 不贡献能量
 }
 
