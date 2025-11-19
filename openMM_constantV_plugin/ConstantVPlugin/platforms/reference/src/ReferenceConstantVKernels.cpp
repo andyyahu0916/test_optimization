@@ -579,31 +579,114 @@ void ReferenceCalcConstantVKernel::numericalChargeConductor(
     // forces = state.getForces()
     nonbondedForce->updateParametersInContext(context.getOwner());
 
-    // Note: Caller must recompute forces after this call!
+    // Recompute forces after Step 1 charge update
+    context.calcForcesAndEnergy(true, false, -1);
+    vector<Vec3>& forcesNew = extractForces(context);
 
     // ═══════════════════════════════════════════════════════════
-    // Step 2: Charge transfer to Conductor (Line 429-482)
+    // Step 2: Charge transfer to Conductor (Line 429-495)
+    // Distribute uniformly on atoms
     // ═══════════════════════════════════════════════════════════
 
-    // Line 435-452: get field normal to surface (完全照抄)
+    // Line 435-439: index of close contact atom (完全照抄)
     // conductor_atom = Conductor.Electrode_contact_atom
     // conductor_atom_index = conductor_atom.atom_index
     // (q_i_quantity, sig, eps) = self.nbondedForce.getParticleParameters(conductor_atom_index)
     // q_i = q_i_quantity._value
-    //
+    if (conductor.contactAtomIndex < 0) {
+        std::cout << "[Reference] Warning: No contact atom found for Buckyball, skipping Step 2" << std::endl;
+        return;
+    }
+
+    int conductorAtomIndex = conductor.contactAtomIndex;
+    double charge, sigma, epsilon;
+    nonbondedForce->getParticleParameters(conductorAtomIndex, charge, sigma, epsilon);
+    double q_i = charge;
+
+    // Need to find the normal vector for this contact atom
+    // The contact atom is on the electrode (cathode/anode), NOT on the conductor
+    // So we need to compute its normal vector pointing from electrode to conductor
+    // For flat electrode, normal is simply (0, 0, ±1)
+    double conductor_atom_nx, conductor_atom_ny, conductor_atom_nz;
+
+    // Determine normal based on electrode type
+    if (conductor.electrodeType == "cathode") {
+        // Cathode normal points in +z direction (towards anode)
+        conductor_atom_nx = 0.0;
+        conductor_atom_ny = 0.0;
+        conductor_atom_nz = 1.0;
+    } else {
+        // Anode normal points in -z direction (towards cathode)
+        conductor_atom_nx = 0.0;
+        conductor_atom_ny = 0.0;
+        conductor_atom_nz = -1.0;
+    }
+
+    // Line 441-452: get field normal to surface (完全照抄)
     // E_external=[]
     // if abs(q_i) > (0.9*self.small_threshold):
-    //     E_external.append( forces[conductor_atom_index][0]._value / q_i )
-    //     E_external.append( forces[conductor_atom_index][1]._value / q_i )
-    //     E_external.append( forces[conductor_atom_index][2]._value / q_i )
+    //     E_external.append( forces[conductor_atom_index][0]._value / q_i ) # Ex
+    //     E_external.append( forces[conductor_atom_index][1]._value / q_i ) # Ey
+    //     E_external.append( forces[conductor_atom_index][2]._value / q_i ) # Ez
     //     En_external = numpy.dot( numpy.array( E_external ) , numpy.array( [ conductor_atom.nx , conductor_atom.ny , conductor_atom.nz ] ) )
     // else:
     //     En_external = 0.0
+    double En_external = 0.0;
 
-    // Note: We need to recompute forces after Step 1, so this is TODO for now
-    // TODO: Implement charge transfer logic after getting new forces
+    if (fabs(q_i) > (0.9 * SMALL_THRESHOLD)) {
+        double Ex = forcesNew[conductorAtomIndex][0] / q_i;
+        double Ey = forcesNew[conductorAtomIndex][1] / q_i;
+        double Ez = forcesNew[conductorAtomIndex][2] / q_i;
 
-    std::cout << "[Reference] Buckyball numerical charge updated (Step 1 complete, Step 2 TODO)" << std::endl;
+        // project out normal
+        En_external = Ex * conductor_atom_nx + Ey * conductor_atom_ny + Ez * conductor_atom_nz;
+    }
+
+    // Line 455-466: boundary condition depends on whether contact is with Electrode or another conductor (完全照抄)
+    // if Conductor.close_conductor_Electrode :
+    //     dE_conductor = - ( En_external + self.Cathode.Voltage / self.Lgap / 2.0 ) * conversion_KjmolNm_Au
+    // else :
+    //     dE_conductor = - En_external * conversion_KjmolNm_Au
+    double dE_conductor;
+
+    if (conductor.closeToElectrode) {
+        // Line 462: Electrostatics boundary condition (完全照抄)
+        // dE_conductor = -( Eext + dV/2L )
+        dE_conductor = -(En_external + voltage / Lgap / 2.0) * CONVERSION_KJMOLNM_AU;
+    } else {
+        // Line 466: Another conductor contact (完全照抄)
+        dE_conductor = -En_external * CONVERSION_KJMOLNM_AU;
+    }
+
+    // Line 469-473: Charge depends on geometry of conductor (完全照抄)
+    // if type(Conductor).__name__ == "Buckyball_Virtual" :
+    //     sign=-1.0
+    //     dQ_conductor =  sign * dE_conductor * Conductor.dr_center_contact**2
+    double sign = -1.0;
+    double dQ_conductor = sign * dE_conductor * conductor.dr_center_contact * conductor.dr_center_contact;
+
+    // Line 486-495: per atom charge and ADD to Conductor (完全照抄)
+    // dq_atom = dQ_conductor / Conductor.Natoms
+    // for atom in Conductor.electrode_atoms:
+    //     index = atom.atom_index
+    //     (q_i_quantity, sig, eps) = self.nbondedForce.getParticleParameters(index)
+    //     q_i = q_i_quantity._value +  dq_atom
+    //     atom.charge = q_i
+    //     self.nbondedForce.setParticleParameters(index, q_i, sig , eps)
+    int Natoms = conductor.virtualAtomIndices.size();
+    double dq_atom = dQ_conductor / Natoms;
+
+    for (int atomIdx : conductor.virtualAtomIndices) {
+        double charge_old, sig, eps;
+        nonbondedForce->getParticleParameters(atomIdx, charge_old, sig, eps);
+        double q_i_new = charge_old + dq_atom;  // ADD dq_atom (完全照抄)
+
+        currentCharges[atomIdx] = q_i_new;
+        nonbondedForce->setParticleParameters(atomIdx, q_i_new, sig, eps);
+    }
+
+    std::cout << "[Reference] Buckyball charge transfer: dQ=" << dQ_conductor
+              << ", dq_atom=" << dq_atom << ", En_external=" << En_external << std::endl;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -771,10 +854,44 @@ double ReferenceCalcConstantVKernel::execute(
             nonbondedForce->setParticleParameters(atomIdx, q_i, 1.0, 0.0);
         }
 
-        // ───────────────────────────────────────────────────────
-        // Line 352-360: Conductor处理（第一版跳过）
-        // ───────────────────────────────────────────────────────
-        // TODO: 实现Buckyball/Nanotube支持
+        // ═══════════════════════════════════════════════════════
+        // Line 352-361: Conductor处理（完全照抄）
+        // ═══════════════════════════════════════════════════════
+        // if self.Conductor_list:
+        //     for Conductor in self.Conductor_list:
+        //         self.Numerical_charge_Conductor( Conductor , forces )
+        //     self.nbondedForce.updateParametersInContext(self.simmd.context)
+        //     self.Cathode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Anode.z_pos )
+        //     self.Anode.compute_Electrode_charge_analytic( self , positions , self.Conductor_list, z_opposite = self.Cathode.z_pos )
+
+        if (!buckyballConductors.empty()) {
+            std::cout << "[Reference Debug] Processing " << buckyballConductors.size() << " Buckyball conductor(s)..." << std::endl;
+
+            // Line 354-355: Process each conductor (完全照抄)
+            for (BuckyballConductor& conductor : buckyballConductors) {
+                numericalChargeConductor(conductor, forces, context);
+            }
+
+            // Line 357: Update context after conductor charge updates (完全照抄)
+            nonbondedForce->updateParametersInContext(context.getOwner());
+
+            // Line 358-360: Recompute Q_analytic because conductors are "part of electrolyte" (完全照抄)
+            // Get fresh positions after conductor updates
+            const vector<Vec3>& positionsUpdated = state.getPositions();
+
+            computeElectrodeChargeAnalytic(
+                cathodeAtomIndices, positionsUpdated, "cathode",
+                z_anode, Q_analytic_cathode
+            );
+
+            computeElectrodeChargeAnalytic(
+                anodeAtomIndices, positionsUpdated, "anode",
+                z_cathode, Q_analytic_anode
+            );
+
+            std::cout << "[Reference Debug] After conductor processing: Q_analytic_cathode="
+                      << Q_analytic_cathode << ", Q_analytic_anode=" << Q_analytic_anode << std::endl;
+        }
 
         // ═══════════════════════════════════════════════════════
         // Line 362-363: Green's校正（完全照抄）
