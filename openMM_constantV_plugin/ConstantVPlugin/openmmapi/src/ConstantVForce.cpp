@@ -80,6 +80,47 @@ void ConstantVForce::getElectrolyteAtomParameters(int index, int& particle, doub
 }
 
 // ═══════════════════════════════════════════════════════════
+// Buckyball导体方法
+// 对应: Buckyball_Virtual class (Fixed_Voltage_routines.py:391-473)
+// ═══════════════════════════════════════════════════════════
+
+int ConstantVForce::addBuckyballConductor(const std::vector<int>& virtualAtoms,
+                                            const std::vector<int>& realAtoms,
+                                            const std::string& electrodeType,
+                                            double voltage) {
+    // 验证输入（对应Python Original的Line 398-403）
+    if (electrodeType != "cathode" && electrodeType != "anode") {
+        throw OpenMMException("ConstantVForce::addBuckyballConductor: electrode_type must be 'cathode' or 'anode'");
+    }
+
+    if (virtualAtoms.empty()) {
+        throw OpenMMException("ConstantVForce::addBuckyballConductor: virtualAtoms list cannot be empty");
+    }
+
+    if (realAtoms.empty()) {
+        throw OpenMMException("ConstantVForce::addBuckyballConductor: realAtoms list cannot be empty (must input both virtual and real electrode atoms for BuckyBall)");
+    }
+
+    // 创建BuckyballConductorInfo对象（对应Python的__init__）
+    BuckyballConductorInfo conductor(virtualAtoms, realAtoms, electrodeType, voltage);
+
+    buckyballConductors.push_back(conductor);
+    return buckyballConductors.size() - 1;
+}
+
+void ConstantVForce::getBuckyballConductorParameters(int index,
+                                                       std::vector<int>& virtualAtoms,
+                                                       std::vector<int>& realAtoms,
+                                                       std::string& electrodeType,
+                                                       double& voltage) const {
+    const BuckyballConductorInfo& conductor = buckyballConductors[index];
+    virtualAtoms = conductor.virtualAtomIndices;
+    realAtoms = conductor.realAtomIndices;
+    electrodeType = conductor.electrodeType;
+    voltage = conductor.voltageVolts;
+}
+
+// ═══════════════════════════════════════════════════════════
 // 系统几何参数方法
 // ═══════════════════════════════════════════════════════════
 
