@@ -148,6 +148,31 @@ void ReferenceCalcConstantVKernel::initialize(const System& system, const Consta
     }
 
     // ───────────────────────────────────────────────────────
+    // 从Force获取Buckyball导体
+    // 对应: Buckyball_Virtual class
+    // ───────────────────────────────────────────────────────
+    int numBuckyballs = force.getNumBuckyballConductors();
+    buckyballConductors.resize(numBuckyballs);
+
+    for (int i = 0; i < numBuckyballs; i++) {
+        std::vector<int> virtualAtoms, realAtoms;
+        std::string electrodeType;
+        double voltage;
+        force.getBuckyballConductorParameters(i, virtualAtoms, realAtoms, electrodeType, voltage);
+
+        BuckyballConductor& conductor = buckyballConductors[i];
+        conductor.virtualAtomIndices = virtualAtoms;
+        conductor.realAtomIndices = realAtoms;
+        conductor.electrodeType = electrodeType;
+        conductor.voltageKjMol = voltage * 96.487;  // V -> kJ/mol
+        conductor.closeThreshold = 1.5;  // nm (默认值，对应Python Line 100)
+        conductor.closeToElectrode = true;
+        conductor.contactAtomIndex = -1;
+        conductor.dr_center_contact = 0.0;
+        // 几何参数将在initializeElectrodeCharges()中计算
+    }
+
+    // ───────────────────────────────────────────────────────
     // 从Force获取系统几何参数
     // ───────────────────────────────────────────────────────
     voltage = force.getVoltage() * 96.487;  // V -> kJ/mol（完全照抄教授的转换）
@@ -216,6 +241,25 @@ void ReferenceCalcConstantVKernel::initializeElectrodeCharges(ContextImpl& conte
     // ✅ CRITICAL: Update OpenMM's internal state!
     // Without this, NonbondedForce won't see the updated charges
     nonbondedForce->updateParametersInContext(context.getOwner());
+
+    // ───────────────────────────────────────────────────────
+    // Initialize Buckyball conductors (对应 Buckyball_Virtual.__init__)
+    // ───────────────────────────────────────────────────────
+    if (!buckyballConductors.empty()) {
+        // Get positions for geometry calculation
+        vector<Vec3>& positions = extractPositions(context);
+
+        for (BuckyballConductor& conductor : buckyballConductors) {
+            // Line 424-457: Initialize geometry (center, radius, normals)
+            initializeBuckyballGeometry(conductor, positions);
+
+            // Line 459: Find contact neighbor conductor
+            findContactNeighborConductor(conductor, positions);
+        }
+
+        std::cout << "[Reference] Initialized " << buckyballConductors.size()
+                  << " Buckyball conductor(s)" << std::endl;
+    }
 
     chargesInitialized = true;
     std::cout << "[Reference] Electrode charges initialized and context updated" << std::endl;
@@ -317,6 +361,249 @@ void ReferenceCalcConstantVKernel::scaleChargesAnalytic(
             );
         }
     }
+}
+
+// ═══════════════════════════════════════════════════════════
+// initializeBuckyballGeometry()
+// 翻译自: Buckyball_Virtual.__init__ (Line 424-457)
+// ═══════════════════════════════════════════════════════════
+
+void ReferenceCalcConstantVKernel::initializeBuckyballGeometry(
+    BuckyballConductor& conductor,
+    const vector<Vec3>& positions
+) {
+    int Natoms = conductor.virtualAtomIndices.size();
+
+    // Line 428-436: Find center of buckyball (完全照抄)
+    // self.r_center = [ 0.0 , 0.0 , 0.0 ] # in nm
+    // for atom in self.electrode_atoms:
+    //     self.r_center[0] += positions[atom.atom_index][0]._value
+    //     self.r_center[1] += positions[atom.atom_index][1]._value
+    //     self.r_center[2] += positions[atom.atom_index][2]._value
+    // self.r_center[0] = self.r_center[0] / self.Natoms
+    // self.r_center[1] = self.r_center[1] / self.Natoms
+    // self.r_center[2] = self.r_center[2] / self.Natoms
+    conductor.r_center[0] = 0.0;
+    conductor.r_center[1] = 0.0;
+    conductor.r_center[2] = 0.0;
+
+    for (int atomIdx : conductor.virtualAtomIndices) {
+        conductor.r_center[0] += positions[atomIdx][0];
+        conductor.r_center[1] += positions[atomIdx][1];
+        conductor.r_center[2] += positions[atomIdx][2];
+    }
+
+    conductor.r_center[0] /= Natoms;
+    conductor.r_center[1] /= Natoms;
+    conductor.r_center[2] /= Natoms;
+
+    // Line 439-446: compute area per atom, get radius from first atom (完全照抄)
+    // self.radius=0.0
+    // for atom in self.electrode_atoms:
+    //     rx = positions[atom.atom_index][0]._value - self.r_center[0]
+    //     ry = positions[atom.atom_index][1]._value - self.r_center[1]
+    //     rz = positions[atom.atom_index][2]._value - self.r_center[2]
+    //     self.radius = sqrt( rx**2 + ry**2 + rz**2 )
+    //     break
+    // self.area_atom = 4.0 * numpy.pi * self.radius**2 / self.Natoms
+    if (Natoms > 0) {
+        int firstAtom = conductor.virtualAtomIndices[0];
+        double rx = positions[firstAtom][0] - conductor.r_center[0];
+        double ry = positions[firstAtom][1] - conductor.r_center[1];
+        double rz = positions[firstAtom][2] - conductor.r_center[2];
+        conductor.radius = sqrt(rx*rx + ry*ry + rz*rz);
+    }
+
+    conductor.area_atom = 4.0 * M_PI * conductor.radius * conductor.radius / Natoms;
+
+    // Line 450-456: calculate surface normal vector at each atom (完全照抄)
+    // for atom in self.electrode_atoms:
+    //     nx = positions[atom.atom_index][0]._value - self.r_center[0]
+    //     ny = positions[atom.atom_index][1]._value - self.r_center[1]
+    //     nz = positions[atom.atom_index][2]._value - self.r_center[2]
+    //     norm = sqrt( nx**2 + ny**2 + nz**2)
+    //     atom.nx = nx / norm ; atom.ny = ny / norm ; atom.nz = nz / norm
+    conductor.normalVectors.resize(3 * Natoms);
+
+    for (size_t i = 0; i < conductor.virtualAtomIndices.size(); i++) {
+        int atomIdx = conductor.virtualAtomIndices[i];
+        double nx = positions[atomIdx][0] - conductor.r_center[0];
+        double ny = positions[atomIdx][1] - conductor.r_center[1];
+        double nz = positions[atomIdx][2] - conductor.r_center[2];
+        double norm = sqrt(nx*nx + ny*ny + nz*nz);
+
+        conductor.normalVectors[3*i + 0] = nx / norm;
+        conductor.normalVectors[3*i + 1] = ny / norm;
+        conductor.normalVectors[3*i + 2] = nz / norm;
+    }
+
+    std::cout << "[Reference] Buckyball geometry initialized: r_center=("
+              << conductor.r_center[0] << "," << conductor.r_center[1] << "," << conductor.r_center[2]
+              << "), radius=" << conductor.radius
+              << ", area_atom=" << conductor.area_atom << std::endl;
+}
+
+// ═══════════════════════════════════════════════════════════
+// findContactNeighborConductor()
+// 翻译自: Conductor_Virtual.find_contact_neighbor_conductor (Line 177-227)
+// ═══════════════════════════════════════════════════════════
+
+void ReferenceCalcConstantVKernel::findContactNeighborConductor(
+    BuckyballConductor& conductor,
+    const vector<Vec3>& positions
+) {
+    // Line 181-184: Find Cathode/Anode contact atom (完全照抄)
+    // if self.electrode_type == "cathode":
+    //     Electrode_contact = MMsys.Cathode
+    // else:
+    //     Electrode_contact = MMsys.Anode
+    const vector<int>* electrodeContact = nullptr;
+    if (conductor.electrodeType == "cathode") {
+        electrodeContact = &cathodeAtomIndices;
+    } else {
+        electrodeContact = &anodeAtomIndices;
+    }
+
+    // Line 186-193: find contact atom based on closest distance to r_center (完全照抄)
+    // min_dist = 10.0 # something large...
+    // for atom in Electrode_contact.electrode_atoms:
+    //     dr_atom = numpy.sqrt( ( r_center[0] - positions[atom.atom_index][0]._value )**2 +
+    //                           ( r_center[1] - positions[atom.atom_index][1]._value )**2 +
+    //                           ( r_center[2] - positions[atom.atom_index][2]._value )**2 )
+    //     if dr_atom < min_dist:
+    //         self.Electrode_contact_atom = atom
+    //         min_dist = dr_atom
+    double min_dist = 10.0;  // something large
+    conductor.contactAtomIndex = -1;
+
+    for (int atomIdx : *electrodeContact) {
+        double dx = conductor.r_center[0] - positions[atomIdx][0];
+        double dy = conductor.r_center[1] - positions[atomIdx][1];
+        double dz = conductor.r_center[2] - positions[atomIdx][2];
+        double dr_atom = sqrt(dx*dx + dy*dy + dz*dz);
+
+        if (dr_atom < min_dist) {
+            conductor.contactAtomIndex = atomIdx;
+            min_dist = dr_atom;
+        }
+    }
+
+    // Line 195-198: We are likely done here (完全照抄)
+    // if  min_dist < self.close_conductor_threshold :
+    //     self.dr_center_contact = min_dist
+    //     return False  # indicates that dr_vector isn't returned
+    if (min_dist < conductor.closeThreshold) {
+        conductor.dr_center_contact = min_dist;
+        conductor.closeToElectrode = true;
+        std::cout << "[Reference] Buckyball contact found: atomIdx=" << conductor.contactAtomIndex
+                  << ", distance=" << min_dist << " nm" << std::endl;
+        return;
+    }
+
+    // Line 200-227: conductor is in contact with another conductor (第一版跳过)
+    // TODO: 实现多导体链接支持
+    conductor.closeToElectrode = false;
+    std::cout << "[Reference] Warning: Buckyball not close to primary electrode (dist=" << min_dist
+              << " > threshold=" << conductor.closeThreshold << ")" << std::endl;
+}
+
+// ═══════════════════════════════════════════════════════════
+// numericalChargeConductor()
+// 翻译自: MM.Numerical_charge_Conductor (Line 388-497)
+// ═══════════════════════════════════════════════════════════
+
+void ReferenceCalcConstantVKernel::numericalChargeConductor(
+    BuckyballConductor& conductor,
+    const vector<Vec3>& forces,
+    ContextImpl& context
+) {
+    // ═══════════════════════════════════════════════════════════
+    // Step 1: Image charges on Conductor (Line 390-422)
+    // Project Efield to surface normal vector
+    // ═══════════════════════════════════════════════════════════
+
+    // Line 396-420: Images charges are set on 'Virtual' atoms (完全照抄)
+    // for atom in Conductor.electrode_atoms:
+    //     index = atom.atom_index
+    //     (q_i_quantity, sig, eps) = self.nbondedForce.getParticleParameters(index)
+    //     q_i = q_i_quantity._value
+    //
+    //     E_external=[]
+    //     if abs(q_i) > (0.9*self.small_threshold):
+    //         E_external.append( forces[index][0]._value / q_i ) # Ex
+    //         E_external.append( forces[index][1]._value / q_i ) # Ey
+    //         E_external.append( forces[index][2]._value / q_i ) # Ez
+    //
+    //         # project out normal
+    //         En_external = numpy.dot( numpy.array( E_external ) , numpy.array( [ atom.nx , atom.ny , atom.nz ] ) )
+    //         # now solve for surface charge
+    //         q_i = 2.0 / ( 4.0 * numpy.pi ) * Conductor.area_atom * En_external * conversion_KjmolNm_Au
+    //     else:
+    //         q_i = self.small_threshold  # Cathode, make positive
+    //
+    //     atom.charge = q_i
+    //     self.nbondedForce.setParticleParameters(index, atom.charge, sig , eps)
+
+    for (size_t i = 0; i < conductor.virtualAtomIndices.size(); i++) {
+        int atomIdx = conductor.virtualAtomIndices[i];
+        double charge, sigma, epsilon;
+        nonbondedForce->getParticleParameters(atomIdx, charge, sigma, epsilon);
+        double q_i = charge;
+
+        double nx = conductor.normalVectors[3*i + 0];
+        double ny = conductor.normalVectors[3*i + 1];
+        double nz = conductor.normalVectors[3*i + 2];
+
+        if (fabs(q_i) > (0.9 * SMALL_THRESHOLD)) {
+            // E_external = F / q
+            double Ex = forces[atomIdx][0] / q_i;
+            double Ey = forces[atomIdx][1] / q_i;
+            double Ez = forces[atomIdx][2] / q_i;
+
+            // project out normal component
+            double En_external = Ex * nx + Ey * ny + Ez * nz;
+
+            // solve for surface charge (完全照抄公式)
+            q_i = 2.0 / (4.0 * M_PI) * conductor.area_atom * En_external * CONVERSION_KJMOLNM_AU;
+        } else {
+            q_i = SMALL_THRESHOLD;  // prevent zero charge
+        }
+
+        currentCharges[atomIdx] = q_i;
+        nonbondedForce->setParticleParameters(atomIdx, q_i, sigma, epsilon);
+    }
+
+    // Line 424-426: Update context and get new forces (完全照抄)
+    // self.nbondedForce.updateParametersInContext(self.simmd.context)
+    // state = self.simmd.context.getState(getEnergy=True,getForces=True,getVelocities=False,getPositions=True)
+    // forces = state.getForces()
+    nonbondedForce->updateParametersInContext(context.getOwner());
+
+    // Note: Caller must recompute forces after this call!
+
+    // ═══════════════════════════════════════════════════════════
+    // Step 2: Charge transfer to Conductor (Line 429-482)
+    // ═══════════════════════════════════════════════════════════
+
+    // Line 435-452: get field normal to surface (完全照抄)
+    // conductor_atom = Conductor.Electrode_contact_atom
+    // conductor_atom_index = conductor_atom.atom_index
+    // (q_i_quantity, sig, eps) = self.nbondedForce.getParticleParameters(conductor_atom_index)
+    // q_i = q_i_quantity._value
+    //
+    // E_external=[]
+    // if abs(q_i) > (0.9*self.small_threshold):
+    //     E_external.append( forces[conductor_atom_index][0]._value / q_i )
+    //     E_external.append( forces[conductor_atom_index][1]._value / q_i )
+    //     E_external.append( forces[conductor_atom_index][2]._value / q_i )
+    //     En_external = numpy.dot( numpy.array( E_external ) , numpy.array( [ conductor_atom.nx , conductor_atom.ny , conductor_atom.nz ] ) )
+    // else:
+    //     En_external = 0.0
+
+    // Note: We need to recompute forces after Step 1, so this is TODO for now
+    // TODO: Implement charge transfer logic after getting new forces
+
+    std::cout << "[Reference] Buckyball numerical charge updated (Step 1 complete, Step 2 TODO)" << std::endl;
 }
 
 // ═══════════════════════════════════════════════════════════
