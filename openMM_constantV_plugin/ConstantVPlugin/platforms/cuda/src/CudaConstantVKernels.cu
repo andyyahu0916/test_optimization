@@ -785,6 +785,65 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
     size_t sharedMemSize = blockSize * sizeof(double);
 
     // ═══════════════════════════════════════════════════════════
+    // 🔥 FIX: 計算 Q_analytic（在 SCF 迭代前，只計算一次）
+    // 物理語意：Born-Oppenheimer 近似下，電解質在 SCF 時間尺度內是凍結的
+    // 效率優化：避免每次迭代都重複計算相同的結果
+    // 對應: Python Line 295-300, Reference Line 367-378
+    // ═══════════════════════════════════════════════════════════
+
+    // 清零 Q_analytic 緩衝區
+    cudaMemsetAsync((void*)d_Q_analytic_cathode->getDevicePointer(), 0, sizeof(double), cu.getCurrentStream());
+    cudaMemsetAsync((void*)d_Q_analytic_anode->getDevicePointer(), 0, sizeof(double), cu.getCurrentStream());
+
+    // 計算幾何貢獻（Cathode: sign = +1.0）
+    computeGeometricChargeKernel<<<1, 1, 0, cu.getCurrentStream()>>>(
+        (double*)d_Q_analytic_cathode->getDevicePointer(),
+        voltage, Lgap, Lcell, totalArea,
+        +1.0
+    );
+
+    // 計算幾何貢獻（Anode: sign = -1.0）
+    computeGeometricChargeKernel<<<1, 1, 0, cu.getCurrentStream()>>>(
+        (double*)d_Q_analytic_anode->getDevicePointer(),
+        voltage, Lgap, Lcell, totalArea,
+        -1.0
+    );
+
+    // 計算鏡像電荷貢獻（Cathode, z_opposite = z_anode）
+    warpAssistedReductionKernel<ImageChargeFunctor><<<numBlocks_electrolyte, blockSize, (blockSize/32)*sizeof(double), cu.getCurrentStream()>>>(
+        numElectrolytes,
+        (const int*)d_electrolyteIndices->getDevicePointer(),
+        (const float4*)posq.getDevicePointer(),
+        (double*)d_cathode_partial->getDevicePointer(),
+        z_anode,
+        Lcell
+    );
+
+    // Reduce partial sums for cathode
+    reducePartialSumsKernel<<<1, 256, 256*sizeof(double), cu.getCurrentStream()>>>(
+        numBlocks_electrolyte,
+        (const double*)d_cathode_partial->getDevicePointer(),
+        (double*)d_Q_analytic_cathode->getDevicePointer()
+    );
+
+    // 計算鏡像電荷貢獻（Anode, z_opposite = z_cathode）
+    warpAssistedReductionKernel<ImageChargeFunctor><<<numBlocks_electrolyte, blockSize, (blockSize/32)*sizeof(double), cu.getCurrentStream()>>>(
+        numElectrolytes,
+        (const int*)d_electrolyteIndices->getDevicePointer(),
+        (const float4*)posq.getDevicePointer(),
+        (double*)d_anode_partial->getDevicePointer(),
+        z_cathode,
+        Lcell
+    );
+
+    // Reduce partial sums for anode
+    reducePartialSumsKernel<<<1, 256, 256*sizeof(double), cu.getCurrentStream()>>>(
+        numBlocks_electrolyte,
+        (const double*)d_anode_partial->getDevicePointer(),
+        (double*)d_Q_analytic_anode->getDevicePointer()
+    );
+
+    // ═══════════════════════════════════════════════════════════
     // SCF 迭代循環（照抄 Reference Line 352-462）
     // 🔥 修復：每次迭代都重新計算 forces（符合第一性原則）
     // ═══════════════════════════════════════════════════════════
@@ -839,69 +898,14 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
 
         // ───────────────────────────────────────────────────────
         // Step 3: Green's Reciprocity 校正
-        // Line 418-458
+        // 使用已在循環外計算好的固定 Q_analytic
         // ───────────────────────────────────────────────────────
 
-        // === 3a. 清零解析/數值電荷緩衝區 ===
-        cudaMemsetAsync((void*)d_Q_analytic_cathode->getDevicePointer(), 0, sizeof(double), cu.getCurrentStream());
-        cudaMemsetAsync((void*)d_Q_analytic_anode->getDevicePointer(), 0, sizeof(double), cu.getCurrentStream());
+        // 清零數值電荷緩衝區（Q_numeric 每次迭代都會變，必須清零）
         cudaMemsetAsync((void*)d_Q_numeric_cathode->getDevicePointer(), 0, sizeof(double), cu.getCurrentStream());
         cudaMemsetAsync((void*)d_Q_numeric_anode->getDevicePointer(), 0, sizeof(double), cu.getCurrentStream());
 
-        // === 3b. 計算解析電荷（幾何貢獻）===
-        // Cathode: sign = +1.0
-        computeGeometricChargeKernel<<<1, 1, 0, cu.getCurrentStream()>>>(
-            (double*)d_Q_analytic_cathode->getDevicePointer(),
-            voltage, Lgap, Lcell, totalArea,
-            +1.0
-        );
-
-        // Anode: sign = -1.0
-        computeGeometricChargeKernel<<<1, 1, 0, cu.getCurrentStream()>>>(
-            (double*)d_Q_analytic_anode->getDevicePointer(),
-            voltage, Lgap, Lcell, totalArea,
-            -1.0
-        );
-
-        // === 3c. 計算解析電荷（鏡像電荷貢獻）===
-        // ───────────────────────────────────────────────────────
-        // Level 2 優化: 使用 Warp Shuffle Reduction
-        // ───────────────────────────────────────────────────────
-        // Cathode (z_opposite = z_anode)
-        warpAssistedReductionKernel<ImageChargeFunctor><<<numBlocks_electrolyte, blockSize, (blockSize/32)*sizeof(double), cu.getCurrentStream()>>>(
-            numElectrolytes,
-            (const int*)d_electrolyteIndices->getDevicePointer(),
-            (const float4*)posq.getDevicePointer(),
-            (double*)d_cathode_partial->getDevicePointer(),
-            z_anode,
-            Lcell
-        );
-
-        // Reduce partial sums for cathode
-        reducePartialSumsKernel<<<1, 256, 256*sizeof(double), cu.getCurrentStream()>>>(
-            numBlocks_electrolyte,
-            (const double*)d_cathode_partial->getDevicePointer(),
-            (double*)d_Q_analytic_cathode->getDevicePointer()
-        );
-
-        // Anode (z_opposite = z_cathode)
-        warpAssistedReductionKernel<ImageChargeFunctor><<<numBlocks_electrolyte, blockSize, (blockSize/32)*sizeof(double), cu.getCurrentStream()>>>(
-            numElectrolytes,
-            (const int*)d_electrolyteIndices->getDevicePointer(),
-            (const float4*)posq.getDevicePointer(),
-            (double*)d_anode_partial->getDevicePointer(),
-            z_cathode,
-            Lcell
-        );
-
-        // Reduce partial sums for anode
-        reducePartialSumsKernel<<<1, 256, 256*sizeof(double), cu.getCurrentStream()>>>(
-            numBlocks_electrolyte,
-            (const double*)d_anode_partial->getDevicePointer(),
-            (double*)d_Q_analytic_anode->getDevicePointer()
-        );
-
-        // === 3d. 計算數值總電荷 ===
+        // 計算數值總電荷
         // Level 2 優化: Cathode使用Warp Shuffle
         warpAssistedReductionKernel<SumFunctor><<<numBlocks_cathode, blockSize, (blockSize/32)*sizeof(double), cu.getCurrentStream()>>>(
             numCathodes,
@@ -968,6 +972,11 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
         cu.invalidateMolecules();
 
     } // End SCF iteration loop
+
+    // ───────────────────────────────────────────────────────
+    // 最終更新通知（防禦性編程，確保所有變更都被識別）
+    // ───────────────────────────────────────────────────────
+    cu.invalidateMolecules();
 
     return 0.0;
 }
