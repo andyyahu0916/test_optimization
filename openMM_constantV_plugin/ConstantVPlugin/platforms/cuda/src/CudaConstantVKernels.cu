@@ -1052,7 +1052,12 @@ void CudaIntegrateConstantVStepKernel::execute(ContextImpl& context, const Const
     }
 
     // 步骤2: 计算力（使用最新电荷）
-    context.calcForcesAndEnergy(true, false, integrator.getIntegrationForceGroups());
+    // ⭐ CRITICAL: Exclude ConstantVForce (Group 31) to prevent double SCF execution
+    // Without this, if ConstantVForce is mistakenly added to the System,
+    // calcForcesAndEnergy() would trigger it again, causing SCF to run twice
+    int forceGroups = integrator.getIntegrationForceGroups();
+    forceGroups &= ~(1U << CONSTANTV_FORCE_GROUP);  // Exclude Group 31
+    context.calcForcesAndEnergy(true, false, forceGroups);
 
     // 步骤3: Verlet积分 - Launch CUDA kernel
     int numParticles = cu.getNumAtoms();

@@ -676,7 +676,10 @@ void ReferenceIntegrateConstantVStepKernel::execute(
 
     // 步骤2: 重新计算力（使用最新电荷）
     // 对应教授的 simmd.step() 内部会自动用新电荷计算力
-    context.calcForcesAndEnergy(true, false, context.getIntegrator().getIntegrationForceGroups());
+    // ⭐ CRITICAL: Exclude ConstantVForce (Group 31) to prevent double SCF execution
+    int forceGroups = context.getIntegrator().getIntegrationForceGroups();
+    forceGroups &= ~(1U << 31);  // Exclude Group 31 (ConstantVForce)
+    context.calcForcesAndEnergy(true, false, forceGroups);
 
     // 步骤3: Verlet积分（参考DrudeSCFIntegrator）
     vector<Vec3>& pos = extractPositions(context);
