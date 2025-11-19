@@ -39,16 +39,6 @@ static const double CONVERSION_EV_KJMOL = 96.487;  // 照抄Python Line 38
 static const double SMALL_THRESHOLD = 1e-6;  // 照抄Python Line 48 (不是1e-10！)
 
 // ═══════════════════════════════════════════════════════════
-// 🔥 CRITICAL: Force Group Assignment (prevents infinite recursion)
-// ═══════════════════════════════════════════════════════════
-// ConstantVForce should be assigned to this group (31) to prevent recursion:
-// - When ConstantVForce::calcForcesAndEnergy() is called, it invokes this kernel
-// - This kernel internally calls context.calcForcesAndEnergy() to get forces
-// - If we don't mask out group 31, it will call ConstantVForce again → ∞ loop
-// - Solution: Always exclude group 31 when calling calcForcesAndEnergy internally
-static const int CONSTANTV_FORCE_GROUP = 31;
-
-// ═══════════════════════════════════════════════════════════
 // CUDA Kernels - 直接翻譯 Reference 實現
 // ═══════════════════════════════════════════════════════════
 
@@ -313,86 +303,6 @@ __global__ void reducePartialSumsKernel(
     if (tid == 0) {
         atomicAdd(Q_analytic, sdata[0]);
     }
-}
-
-// ═══════════════════════════════════════════════════════════
-// Level 2 優化: Warp Shuffle Reduction
-// 性能優化：使用warp-level primitives代替shared memory
-// 收益：
-//   - 減少shared memory bank conflicts
-//   - 更高的指令吞吐量（warp shuffle比shared memory快）
-//   - 更好的pipeline利用率
-// 預計提升：15-25%
-// 風險：零（數學上完全等價）
-// ═══════════════════════════════════════════════════════════
-
-// Functor: 加載數值電荷（用於sumElectrodeChargesKernel的替代版本）
-struct SumFunctor {
-    __device__ double operator()(int i, const int* __restrict__ indices,
-                                const float4* __restrict__ posq, double, double) const {
-        int atomIdx = indices[i];
-        return (double)posq[atomIdx].w;
-    }
-};
-
-// Functor: 加載鏡像電荷貢獻（用於computeImageChargeKernel的替代版本）
-struct ImageChargeFunctor {
-    __device__ double operator()(int i, const int* __restrict__ indices,
-                                const float4* __restrict__ posq,
-                                double z_opposite, double Lcell) const {
-        int index = indices[i];
-        double q_i = (double)posq[index].w;
-        double z_atom = (double)posq[index].z;
-        double z_distance = fabs(z_atom - z_opposite);
-        return (z_distance / Lcell) * (-q_i);
-    }
-};
-
-/**
- * Level 2 優化: 模板化的 Warp-Assisted Reduction Kernel
- * 使用warp shuffle指令加速reduction操作
- * Loader是一個functor，定義如何加載和計算每個元素的貢獻
- */
-template <typename Loader>
-__global__ void warpAssistedReductionKernel(
-    int numItems,
-    const int* __restrict__ indices,
-    const float4* __restrict__ posq,
-    double* __restrict__ partialSums,
-    double arg1,  // 用於z_opposite或其他參數
-    double arg2   // 用於Lcell或其他參數
-) {
-    extern __shared__ double sdata[];
-    double sum = 0.0;
-    Loader loader;
-
-    // Grid-stride loop: 每個線程處理多個元素
-    for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < numItems; i += gridDim.x * blockDim.x) {
-        sum += loader(i, indices, posq, arg1, arg2);
-    }
-
-    // Warp-level reduction: 使用shuffle指令在warp內求和
-    for (int offset = 16; offset > 0; offset /= 2)
-        sum += __shfl_down_sync(0xffffffff, sum, offset);
-
-    // 每個warp的lane 0寫入shared memory
-    if (threadIdx.x % 32 == 0)
-        sdata[threadIdx.x / 32] = sum;
-
-    __syncthreads();
-
-    // Block-level reduction: 由第一個warp完成
-    if (threadIdx.x < 32) {
-        sum = (threadIdx.x < blockDim.x / 32) ? sdata[threadIdx.x] : 0.0;
-        if (threadIdx.x < 16) {
-            for (int offset = 16; offset > 0; offset /= 2)
-                sum += __shfl_down_sync(0xffffffff, sum, offset);
-        }
-    }
-
-    // Block的thread 0寫入最終結果
-    if (threadIdx.x == 0)
-        partialSums[blockIdx.x] = sum;
 }
 
 /**
@@ -774,8 +684,9 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
         initializeGPU();
     }
 
-    // 獲取 GPU 資源
+    // 獲取 GPU 資源（零傳輸！）
     CudaArray& posq = cu.getPosq();
+    CudaArray& forces = cu.getForce();
 
     int blockSize = 256;
     int numBlocks_cathode = (numCathodes + blockSize - 1) / blockSize;
@@ -786,28 +697,13 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
 
     // ═══════════════════════════════════════════════════════════
     // SCF 迭代循環（照抄 Reference Line 352-462）
-    // 🔥 修復：每次迭代都重新計算 forces（符合第一性原則）
     // ═══════════════════════════════════════════════════════════
 
     for (int iter = 0; iter < nIterations; iter++) {
 
-        // ───────────────────────────────────────────────────────
-        // 🔥 CRITICAL FIX: 每次 SCF 迭代都重新計算 forces！
-        // Reference Line 354-357, Python Line 313-314
-        // ───────────────────────────────────────────────────────
-        // 這是符合第一性原則的核心：每次電荷更新後，
-        // 電極-電荷、電荷-電荷的交互改變，forces 必須重新計算！
-        //
-        // 🔥 CRITICAL: Prevent infinite recursion by excluding ConstantVForce group
-        // - If ConstantVForce is added to the System (not typical, but possible),
-        //   calling calcForcesAndEnergy() would re-trigger this kernel → stack overflow
-        // - Solution: Mask out group 31 to exclude ConstantVForce from force calculation
-        int forceGroups = context.getIntegrator().getIntegrationForceGroups();
-        forceGroups &= ~(1U << CONSTANTV_FORCE_GROUP);  // Exclude group 31 (use 1U to avoid UB)
-        context.calcForcesAndEnergy(true, false, forceGroups);
-
-        // 獲取最新計算的 forces
-        CudaArray& forces = cu.getForce();
+        // Line 354-357: 獲取力和位置（已在 GPU，零傳輸！）
+        // State state = context.getState(State::Forces | State::Positions);
+        // （CUDA 版本：forces 和 posq 已經在 GPU，無需 getState）
 
         // ───────────────────────────────────────────────────────
         // OPTIMIZED: Step 1+2 合併為單次kernel調用
@@ -864,11 +760,8 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
         );
 
         // === 3c. 計算解析電荷（鏡像電荷貢獻）===
-        // ───────────────────────────────────────────────────────
-        // Level 2 優化: 使用 Warp Shuffle Reduction
-        // ───────────────────────────────────────────────────────
         // Cathode (z_opposite = z_anode)
-        warpAssistedReductionKernel<ImageChargeFunctor><<<numBlocks_electrolyte, blockSize, (blockSize/32)*sizeof(double), cu.getCurrentStream()>>>(
+        computeImageChargeKernel<<<numBlocks_electrolyte, blockSize, sharedMemSize, cu.getCurrentStream()>>>(
             numElectrolytes,
             (const int*)d_electrolyteIndices->getDevicePointer(),
             (const float4*)posq.getDevicePointer(),
@@ -885,7 +778,7 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
         );
 
         // Anode (z_opposite = z_cathode)
-        warpAssistedReductionKernel<ImageChargeFunctor><<<numBlocks_electrolyte, blockSize, (blockSize/32)*sizeof(double), cu.getCurrentStream()>>>(
+        computeImageChargeKernel<<<numBlocks_electrolyte, blockSize, sharedMemSize, cu.getCurrentStream()>>>(
             numElectrolytes,
             (const int*)d_electrolyteIndices->getDevicePointer(),
             (const float4*)posq.getDevicePointer(),
@@ -902,13 +795,11 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
         );
 
         // === 3d. 計算數值總電荷 ===
-        // Level 2 優化: Cathode使用Warp Shuffle
-        warpAssistedReductionKernel<SumFunctor><<<numBlocks_cathode, blockSize, (blockSize/32)*sizeof(double), cu.getCurrentStream()>>>(
+        sumElectrodeChargesKernel<<<numBlocks_cathode, blockSize, sharedMemSize, cu.getCurrentStream()>>>(
             numCathodes,
             (const int*)d_cathodeIndices->getDevicePointer(),
             (const float4*)posq.getDevicePointer(),
-            (double*)d_cathode_numeric_partial->getDevicePointer(),
-            0.0, 0.0  // Unused args for SumFunctor
+            (double*)d_cathode_numeric_partial->getDevicePointer()
         );
 
         reducePartialSumsKernel<<<1, 256, 256*sizeof(double), cu.getCurrentStream()>>>(
@@ -917,13 +808,11 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
             (double*)d_Q_numeric_cathode->getDevicePointer()
         );
 
-        // Level 2 優化: Anode使用Warp Shuffle
-        warpAssistedReductionKernel<SumFunctor><<<numBlocks_anode, blockSize, (blockSize/32)*sizeof(double), cu.getCurrentStream()>>>(
+        sumElectrodeChargesKernel<<<numBlocks_anode, blockSize, sharedMemSize, cu.getCurrentStream()>>>(
             numAnodes,
             (const int*)d_anodeIndices->getDevicePointer(),
             (const float4*)posq.getDevicePointer(),
-            (double*)d_anode_numeric_partial->getDevicePointer(),
-            0.0, 0.0  // Unused args for SumFunctor
+            (double*)d_anode_numeric_partial->getDevicePointer()
         );
 
         reducePartialSumsKernel<<<1, 256, 256*sizeof(double), cu.getCurrentStream()>>>(
@@ -957,17 +846,10 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
 
         // 無需cudaStreamSynchronize()！GPU pipeline保持運行 ✨
 
-        // ───────────────────────────────────────────────────────
-        // 🔥 CRITICAL FIX (Plan B): 在 SCF 迭代內通知電荷已更新！
-        // Reference Line 461: cu.invalidateMolecules()
-        // ───────────────────────────────────────────────────────
-        // ⭐ 這是第一性原則的核心：
-        // - 當前迭代更新了電荷（Lines 802-939）
-        // - 必須立即通知 OpenMM 讓下一次迭代的 calcForcesAndEnergy() 看到新電荷
-        // - 如果放在迴圈外，SCF 收斂性會被破壞（違反自洽性）
-        cu.invalidateMolecules();
-
     } // End SCF iteration loop
+
+    // Line 461: 通知 OpenMM 電荷已更新
+    cu.invalidateMolecules();
 
     return 0.0;
 }
@@ -1017,24 +899,21 @@ __global__ void integrateVerletKernel(
 }
 
 CudaIntegrateConstantVStepKernel::CudaIntegrateConstantVStepKernel(std::string name, const Platform& platform, CudaContext& cu) :
-    IntegrateConstantVStepKernel(name, platform), cu(cu), scf_frequency(1), prevStepSize(-1.0), kernelInitialized(false) {
+    IntegrateConstantVStepKernel(name, platform), cu(cu), scf_frequency(1), prevStepSize(-1.0) {
 }
 
 void CudaIntegrateConstantVStepKernel::initialize(const System& system, const ConstantVIntegrator& integrator) {
     scf_frequency = integrator.getSCFFrequency();
-    // Note: calcConstantVKernel will be created lazily in execute() when we have access to context
+
+    // 獲取CalcConstantVKernel來執行SCF迭代
+    ContextImpl& context = cu.getContextImpl();
+    Platform& platform = context.getPlatform();
+    calcConstantVKernel = platform.createKernel(CalcConstantVKernel::Name(), context);
 }
 
 void CudaIntegrateConstantVStepKernel::execute(ContextImpl& context, const ConstantVIntegrator& integrator) {
     // 照抄Reference版本的逻辑（ReferenceConstantVKernels.cpp:661-704）
     // 教授的顺序: 先SCF，后MD积分
-
-    // Lazy initialization of calcConstantVKernel on first use
-    if (!kernelInitialized) {
-        Platform& platform = context.getPlatform();
-        calcConstantVKernel = platform.createKernel(CalcConstantVKernel::Name(), context);
-        kernelInitialized = true;
-    }
 
     // 步骤1: 每scf_frequency步做一次SCF
     int stepCount = context.getStepCount();

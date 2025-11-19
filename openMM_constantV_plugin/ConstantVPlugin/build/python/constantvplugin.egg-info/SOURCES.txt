@@ -1,5 +1,6 @@
 ConstantVPluginWrapper.cpp
 constantvplugin.py
+constantvplugin_helpers.py
 setup.py
 constantvplugin.egg-info/PKG-INFO
 constantvplugin.egg-info/SOURCES.txt

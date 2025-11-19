@@ -114,7 +114,6 @@ private:
     int scf_frequency;
     double prevStepSize;
     OpenMM::Kernel calcConstantVKernel;  // SCF iteration kernel
-    bool kernelInitialized;  // Track whether calcConstantVKernel has been initialized
 };
 
 } // namespace ConstantVPlugin

@@ -14,6 +14,7 @@ libConstantVPluginCUDA.so: \
   /home/andy/miniforge3/envs/cuda/lib/libcublasLt.so \
   /home/andy/miniforge3/envs/cuda/lib/libculibos.a \
   /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so \
+  /home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so \
   /home/andy/miniforge3/envs/cuda/lib/libcudadevrt.a \
   /home/andy/miniforge3/envs/cuda/lib/libcudart_static.a \
   /home/andy/miniforge3/envs/cuda/bin/../x86_64-conda-linux-gnu/sysroot/usr/lib/../lib/librt.a \
@@ -75,6 +76,8 @@ CMakeFiles/ConstantVPluginCUDA.dir/cmake_device_link.o:
 /home/andy/miniforge3/envs/cuda/lib/libculibos.a:
 
 /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so:
+
+/home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so:
 
 /home/andy/miniforge3/envs/cuda/lib/libcudadevrt.a:
 

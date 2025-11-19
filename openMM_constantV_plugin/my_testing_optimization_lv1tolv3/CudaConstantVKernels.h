@@ -62,10 +62,6 @@ private:
     OpenMM::CudaArray* d_anodeAreas;        // [numAnodes] - area per anode atom (nm^2)
     OpenMM::CudaArray* d_electrolyteIndices; // [numElectrolytes] - electrolyte particle indices
 
-    // GPU arrays - SCF iteration working data (rewritten each iteration)
-    OpenMM::CudaArray* d_Ez_cathode;        // [numCathodes] - Ez_external for cathode atoms
-    OpenMM::CudaArray* d_Ez_anode;          // [numAnodes] - Ez_external for anode atoms
-
     // GPU arrays - Green's Reciprocity (analytic charge calculation)
     OpenMM::CudaArray* d_Q_analytic_cathode;  // [1] - analytic total charge for cathode
     OpenMM::CudaArray* d_Q_analytic_anode;    // [1] - analytic total charge for anode
@@ -81,6 +77,13 @@ private:
     // Pointer to NonbondedForce for charge updates
     OpenMM::NonbondedForce* nonbondedForce;
 
+    // Level 2 Optimization: Texture object for posq array
+    cudaTextureObject_t posqTexture;
+
+    // Level 3 Optimization: CUDA Graph for SCF loop
+    cudaGraph_t scfGraph;
+    cudaGraphExec_t scfGraphExec;
+
     // Lazy initialization flag
     bool gpuInitialized;
 
@@ -93,28 +96,6 @@ private:
 
 private:
     void initializeGPU();  // Defer GPU allocation to first execute()
-};
-
-/**
- * CUDA implementation of IntegrateConstantVStepKernel.
- * Coordinates SCF iteration + force calculation + Verlet integration.
- */
-class CudaIntegrateConstantVStepKernel : public IntegrateConstantVStepKernel {
-public:
-    CudaIntegrateConstantVStepKernel(std::string name, const OpenMM::Platform& platform, OpenMM::CudaContext& cu);
-
-    void initialize(const OpenMM::System& system, const ConstantVIntegrator& integrator) override;
-
-    void execute(OpenMM::ContextImpl& context, const ConstantVIntegrator& integrator) override;
-
-    double computeKineticEnergy(OpenMM::ContextImpl& context, const ConstantVIntegrator& integrator) override;
-
-private:
-    OpenMM::CudaContext& cu;
-    int scf_frequency;
-    double prevStepSize;
-    OpenMM::Kernel calcConstantVKernel;  // SCF iteration kernel
-    bool kernelInitialized;  // Track whether calcConstantVKernel has been initialized
 };
 
 } // namespace ConstantVPlugin

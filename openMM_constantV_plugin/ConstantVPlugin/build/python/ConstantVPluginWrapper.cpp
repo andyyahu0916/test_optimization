@@ -3440,26 +3440,28 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 
 /* -------- TYPES TABLE (BEGIN) -------- */
 
-#define SWIGTYPE_p_ConstantVPlugin__ConstantVForce swig_types[0]
-#define SWIGTYPE_p_ConstantVPlugin__ConstantVIntegrator swig_types[1]
-#define SWIGTYPE_p_OpenMM__Force swig_types[2]
-#define SWIGTYPE_p_OpenMM__Integrator swig_types[3]
-#define SWIGTYPE_p_allocator_type swig_types[4]
-#define SWIGTYPE_p_char swig_types[5]
-#define SWIGTYPE_p_difference_type swig_types[6]
-#define SWIGTYPE_p_double swig_types[7]
-#define SWIGTYPE_p_int swig_types[8]
-#define SWIGTYPE_p_p_PyObject swig_types[9]
-#define SWIGTYPE_p_size_type swig_types[10]
-#define SWIGTYPE_p_std__allocatorT_double_t swig_types[11]
-#define SWIGTYPE_p_std__allocatorT_int_t swig_types[12]
-#define SWIGTYPE_p_std__invalid_argument swig_types[13]
-#define SWIGTYPE_p_std__vectorT_double_t swig_types[14]
-#define SWIGTYPE_p_std__vectorT_int_t swig_types[15]
-#define SWIGTYPE_p_swig__SwigPyIterator swig_types[16]
-#define SWIGTYPE_p_value_type swig_types[17]
-static swig_type_info *swig_types[19];
-static swig_module_info swig_module = {swig_types, 18, 0, 0, 0, 0};
+#define SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator swig_types[0]
+#define SWIGTYPE_p_ConstantVPlugin__ConstantVForce swig_types[1]
+#define SWIGTYPE_p_ConstantVPlugin__ConstantVIntegrator swig_types[2]
+#define SWIGTYPE_p_OpenMM__DrudeIntegrator swig_types[3]
+#define SWIGTYPE_p_OpenMM__Force swig_types[4]
+#define SWIGTYPE_p_OpenMM__Integrator swig_types[5]
+#define SWIGTYPE_p_allocator_type swig_types[6]
+#define SWIGTYPE_p_char swig_types[7]
+#define SWIGTYPE_p_difference_type swig_types[8]
+#define SWIGTYPE_p_double swig_types[9]
+#define SWIGTYPE_p_int swig_types[10]
+#define SWIGTYPE_p_p_PyObject swig_types[11]
+#define SWIGTYPE_p_size_type swig_types[12]
+#define SWIGTYPE_p_std__allocatorT_double_t swig_types[13]
+#define SWIGTYPE_p_std__allocatorT_int_t swig_types[14]
+#define SWIGTYPE_p_std__invalid_argument swig_types[15]
+#define SWIGTYPE_p_std__vectorT_double_t swig_types[16]
+#define SWIGTYPE_p_std__vectorT_int_t swig_types[17]
+#define SWIGTYPE_p_swig__SwigPyIterator swig_types[18]
+#define SWIGTYPE_p_value_type swig_types[19]
+static swig_type_info *swig_types[21];
+static swig_module_info swig_module = {swig_types, 20, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -5459,8 +5461,10 @@ SWIGINTERN void std_vector_Sl_int_Sg__insert__SWIG_1(std::vector< int > *self,st
 
 #include "ConstantVForce.h"
 #include "ConstantVIntegrator.h"
+#include "ConstantVDrudeLangevinIntegrator.h"
 #include "openmm/Force.h"
 #include "openmm/Integrator.h"
+#include "openmm/DrudeIntegrator.h"
 #include "openmm/Context.h"
 
 SWIGINTERN ConstantVPlugin::ConstantVForce &ConstantVPlugin_ConstantVForce_cast(OpenMM::Force &force){
@@ -5474,6 +5478,12 @@ SWIGINTERN ConstantVPlugin::ConstantVIntegrator &ConstantVPlugin_ConstantVIntegr
         }
 SWIGINTERN bool ConstantVPlugin_ConstantVIntegrator_isinstance(OpenMM::Integrator &integrator){
             return (dynamic_cast<ConstantVPlugin::ConstantVIntegrator*>(&integrator) != NULL);
+        }
+SWIGINTERN ConstantVPlugin::ConstantVDrudeLangevinIntegrator &ConstantVPlugin_ConstantVDrudeLangevinIntegrator_cast(OpenMM::Integrator &integrator){
+            return dynamic_cast<ConstantVPlugin::ConstantVDrudeLangevinIntegrator&>(integrator);
+        }
+SWIGINTERN bool ConstantVPlugin_ConstantVDrudeLangevinIntegrator_isinstance(OpenMM::Integrator &integrator){
+            return (dynamic_cast<ConstantVPlugin::ConstantVDrudeLangevinIntegrator*>(&integrator) != NULL);
         }
 #ifdef __cplusplus
 extern "C" {
@@ -10037,6 +10047,175 @@ SWIGINTERN PyObject *Integrator_swigregister(PyObject *SWIGUNUSEDPARM(self), PyO
   return SWIG_Py_Void();
 }
 
+SWIGINTERN PyObject *_wrap_DrudeIntegrator_getDrudeTemperature(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  OpenMM::DrudeIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_OpenMM__DrudeIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "DrudeIntegrator_getDrudeTemperature" "', argument " "1"" of type '" "OpenMM::DrudeIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< OpenMM::DrudeIntegrator * >(argp1);
+  result = (double)((OpenMM::DrudeIntegrator const *)arg1)->getDrudeTemperature();
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_DrudeIntegrator_setDrudeTemperature(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  OpenMM::DrudeIntegrator *arg1 = 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "DrudeIntegrator_setDrudeTemperature", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_OpenMM__DrudeIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "DrudeIntegrator_setDrudeTemperature" "', argument " "1"" of type '" "OpenMM::DrudeIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< OpenMM::DrudeIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "DrudeIntegrator_setDrudeTemperature" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  (arg1)->setDrudeTemperature(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_DrudeIntegrator_getMaxDrudeDistance(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  OpenMM::DrudeIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_OpenMM__DrudeIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "DrudeIntegrator_getMaxDrudeDistance" "', argument " "1"" of type '" "OpenMM::DrudeIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< OpenMM::DrudeIntegrator * >(argp1);
+  result = (double)((OpenMM::DrudeIntegrator const *)arg1)->getMaxDrudeDistance();
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_DrudeIntegrator_setMaxDrudeDistance(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  OpenMM::DrudeIntegrator *arg1 = 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "DrudeIntegrator_setMaxDrudeDistance", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_OpenMM__DrudeIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "DrudeIntegrator_setMaxDrudeDistance" "', argument " "1"" of type '" "OpenMM::DrudeIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< OpenMM::DrudeIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "DrudeIntegrator_setMaxDrudeDistance" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  (arg1)->setMaxDrudeDistance(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_DrudeIntegrator_setRandomNumberSeed(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  OpenMM::DrudeIntegrator *arg1 = 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "DrudeIntegrator_setRandomNumberSeed", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_OpenMM__DrudeIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "DrudeIntegrator_setRandomNumberSeed" "', argument " "1"" of type '" "OpenMM::DrudeIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< OpenMM::DrudeIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "DrudeIntegrator_setRandomNumberSeed" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  (arg1)->setRandomNumberSeed(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_DrudeIntegrator_getRandomNumberSeed(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  OpenMM::DrudeIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_OpenMM__DrudeIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "DrudeIntegrator_getRandomNumberSeed" "', argument " "1"" of type '" "OpenMM::DrudeIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< OpenMM::DrudeIntegrator * >(argp1);
+  result = (int)((OpenMM::DrudeIntegrator const *)arg1)->getRandomNumberSeed();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *DrudeIntegrator_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj = NULL;
+  if (!SWIG_Python_UnpackTuple(args, "swigregister", 1, 1, &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_OpenMM__DrudeIntegrator, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
 SWIGINTERN PyObject *_wrap_new_ConstantVForce(PyObject *self, PyObject *args) {
   PyObject *resultobj = 0;
   ConstantVPlugin::ConstantVForce *result = 0 ;
@@ -12168,6 +12347,1190 @@ SWIGINTERN PyObject *ConstantVIntegrator_swiginit(PyObject *SWIGUNUSEDPARM(self)
   return SWIG_Python_InitShadowInstance(args);
 }
 
+SWIGINTERN PyObject *_wrap_new_ConstantVDrudeLangevinIntegrator(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  double arg5 ;
+  double val1 ;
+  int ecode1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  double val4 ;
+  int ecode4 = 0 ;
+  double val5 ;
+  int ecode5 = 0 ;
+  PyObject *swig_obj[5] ;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *result = 0 ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "new_ConstantVDrudeLangevinIntegrator", 5, 5, swig_obj)) SWIG_fail;
+  ecode1 = SWIG_AsVal_double(swig_obj[0], &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ConstantVDrudeLangevinIntegrator" "', argument " "1"" of type '" "double""'");
+  } 
+  arg1 = static_cast< double >(val1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ConstantVDrudeLangevinIntegrator" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  ecode3 = SWIG_AsVal_double(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_ConstantVDrudeLangevinIntegrator" "', argument " "3"" of type '" "double""'");
+  } 
+  arg3 = static_cast< double >(val3);
+  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_ConstantVDrudeLangevinIntegrator" "', argument " "4"" of type '" "double""'");
+  } 
+  arg4 = static_cast< double >(val4);
+  ecode5 = SWIG_AsVal_double(swig_obj[4], &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "new_ConstantVDrudeLangevinIntegrator" "', argument " "5"" of type '" "double""'");
+  } 
+  arg5 = static_cast< double >(val5);
+  {
+    try {
+      result = (ConstantVPlugin::ConstantVDrudeLangevinIntegrator *)new ConstantVPlugin::ConstantVDrudeLangevinIntegrator(arg1,arg2,arg3,arg4,arg5);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getTemperature(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getTemperature" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (double)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getTemperature();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_setTemperature(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_setTemperature", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_setTemperature" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_setTemperature" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  {
+    try {
+      (arg1)->setTemperature(arg2);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getFriction(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getFriction" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (double)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getFriction();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_setFriction(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_setFriction", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_setFriction" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_setFriction" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  {
+    try {
+      (arg1)->setFriction(arg2);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getDrudeFriction(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getDrudeFriction" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (double)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getDrudeFriction();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_setDrudeFriction(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_setDrudeFriction", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_setDrudeFriction" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_setDrudeFriction" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  {
+    try {
+      (arg1)->setDrudeFriction(arg2);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getVoltage(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getVoltage" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (double)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getVoltage();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_setVoltage(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_setVoltage", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_setVoltage" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_setVoltage" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  {
+    try {
+      (arg1)->setVoltage(arg2);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getNumSCFIterations(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getNumSCFIterations" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (int)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getNumSCFIterations();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_setNumSCFIterations(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_setNumSCFIterations", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_setNumSCFIterations" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_setNumSCFIterations" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  {
+    try {
+      (arg1)->setNumSCFIterations(arg2);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getSCFFrequency(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getSCFFrequency" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (int)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getSCFFrequency();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_setSCFFrequency(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_setSCFFrequency", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_setSCFFrequency" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_setSCFFrequency" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  {
+    try {
+      (arg1)->setSCFFrequency(arg2);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_addCathodeAtom(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  int arg2 ;
+  double arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  PyObject *swig_obj[3] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_addCathodeAtom", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_addCathodeAtom" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_addCathodeAtom" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_double(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ConstantVDrudeLangevinIntegrator_addCathodeAtom" "', argument " "3"" of type '" "double""'");
+  } 
+  arg3 = static_cast< double >(val3);
+  {
+    try {
+      (arg1)->addCathodeAtom(arg2,arg3);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_addAnodeAtom(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  int arg2 ;
+  double arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  PyObject *swig_obj[3] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_addAnodeAtom", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_addAnodeAtom" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_addAnodeAtom" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_double(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ConstantVDrudeLangevinIntegrator_addAnodeAtom" "', argument " "3"" of type '" "double""'");
+  } 
+  arg3 = static_cast< double >(val3);
+  {
+    try {
+      (arg1)->addAnodeAtom(arg2,arg3);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_addElectrolyteAtom(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  int arg2 ;
+  double arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  PyObject *swig_obj[3] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_addElectrolyteAtom", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_addElectrolyteAtom" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_addElectrolyteAtom" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_double(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ConstantVDrudeLangevinIntegrator_addElectrolyteAtom" "', argument " "3"" of type '" "double""'");
+  } 
+  arg3 = static_cast< double >(val3);
+  {
+    try {
+      (arg1)->addElectrolyteAtom(arg2,arg3);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getNumCathodeAtoms(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getNumCathodeAtoms" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (int)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getNumCathodeAtoms();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getNumAnodeAtoms(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getNumAnodeAtoms" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (int)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getNumAnodeAtoms();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getNumElectrolyteAtoms(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getNumElectrolyteAtoms" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (int)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getNumElectrolyteAtoms();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_setLgap(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_setLgap", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_setLgap" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_setLgap" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  {
+    try {
+      (arg1)->setLgap(arg2);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_setLcell(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_setLcell", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_setLcell" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_setLcell" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  {
+    try {
+      (arg1)->setLcell(arg2);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_setTotalArea(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_setTotalArea", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_setTotalArea" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_setTotalArea" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  {
+    try {
+      (arg1)->setTotalArea(arg2);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_setZCathode(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_setZCathode", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_setZCathode" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_setZCathode" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  {
+    try {
+      (arg1)->setZCathode(arg2);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_setZAnode(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_setZAnode", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_setZAnode" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_setZAnode" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  {
+    try {
+      (arg1)->setZAnode(arg2);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getLgap(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getLgap" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (double)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getLgap();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getLcell(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getLcell" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (double)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getLcell();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getTotalArea(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getTotalArea" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (double)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getTotalArea();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getZCathode(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getZCathode" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (double)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getZCathode();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_getZAnode(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_getZAnode" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      result = (double)((ConstantVPlugin::ConstantVDrudeLangevinIntegrator const *)arg1)->getZAnode();
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_double(static_cast< double >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_step(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "ConstantVDrudeLangevinIntegrator_step", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_step" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ConstantVDrudeLangevinIntegrator_step" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  {
+    try {
+      (arg1)->step(arg2);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_cast(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  OpenMM::Integrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *result = 0 ;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_OpenMM__Integrator,  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_cast" "', argument " "1"" of type '" "OpenMM::Integrator &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_NullReferenceError, "invalid null reference " "in method '" "ConstantVDrudeLangevinIntegrator_cast" "', argument " "1"" of type '" "OpenMM::Integrator &""'"); 
+  }
+  arg1 = reinterpret_cast< OpenMM::Integrator * >(argp1);
+  {
+    try {
+      result = (ConstantVPlugin::ConstantVDrudeLangevinIntegrator *) &ConstantVPlugin_ConstantVDrudeLangevinIntegrator_cast(*arg1);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ConstantVDrudeLangevinIntegrator_isinstance(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  OpenMM::Integrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  bool result;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_OpenMM__Integrator,  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ConstantVDrudeLangevinIntegrator_isinstance" "', argument " "1"" of type '" "OpenMM::Integrator &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_NullReferenceError, "invalid null reference " "in method '" "ConstantVDrudeLangevinIntegrator_isinstance" "', argument " "1"" of type '" "OpenMM::Integrator &""'"); 
+  }
+  arg1 = reinterpret_cast< OpenMM::Integrator * >(argp1);
+  {
+    try {
+      result = (bool)ConstantVPlugin_ConstantVDrudeLangevinIntegrator_isinstance(*arg1);
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_ConstantVDrudeLangevinIntegrator(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  ConstantVPlugin::ConstantVDrudeLangevinIntegrator *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  (void)self;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_ConstantVDrudeLangevinIntegrator" "', argument " "1"" of type '" "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *""'"); 
+  }
+  arg1 = reinterpret_cast< ConstantVPlugin::ConstantVDrudeLangevinIntegrator * >(argp1);
+  {
+    try {
+      delete arg1;
+    } catch (std::exception &e) {
+      PyErr_SetString(PyExc_Exception, const_cast<char*>(e.what()));
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *ConstantVDrudeLangevinIntegrator_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj = NULL;
+  if (!SWIG_Python_UnpackTuple(args, "swigregister", 1, 1, &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *ConstantVDrudeLangevinIntegrator_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  return SWIG_Python_InitShadowInstance(args);
+}
+
 static PyMethodDef SwigMethods[] = {
 	 { "delete_SwigPyIterator", _wrap_delete_SwigPyIterator, METH_O, NULL},
 	 { "SwigPyIterator_value", _wrap_SwigPyIterator_value, METH_O, NULL},
@@ -12260,6 +13623,13 @@ static PyMethodDef SwigMethods[] = {
 	 { "Force_swigregister", Force_swigregister, METH_O, NULL},
 	 { "Integrator_step", _wrap_Integrator_step, METH_VARARGS, NULL},
 	 { "Integrator_swigregister", Integrator_swigregister, METH_O, NULL},
+	 { "DrudeIntegrator_getDrudeTemperature", _wrap_DrudeIntegrator_getDrudeTemperature, METH_O, NULL},
+	 { "DrudeIntegrator_setDrudeTemperature", _wrap_DrudeIntegrator_setDrudeTemperature, METH_VARARGS, NULL},
+	 { "DrudeIntegrator_getMaxDrudeDistance", _wrap_DrudeIntegrator_getMaxDrudeDistance, METH_O, NULL},
+	 { "DrudeIntegrator_setMaxDrudeDistance", _wrap_DrudeIntegrator_setMaxDrudeDistance, METH_VARARGS, NULL},
+	 { "DrudeIntegrator_setRandomNumberSeed", _wrap_DrudeIntegrator_setRandomNumberSeed, METH_VARARGS, NULL},
+	 { "DrudeIntegrator_getRandomNumberSeed", _wrap_DrudeIntegrator_getRandomNumberSeed, METH_O, NULL},
+	 { "DrudeIntegrator_swigregister", DrudeIntegrator_swigregister, METH_O, NULL},
 	 { "new_ConstantVForce", _wrap_new_ConstantVForce, METH_NOARGS, NULL},
 	 { "ConstantVForce_getNumCathodeAtoms", _wrap_ConstantVForce_getNumCathodeAtoms, METH_O, NULL},
 	 { "ConstantVForce_addCathodeAtom", _wrap_ConstantVForce_addCathodeAtom, METH_VARARGS, NULL},
@@ -12321,20 +13691,66 @@ static PyMethodDef SwigMethods[] = {
 	 { "delete_ConstantVIntegrator", _wrap_delete_ConstantVIntegrator, METH_O, NULL},
 	 { "ConstantVIntegrator_swigregister", ConstantVIntegrator_swigregister, METH_O, NULL},
 	 { "ConstantVIntegrator_swiginit", ConstantVIntegrator_swiginit, METH_VARARGS, NULL},
+	 { "new_ConstantVDrudeLangevinIntegrator", _wrap_new_ConstantVDrudeLangevinIntegrator, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getTemperature", _wrap_ConstantVDrudeLangevinIntegrator_getTemperature, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_setTemperature", _wrap_ConstantVDrudeLangevinIntegrator_setTemperature, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getFriction", _wrap_ConstantVDrudeLangevinIntegrator_getFriction, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_setFriction", _wrap_ConstantVDrudeLangevinIntegrator_setFriction, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getDrudeFriction", _wrap_ConstantVDrudeLangevinIntegrator_getDrudeFriction, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_setDrudeFriction", _wrap_ConstantVDrudeLangevinIntegrator_setDrudeFriction, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getVoltage", _wrap_ConstantVDrudeLangevinIntegrator_getVoltage, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_setVoltage", _wrap_ConstantVDrudeLangevinIntegrator_setVoltage, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getNumSCFIterations", _wrap_ConstantVDrudeLangevinIntegrator_getNumSCFIterations, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_setNumSCFIterations", _wrap_ConstantVDrudeLangevinIntegrator_setNumSCFIterations, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getSCFFrequency", _wrap_ConstantVDrudeLangevinIntegrator_getSCFFrequency, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_setSCFFrequency", _wrap_ConstantVDrudeLangevinIntegrator_setSCFFrequency, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_addCathodeAtom", _wrap_ConstantVDrudeLangevinIntegrator_addCathodeAtom, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_addAnodeAtom", _wrap_ConstantVDrudeLangevinIntegrator_addAnodeAtom, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_addElectrolyteAtom", _wrap_ConstantVDrudeLangevinIntegrator_addElectrolyteAtom, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getNumCathodeAtoms", _wrap_ConstantVDrudeLangevinIntegrator_getNumCathodeAtoms, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getNumAnodeAtoms", _wrap_ConstantVDrudeLangevinIntegrator_getNumAnodeAtoms, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getNumElectrolyteAtoms", _wrap_ConstantVDrudeLangevinIntegrator_getNumElectrolyteAtoms, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_setLgap", _wrap_ConstantVDrudeLangevinIntegrator_setLgap, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_setLcell", _wrap_ConstantVDrudeLangevinIntegrator_setLcell, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_setTotalArea", _wrap_ConstantVDrudeLangevinIntegrator_setTotalArea, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_setZCathode", _wrap_ConstantVDrudeLangevinIntegrator_setZCathode, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_setZAnode", _wrap_ConstantVDrudeLangevinIntegrator_setZAnode, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getLgap", _wrap_ConstantVDrudeLangevinIntegrator_getLgap, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getLcell", _wrap_ConstantVDrudeLangevinIntegrator_getLcell, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getTotalArea", _wrap_ConstantVDrudeLangevinIntegrator_getTotalArea, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getZCathode", _wrap_ConstantVDrudeLangevinIntegrator_getZCathode, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_getZAnode", _wrap_ConstantVDrudeLangevinIntegrator_getZAnode, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_step", _wrap_ConstantVDrudeLangevinIntegrator_step, METH_VARARGS, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_cast", _wrap_ConstantVDrudeLangevinIntegrator_cast, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_isinstance", _wrap_ConstantVDrudeLangevinIntegrator_isinstance, METH_O, NULL},
+	 { "delete_ConstantVDrudeLangevinIntegrator", _wrap_delete_ConstantVDrudeLangevinIntegrator, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_swigregister", ConstantVDrudeLangevinIntegrator_swigregister, METH_O, NULL},
+	 { "ConstantVDrudeLangevinIntegrator_swiginit", ConstantVDrudeLangevinIntegrator_swiginit, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
+static void *_p_ConstantVPlugin__ConstantVDrudeLangevinIntegratorTo_p_OpenMM__DrudeIntegrator(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((OpenMM::DrudeIntegrator *)  ((ConstantVPlugin::ConstantVDrudeLangevinIntegrator *) x));
+}
 static void *_p_ConstantVPlugin__ConstantVForceTo_p_OpenMM__Force(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((OpenMM::Force *)  ((ConstantVPlugin::ConstantVForce *) x));
+}
+static void *_p_ConstantVPlugin__ConstantVDrudeLangevinIntegratorTo_p_OpenMM__Integrator(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((OpenMM::Integrator *) (OpenMM::DrudeIntegrator *) ((ConstantVPlugin::ConstantVDrudeLangevinIntegrator *) x));
 }
 static void *_p_ConstantVPlugin__ConstantVIntegratorTo_p_OpenMM__Integrator(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((OpenMM::Integrator *)  ((ConstantVPlugin::ConstantVIntegrator *) x));
 }
+static void *_p_OpenMM__DrudeIntegratorTo_p_OpenMM__Integrator(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((OpenMM::Integrator *)  ((OpenMM::DrudeIntegrator *) x));
+}
+static swig_type_info _swigt__p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator = {"_p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator", "ConstantVPlugin::ConstantVDrudeLangevinIntegrator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ConstantVPlugin__ConstantVForce = {"_p_ConstantVPlugin__ConstantVForce", "ConstantVPlugin::ConstantVForce *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ConstantVPlugin__ConstantVIntegrator = {"_p_ConstantVPlugin__ConstantVIntegrator", "ConstantVPlugin::ConstantVIntegrator *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_OpenMM__DrudeIntegrator = {"_p_OpenMM__DrudeIntegrator", "OpenMM::DrudeIntegrator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_OpenMM__Force = {"_p_OpenMM__Force", "OpenMM::Force *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_OpenMM__Integrator = {"_p_OpenMM__Integrator", "OpenMM::Integrator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_allocator_type = {"_p_allocator_type", "allocator_type *", 0, 0, (void*)0, 0};
@@ -12353,8 +13769,10 @@ static swig_type_info _swigt__p_swig__SwigPyIterator = {"_p_swig__SwigPyIterator
 static swig_type_info _swigt__p_value_type = {"_p_value_type", "value_type *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
+  &_swigt__p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator,
   &_swigt__p_ConstantVPlugin__ConstantVForce,
   &_swigt__p_ConstantVPlugin__ConstantVIntegrator,
+  &_swigt__p_OpenMM__DrudeIntegrator,
   &_swigt__p_OpenMM__Force,
   &_swigt__p_OpenMM__Integrator,
   &_swigt__p_allocator_type,
@@ -12373,10 +13791,12 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_value_type,
 };
 
+static swig_cast_info _swigc__p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator[] = {  {&_swigt__p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ConstantVPlugin__ConstantVForce[] = {  {&_swigt__p_ConstantVPlugin__ConstantVForce, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ConstantVPlugin__ConstantVIntegrator[] = {  {&_swigt__p_ConstantVPlugin__ConstantVIntegrator, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_OpenMM__DrudeIntegrator[] = {  {&_swigt__p_OpenMM__DrudeIntegrator, 0, 0, 0},  {&_swigt__p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, _p_ConstantVPlugin__ConstantVDrudeLangevinIntegratorTo_p_OpenMM__DrudeIntegrator, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_OpenMM__Force[] = {  {&_swigt__p_OpenMM__Force, 0, 0, 0},  {&_swigt__p_ConstantVPlugin__ConstantVForce, _p_ConstantVPlugin__ConstantVForceTo_p_OpenMM__Force, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_OpenMM__Integrator[] = {  {&_swigt__p_OpenMM__Integrator, 0, 0, 0},  {&_swigt__p_ConstantVPlugin__ConstantVIntegrator, _p_ConstantVPlugin__ConstantVIntegratorTo_p_OpenMM__Integrator, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_OpenMM__Integrator[] = {  {&_swigt__p_OpenMM__Integrator, 0, 0, 0},  {&_swigt__p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator, _p_ConstantVPlugin__ConstantVDrudeLangevinIntegratorTo_p_OpenMM__Integrator, 0, 0},  {&_swigt__p_ConstantVPlugin__ConstantVIntegrator, _p_ConstantVPlugin__ConstantVIntegratorTo_p_OpenMM__Integrator, 0, 0},  {&_swigt__p_OpenMM__DrudeIntegrator, _p_OpenMM__DrudeIntegratorTo_p_OpenMM__Integrator, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_allocator_type[] = {  {&_swigt__p_allocator_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_difference_type[] = {  {&_swigt__p_difference_type, 0, 0, 0},{0, 0, 0, 0}};
@@ -12393,8 +13813,10 @@ static swig_cast_info _swigc__p_swig__SwigPyIterator[] = {  {&_swigt__p_swig__Sw
 static swig_cast_info _swigc__p_value_type[] = {  {&_swigt__p_value_type, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
+  _swigc__p_ConstantVPlugin__ConstantVDrudeLangevinIntegrator,
   _swigc__p_ConstantVPlugin__ConstantVForce,
   _swigc__p_ConstantVPlugin__ConstantVIntegrator,
+  _swigc__p_OpenMM__DrudeIntegrator,
   _swigc__p_OpenMM__Force,
   _swigc__p_OpenMM__Integrator,
   _swigc__p_allocator_type,

@@ -213,6 +213,30 @@ PythonInstall/fast:
 	$(MAKE) $(MAKESILENT) -f python/CMakeFiles/PythonInstall.dir/build.make python/CMakeFiles/PythonInstall.dir/build
 .PHONY : PythonInstall/fast
 
+openmmapi/src/ConstantVDrudeLangevinIntegrator.o: openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o
+.PHONY : openmmapi/src/ConstantVDrudeLangevinIntegrator.o
+
+# target to build an object file
+openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVPlugin.dir/build.make CMakeFiles/ConstantVPlugin.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o
+.PHONY : openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o
+
+openmmapi/src/ConstantVDrudeLangevinIntegrator.i: openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.i
+.PHONY : openmmapi/src/ConstantVDrudeLangevinIntegrator.i
+
+# target to preprocess a source file
+openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVPlugin.dir/build.make CMakeFiles/ConstantVPlugin.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.i
+.PHONY : openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.i
+
+openmmapi/src/ConstantVDrudeLangevinIntegrator.s: openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.s
+.PHONY : openmmapi/src/ConstantVDrudeLangevinIntegrator.s
+
+# target to generate assembly for a file
+openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVPlugin.dir/build.make CMakeFiles/ConstantVPlugin.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.s
+.PHONY : openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.s
+
 openmmapi/src/ConstantVForce.o: openmmapi/src/ConstantVForce.cpp.o
 .PHONY : openmmapi/src/ConstantVForce.o
 
@@ -301,6 +325,9 @@ help:
 	@echo "... ConstantVPlugin"
 	@echo "... ConstantVPluginCUDA"
 	@echo "... ConstantVPluginReference"
+	@echo "... openmmapi/src/ConstantVDrudeLangevinIntegrator.o"
+	@echo "... openmmapi/src/ConstantVDrudeLangevinIntegrator.i"
+	@echo "... openmmapi/src/ConstantVDrudeLangevinIntegrator.s"
 	@echo "... openmmapi/src/ConstantVForce.o"
 	@echo "... openmmapi/src/ConstantVForce.i"
 	@echo "... openmmapi/src/ConstantVForce.s"

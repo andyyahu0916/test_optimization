@@ -16,7 +16,7 @@ if platform.system() == 'Darwin':
 
 extension = Extension(name='_constantvplugin',
                       sources=['ConstantVPluginWrapper.cpp'],
-                      libraries=['OpenMM', 'ConstantVPlugin'],
+                      libraries=['OpenMM', 'OpenMMDrude', 'ConstantVPlugin'],
                       include_dirs=[os.path.join(openmm_dir, 'include'), constantvplugin_header_dir],
                       library_dirs=[os.path.join(openmm_dir, 'lib'), constantvplugin_library_dir],
                       extra_compile_args=extra_compile_args,

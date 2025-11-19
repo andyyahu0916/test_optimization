@@ -349,6 +349,33 @@ class Integrator(object):
 
 # Register Integrator in _constantvplugin:
 _constantvplugin.Integrator_swigregister(Integrator)
+class DrudeIntegrator(Integrator):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+
+    def __init__(self, *args, **kwargs):
+        raise AttributeError("No constructor defined - class is abstract")
+    __repr__ = _swig_repr
+
+    def getDrudeTemperature(self):
+        return _constantvplugin.DrudeIntegrator_getDrudeTemperature(self)
+
+    def setDrudeTemperature(self, temp):
+        return _constantvplugin.DrudeIntegrator_setDrudeTemperature(self, temp)
+
+    def getMaxDrudeDistance(self):
+        return _constantvplugin.DrudeIntegrator_getMaxDrudeDistance(self)
+
+    def setMaxDrudeDistance(self, distance):
+        return _constantvplugin.DrudeIntegrator_setMaxDrudeDistance(self, distance)
+
+    def setRandomNumberSeed(self, seed):
+        return _constantvplugin.DrudeIntegrator_setRandomNumberSeed(self, seed)
+
+    def getRandomNumberSeed(self):
+        return _constantvplugin.DrudeIntegrator_getRandomNumberSeed(self)
+
+# Register DrudeIntegrator in _constantvplugin:
+_constantvplugin.DrudeIntegrator_swigregister(DrudeIntegrator)
 
 import openmm as mm
 import openmm.unit as unit
@@ -536,4 +563,109 @@ class ConstantVIntegrator(Integrator):
 
 # Register ConstantVIntegrator in _constantvplugin:
 _constantvplugin.ConstantVIntegrator_swigregister(ConstantVIntegrator)
+class ConstantVDrudeLangevinIntegrator(DrudeIntegrator):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def __init__(self, temperature, frictionCoeff, drudeTemperature, drudeFrictionCoeff, stepSize):
+        _constantvplugin.ConstantVDrudeLangevinIntegrator_swiginit(self, _constantvplugin.new_ConstantVDrudeLangevinIntegrator(temperature, frictionCoeff, drudeTemperature, drudeFrictionCoeff, stepSize))
+
+    def getTemperature(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getTemperature(self)
+
+    def setTemperature(self, temp):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_setTemperature(self, temp)
+
+    def getFriction(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getFriction(self)
+
+    def setFriction(self, coeff):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_setFriction(self, coeff)
+
+    def getDrudeFriction(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getDrudeFriction(self)
+
+    def setDrudeFriction(self, coeff):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_setDrudeFriction(self, coeff)
+
+    def getVoltage(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getVoltage(self)
+
+    def setVoltage(self, v):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_setVoltage(self, v)
+
+    def getNumSCFIterations(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getNumSCFIterations(self)
+
+    def setNumSCFIterations(self, n):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_setNumSCFIterations(self, n)
+
+    def getSCFFrequency(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getSCFFrequency(self)
+
+    def setSCFFrequency(self, freq):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_setSCFFrequency(self, freq)
+
+    def addCathodeAtom(self, particle, area):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_addCathodeAtom(self, particle, area)
+
+    def addAnodeAtom(self, particle, area):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_addAnodeAtom(self, particle, area)
+
+    def addElectrolyteAtom(self, particle, charge):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_addElectrolyteAtom(self, particle, charge)
+
+    def getNumCathodeAtoms(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getNumCathodeAtoms(self)
+
+    def getNumAnodeAtoms(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getNumAnodeAtoms(self)
+
+    def getNumElectrolyteAtoms(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getNumElectrolyteAtoms(self)
+
+    def setLgap(self, gap):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_setLgap(self, gap)
+
+    def setLcell(self, cell):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_setLcell(self, cell)
+
+    def setTotalArea(self, area):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_setTotalArea(self, area)
+
+    def setZCathode(self, z):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_setZCathode(self, z)
+
+    def setZAnode(self, z):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_setZAnode(self, z)
+
+    def getLgap(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getLgap(self)
+
+    def getLcell(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getLcell(self)
+
+    def getTotalArea(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getTotalArea(self)
+
+    def getZCathode(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getZCathode(self)
+
+    def getZAnode(self):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_getZAnode(self)
+
+    def step(self, steps):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_step(self, steps)
+
+    @staticmethod
+    def cast(integrator):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_cast(integrator)
+
+    @staticmethod
+    def isinstance(integrator):
+        return _constantvplugin.ConstantVDrudeLangevinIntegrator_isinstance(integrator)
+    __swig_destroy__ = _constantvplugin.delete_ConstantVDrudeLangevinIntegrator
+
+# Register ConstantVDrudeLangevinIntegrator in _constantvplugin:
+_constantvplugin.ConstantVDrudeLangevinIntegrator_swigregister(ConstantVDrudeLangevinIntegrator)
 

@@ -6,6 +6,7 @@ libConstantVPluginReference.so: \
   /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so \
   ../../libConstantVPlugin.so \
   /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so \
+  /home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so \
   /home/andy/miniforge3/envs/cuda/lib/libstdc++.so \
   /home/andy/miniforge3/envs/cuda/bin/../x86_64-conda-linux-gnu/sysroot/usr/lib/../lib/libm.so \
   /home/andy/miniforge3/envs/cuda/bin/../x86_64-conda-linux-gnu/sysroot/usr/lib/../lib/libm.so \
@@ -46,6 +47,8 @@ CMakeFiles/ConstantVPluginReference.dir/src/ReferenceConstantVKernels.cpp.o:
 ../../libConstantVPlugin.so:
 
 /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so:
+
+/home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so:
 
 /home/andy/miniforge3/envs/cuda/lib/libstdc++.so:
 

@@ -23,6 +23,12 @@ ConstantVForce::ConstantVForce() :
     z_anode(0.0),
     nIterations(4)  // 教授默认4次SCF迭代
 {
+    // 🔥 CRITICAL: Assign to force group 31 to prevent infinite recursion
+    // - CudaCalcConstantVKernel::execute() internally calls calcForcesAndEnergy()
+    // - If ConstantVForce is in the integration force groups, it would re-trigger itself
+    // - Solution: Use a dedicated group (31) that is always masked out internally
+    // - See CudaConstantVKernels.cu Line 805-807 for the masking logic
+    setForceGroup(31);
 }
 
 // ═══════════════════════════════════════════════════════════

@@ -78,6 +78,7 @@ python/CMakeFiles/PythonInstall.dir/codegen:
 PythonInstall: python/CMakeFiles/PythonInstall
 PythonInstall: python/ConstantVPluginWrapper.cpp
 PythonInstall: python/CMakeFiles/PythonInstall.dir/build.make
+	cd /home/andy/test_optimization/openMM_constantV_plugin/ConstantVPlugin/build/python && /home/andy/miniforge3/envs/cuda/bin/cmake -E copy /home/andy/test_optimization/openMM_constantV_plugin/ConstantVPlugin/python/helpers.py /home/andy/test_optimization/openMM_constantV_plugin/ConstantVPlugin/build/python/constantvplugin_helpers.py
 	cd /home/andy/test_optimization/openMM_constantV_plugin/ConstantVPlugin/build/python && /home/andy/miniforge3/envs/cuda/bin/python setup.py build
 	cd /home/andy/test_optimization/openMM_constantV_plugin/ConstantVPlugin/build/python && /home/andy/miniforge3/envs/cuda/bin/python setup.py install
 .PHONY : PythonInstall

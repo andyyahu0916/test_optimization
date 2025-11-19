@@ -516,6 +516,7 @@ platforms/reference/libConstantVPluginReference.so: libConstantVPlugin.so \
   /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/libpthread.a \
   /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib64/libc_nonshared.a \
   /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so \
+  /home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so \
   /home/andy/miniforge3/envs/cuda/lib/libgcc_s.so \
   /home/andy/miniforge3/envs/cuda/lib/libgcc_s.so.1 \
   /home/andy/miniforge3/envs/cuda/lib/libgomp.so \
@@ -529,6 +530,8 @@ platforms/reference/CMakeFiles/ConstantVPluginReference.dir/src/ReferenceConstan
 /home/andy/miniforge3/envs/cuda/lib/libstdc++.so:
 
 /home/andy/miniforge3/envs/cuda/lib/libgcc_s.so.1:
+
+/home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so:
 
 /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/libpthread.a:
 

@@ -9,8 +9,10 @@ namespace std {
 %{
 #include "ConstantVForce.h"
 #include "ConstantVIntegrator.h"
+#include "ConstantVDrudeLangevinIntegrator.h"
 #include "openmm/Force.h"
 #include "openmm/Integrator.h"
+#include "openmm/DrudeIntegrator.h"
 #include "openmm/Context.h"
 %}
 
@@ -26,6 +28,18 @@ namespace OpenMM {
     class Integrator {
     public:
         virtual void step(int steps) = 0;
+    };
+
+    %nodefaultctor DrudeIntegrator;
+    %nodefaultdtor DrudeIntegrator;
+    class DrudeIntegrator : public Integrator {
+    public:
+        double getDrudeTemperature() const;
+        void setDrudeTemperature(double temp);
+        double getMaxDrudeDistance() const;
+        void setMaxDrudeDistance(double distance);
+        void setRandomNumberSeed(int seed);
+        int getRandomNumberSeed() const;
     };
 
     class Context;
@@ -181,6 +195,70 @@ public:
 
         static bool isinstance(OpenMM::Integrator& integrator) {
             return (dynamic_cast<ConstantVPlugin::ConstantVIntegrator*>(&integrator) != NULL);
+        }
+    }
+};
+
+// ═══════════════════════════════════════════════════════════
+// ConstantVDrudeLangevinIntegrator (Dual-temperature Langevin + Constant Voltage)
+// ═══════════════════════════════════════════════════════════
+
+class ConstantVDrudeLangevinIntegrator : public OpenMM::DrudeIntegrator {
+public:
+    ConstantVDrudeLangevinIntegrator(
+        double temperature,
+        double frictionCoeff,
+        double drudeTemperature,
+        double drudeFrictionCoeff,
+        double stepSize
+    );
+
+    // Langevin parameters
+    double getTemperature() const;
+    void setTemperature(double temp);
+    double getFriction() const;
+    void setFriction(double coeff);
+    double getDrudeFriction() const;
+    void setDrudeFriction(double coeff);
+
+    // Constant voltage parameters
+    double getVoltage() const;
+    void setVoltage(double v);
+    int getNumSCFIterations() const;
+    void setNumSCFIterations(int n);
+    int getSCFFrequency() const;
+    void setSCFFrequency(int freq);
+
+    // Electrode atoms
+    void addCathodeAtom(int particle, double area);
+    void addAnodeAtom(int particle, double area);
+    void addElectrolyteAtom(int particle, double charge);
+    int getNumCathodeAtoms() const;
+    int getNumAnodeAtoms() const;
+    int getNumElectrolyteAtoms() const;
+
+    // Geometry parameters
+    void setLgap(double gap);
+    void setLcell(double cell);
+    void setTotalArea(double area);
+    void setZCathode(double z);
+    void setZAnode(double z);
+    double getLgap() const;
+    double getLcell() const;
+    double getTotalArea() const;
+    double getZCathode() const;
+    double getZAnode() const;
+
+    // Integrator interface
+    void step(int steps);
+
+    %extend {
+        static ConstantVPlugin::ConstantVDrudeLangevinIntegrator& cast(OpenMM::Integrator& integrator) {
+            return dynamic_cast<ConstantVPlugin::ConstantVDrudeLangevinIntegrator&>(integrator);
+        }
+
+        static bool isinstance(OpenMM::Integrator& integrator) {
+            return (dynamic_cast<ConstantVPlugin::ConstantVDrudeLangevinIntegrator*>(&integrator) != NULL);
         }
     }
 };

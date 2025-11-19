@@ -202,12 +202,14 @@ print("STEP 4: Auto-identifying electrolyte atoms")
 print("="*60)
 
 # Use helper function to automatically identify electrolyte
-# (Residues with < 100 atoms, excluding electrode chains)
+# ⭐ CRITICAL FIX (P0): Now uses Scheme A to include Drude particles
+# (Previous version missed Drude particles - catastrophic for SAPT-FF!)
 electrolyte_atoms = add_electrolyte_atoms_auto(
     pdb.topology,
+    system,  # ← NEW: Required for Scheme A (includes Drude particles)
     integrator,
     nonbonded_force,
-    natom_cutoff=100,  # Original default (MM_classes.py:256)
+    natom_cutoff=100,  # Legacy parameter (not used in Scheme A)
     exclude_chains=[CATHODE_CHAIN_INDEX, ANODE_CHAIN_INDEX]
 )
 
