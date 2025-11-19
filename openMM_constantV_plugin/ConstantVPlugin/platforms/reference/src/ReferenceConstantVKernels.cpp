@@ -1008,6 +1008,49 @@ void ReferenceIntegrateConstantVStepKernel::initialize(
     if (nonbondedForce == nullptr)
         throw OpenMMException("ConstantVIntegrator: NonbondedForce not found in System");
 
+    // ───────────────────────────────────────────────────────
+    // 找到ConstantVForce（用于加载Buckyball数据）
+    // ───────────────────────────────────────────────────────
+    const ConstantVForce* constantVForce = nullptr;
+    for (int i = 0; i < system.getNumForces(); i++) {
+        const Force& force = system.getForce(i);
+        const ConstantVForce* cvForce = dynamic_cast<const ConstantVForce*>(&force);
+        if (cvForce != nullptr) {
+            constantVForce = cvForce;
+            break;
+        }
+    }
+
+    // ───────────────────────────────────────────────────────
+    // 从ConstantVForce加载Buckyball导体（如果存在）
+    // ───────────────────────────────────────────────────────
+    if (constantVForce != nullptr) {
+        int numBuckyballs = constantVForce->getNumBuckyballConductors();
+        buckyballConductors.resize(numBuckyballs);
+
+        for (int i = 0; i < numBuckyballs; i++) {
+            std::vector<int> virtualAtoms, realAtoms;
+            std::string electrodeType;
+            double voltageV;
+            constantVForce->getBuckyballConductorParameters(i, virtualAtoms, realAtoms, electrodeType, voltageV);
+
+            BuckyballConductor& conductor = buckyballConductors[i];
+            conductor.virtualAtomIndices = virtualAtoms;
+            conductor.realAtomIndices = realAtoms;
+            conductor.electrodeType = electrodeType;
+            conductor.voltageKjMol = voltageV * CONVERSION_EV_KJMOL;
+            conductor.closeThreshold = 1.5;  // nm
+            conductor.closeToElectrode = true;
+            conductor.contactAtomIndex = -1;
+            conductor.dr_center_contact = 0.0;
+            // 几何参数将在第一次execute时计算
+        }
+
+        if (numBuckyballs > 0) {
+            std::cout << "[Reference Integrator] Loaded " << numBuckyballs << " Buckyball conductor(s) from Force" << std::endl;
+        }
+    }
+
     // 从NonbondedForce初始化currentCharges（修復Bug #3）
     for (int i = 0; i < numParticles; i++) {
         double charge, sigma, epsilon;
@@ -1055,6 +1098,195 @@ void ReferenceIntegrateConstantVStepKernel::initialize(
         // Line 299-300: 設置電荷和LJ參數
         currentCharges[atomIdx] = q_i;
         nonbondedForce->setParticleParameters(atomIdx, q_i, 1.0, 0.0);
+    }
+
+    // ───────────────────────────────────────────────────────
+    // Initialize Buckyball conductors geometry
+    // (Note: This happens in initialize(), not in first execute())
+    // ───────────────────────────────────────────────────────
+    // We need a ContextImpl to get positions, but we don't have it in initialize()
+    // So Buckyball geometry will be initialized in first execute() instead
+    // (Flag will be added to track this)
+}
+
+// ═══════════════════════════════════════════════════════════
+// Integrator Buckyball helper methods (identical to CalcKernel)
+// ═══════════════════════════════════════════════════════════
+
+void ReferenceIntegrateConstantVStepKernel::initializeBuckyballGeometry(
+    BuckyballConductor& conductor,
+    const vector<Vec3>& positions
+) {
+    // Identical implementation to CalcKernel - Line 327-400
+    int Natoms = conductor.virtualAtomIndices.size();
+
+    conductor.r_center[0] = 0.0;
+    conductor.r_center[1] = 0.0;
+    conductor.r_center[2] = 0.0;
+
+    for (int atomIdx : conductor.virtualAtomIndices) {
+        conductor.r_center[0] += positions[atomIdx][0];
+        conductor.r_center[1] += positions[atomIdx][1];
+        conductor.r_center[2] += positions[atomIdx][2];
+    }
+
+    conductor.r_center[0] /= Natoms;
+    conductor.r_center[1] /= Natoms;
+    conductor.r_center[2] /= Natoms;
+
+    if (Natoms > 0) {
+        int firstAtom = conductor.virtualAtomIndices[0];
+        double rx = positions[firstAtom][0] - conductor.r_center[0];
+        double ry = positions[firstAtom][1] - conductor.r_center[1];
+        double rz = positions[firstAtom][2] - conductor.r_center[2];
+        conductor.radius = sqrt(rx*rx + ry*ry + rz*rz);
+    }
+
+    conductor.area_atom = 4.0 * M_PI * conductor.radius * conductor.radius / Natoms;
+
+    conductor.normalVectors.resize(3 * Natoms);
+
+    for (size_t i = 0; i < conductor.virtualAtomIndices.size(); i++) {
+        int atomIdx = conductor.virtualAtomIndices[i];
+        double nx = positions[atomIdx][0] - conductor.r_center[0];
+        double ny = positions[atomIdx][1] - conductor.r_center[1];
+        double nz = positions[atomIdx][2] - conductor.r_center[2];
+        double norm = sqrt(nx*nx + ny*ny + nz*nz);
+
+        conductor.normalVectors[3*i + 0] = nx / norm;
+        conductor.normalVectors[3*i + 1] = ny / norm;
+        conductor.normalVectors[3*i + 2] = nz / norm;
+    }
+}
+
+void ReferenceIntegrateConstantVStepKernel::findContactNeighborConductor(
+    BuckyballConductor& conductor,
+    const vector<Vec3>& positions
+) {
+    // Identical implementation to CalcKernel - Line 407-464
+    const vector<int>* electrodeContact = nullptr;
+    if (conductor.electrodeType == "cathode") {
+        electrodeContact = &cathodeAtomIndices;
+    } else {
+        electrodeContact = &anodeAtomIndices;
+    }
+
+    double min_dist = 10.0;
+    conductor.contactAtomIndex = -1;
+
+    for (int atomIdx : *electrodeContact) {
+        double dx = conductor.r_center[0] - positions[atomIdx][0];
+        double dy = conductor.r_center[1] - positions[atomIdx][1];
+        double dz = conductor.r_center[2] - positions[atomIdx][2];
+        double dr_atom = sqrt(dx*dx + dy*dy + dz*dz);
+
+        if (dr_atom < min_dist) {
+            conductor.contactAtomIndex = atomIdx;
+            min_dist = dr_atom;
+        }
+    }
+
+    if (min_dist < conductor.closeThreshold) {
+        conductor.dr_center_contact = min_dist;
+        conductor.closeToElectrode = true;
+        return;
+    }
+
+    conductor.closeToElectrode = false;
+}
+
+void ReferenceIntegrateConstantVStepKernel::numericalChargeConductor(
+    BuckyballConductor& conductor,
+    const vector<Vec3>& forces,
+    ContextImpl& context
+) {
+    // Identical implementation to CalcKernel - Line 471-690
+    // Step 1: Image charges
+    for (size_t i = 0; i < conductor.virtualAtomIndices.size(); i++) {
+        int atomIdx = conductor.virtualAtomIndices[i];
+        double charge, sigma, epsilon;
+        nonbondedForce->getParticleParameters(atomIdx, charge, sigma, epsilon);
+        double q_i = charge;
+
+        double nx = conductor.normalVectors[3*i + 0];
+        double ny = conductor.normalVectors[3*i + 1];
+        double nz = conductor.normalVectors[3*i + 2];
+
+        if (fabs(q_i) > (0.9 * SMALL_THRESHOLD)) {
+            double Ex = forces[atomIdx][0] / q_i;
+            double Ey = forces[atomIdx][1] / q_i;
+            double Ez = forces[atomIdx][2] / q_i;
+
+            double En_external = Ex * nx + Ey * ny + Ez * nz;
+
+            q_i = 2.0 / (4.0 * M_PI) * conductor.area_atom * En_external * CONVERSION_KJMOLNM_AU;
+        } else {
+            q_i = SMALL_THRESHOLD;
+        }
+
+        currentCharges[atomIdx] = q_i;
+        nonbondedForce->setParticleParameters(atomIdx, q_i, sigma, epsilon);
+    }
+
+    nonbondedForce->updateParametersInContext(context.getOwner());
+
+    // Recompute forces
+    context.calcForcesAndEnergy(true, false, -1);
+    vector<Vec3>& forcesNew = extractForces(context);
+
+    // Step 2: Charge transfer
+    if (conductor.contactAtomIndex < 0) {
+        return;
+    }
+
+    int conductorAtomIndex = conductor.contactAtomIndex;
+    double charge, sigma, epsilon;
+    nonbondedForce->getParticleParameters(conductorAtomIndex, charge, sigma, epsilon);
+    double q_i = charge;
+
+    double conductor_atom_nx, conductor_atom_ny, conductor_atom_nz;
+
+    if (conductor.electrodeType == "cathode") {
+        conductor_atom_nx = 0.0;
+        conductor_atom_ny = 0.0;
+        conductor_atom_nz = 1.0;
+    } else {
+        conductor_atom_nx = 0.0;
+        conductor_atom_ny = 0.0;
+        conductor_atom_nz = -1.0;
+    }
+
+    double En_external = 0.0;
+
+    if (fabs(q_i) > (0.9 * SMALL_THRESHOLD)) {
+        double Ex = forcesNew[conductorAtomIndex][0] / q_i;
+        double Ey = forcesNew[conductorAtomIndex][1] / q_i;
+        double Ez = forcesNew[conductorAtomIndex][2] / q_i;
+
+        En_external = Ex * conductor_atom_nx + Ey * conductor_atom_ny + Ez * conductor_atom_nz;
+    }
+
+    double dE_conductor;
+
+    if (conductor.closeToElectrode) {
+        dE_conductor = -(En_external + voltage / Lgap / 2.0) * CONVERSION_KJMOLNM_AU;
+    } else {
+        dE_conductor = -En_external * CONVERSION_KJMOLNM_AU;
+    }
+
+    double sign = -1.0;
+    double dQ_conductor = sign * dE_conductor * conductor.dr_center_contact * conductor.dr_center_contact;
+
+    int Natoms = conductor.virtualAtomIndices.size();
+    double dq_atom = dQ_conductor / Natoms;
+
+    for (int atomIdx : conductor.virtualAtomIndices) {
+        double charge_old, sig, eps;
+        nonbondedForce->getParticleParameters(atomIdx, charge_old, sig, eps);
+        double q_i_new = charge_old + dq_atom;
+
+        currentCharges[atomIdx] = q_i_new;
+        nonbondedForce->setParticleParameters(atomIdx, q_i_new, sig, eps);
     }
 }
 
