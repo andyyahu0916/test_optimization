@@ -1351,6 +1351,20 @@ void ReferenceIntegrateConstantVStepKernel::scf_iteration(ContextImpl& context) 
     // Line 296-300: 获取位置，计算解析电荷
     vector<Vec3>& positions = extractPositions(context);
 
+    // ───────────────────────────────────────────────────────
+    // Initialize Buckyball geometry on first call
+    // (Need positions from context, so must be done here)
+    // ───────────────────────────────────────────────────────
+    static bool buckyballInitialized = false;
+    if (!buckyballInitialized && !buckyballConductors.empty()) {
+        for (BuckyballConductor& conductor : buckyballConductors) {
+            initializeBuckyballGeometry(conductor, positions);
+            findContactNeighborConductor(conductor, positions);
+        }
+        buckyballInitialized = true;
+        std::cout << "[Reference Integrator] Buckyball conductors initialized" << std::endl;
+    }
+
     computeElectrodeChargeAnalytic(
         cathodeAtomIndices, positions, "cathode",
         z_anode, Q_analytic_cathode
@@ -1418,6 +1432,37 @@ void ReferenceIntegrateConstantVStepKernel::scf_iteration(ContextImpl& context) 
 
             currentCharges[atomIdx] = q_i;
             nonbondedForce->setParticleParameters(atomIdx, q_i, 1.0, 0.0);
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // Line 352-361: Conductor处理（完全照抄）
+        // ═══════════════════════════════════════════════════════
+        // if self.Conductor_list:
+        //     for Conductor in self.Conductor_list:
+        //         self.Numerical_charge_Conductor( Conductor , forces )
+        //     self.nbondedForce.updateParametersInContext(self.simmd.context)
+        //     self.Cathode.compute_Electrode_charge_analytic(...)
+        //     self.Anode.compute_Electrode_charge_analytic(...)
+
+        if (!buckyballConductors.empty()) {
+            // Line 354-355: Process each conductor
+            for (BuckyballConductor& conductor : buckyballConductors) {
+                numericalChargeConductor(conductor, forces, context);
+            }
+
+            // Line 357: Update context after conductor charge updates
+            nonbondedForce->updateParametersInContext(context.getOwner());
+
+            // Line 358-360: Recompute Q_analytic (conductors are "part of electrolyte")
+            computeElectrodeChargeAnalytic(
+                cathodeAtomIndices, positions, "cathode",
+                z_anode, Q_analytic_cathode
+            );
+
+            computeElectrodeChargeAnalytic(
+                anodeAtomIndices, positions, "anode",
+                z_cathode, Q_analytic_anode
+            );
         }
 
         // Line 362-365: Green's校正 + 更新Context
