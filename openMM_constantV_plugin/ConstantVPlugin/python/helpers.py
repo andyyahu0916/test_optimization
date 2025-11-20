@@ -1919,3 +1919,464 @@ def get_scf_constants():
         'conversion_nmBohr': 18.8973,  # MM_classes.py:45
         'conversion_kJmolNm_au': 18.8973 / 2625.5  # MM_classes.py:46-47
     }
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+#   ADDITIONAL FEATURES FROM ORIGINAL (PREVIOUSLY MISSING)
+# ═══════════════════════════════════════════════════════════════════════════
+
+def set_umbrella_potential(simulation, system, topology, molecule_name, force_constant, **kwargs):
+    """
+    Set an umbrella potential constraining the centroid of a molecule.
+
+    Replicates: MM_classes.setumbrella() (MM_classes.py:752-813)
+
+    This function adds an umbrella sampling potential to constrain a molecule's
+    centroid position. Two modes are supported:
+
+    1. Distance constraint: Constrain distance between two molecule centroids
+    2. Absolute z-position constraint: Fix molecule at specific z coordinate
+
+    Parameters:
+    -----------
+    simulation : openmm.app.Simulation
+        The OpenMM simulation object
+    system : openmm.System
+        The OpenMM system object
+    topology : openmm.app.Topology
+        The system topology
+    molecule_name : str
+        Residue name of molecule to constrain (mol1)
+    force_constant : float (with units)
+        Spring constant k for harmonic restraint (e.g., 100*kilocalories_per_mole/angstrom**2)
+
+    **kwargs (Option 1 - Distance constraint):
+        mol2 : str
+            Residue name of second molecule
+        atomtype : str
+            Atom name in mol2 to constrain distance to
+        r0centroid : float (with units)
+            Equilibrium distance (e.g., 0.5*nanometer)
+
+    **kwargs (Option 2 - Absolute z constraint):
+        z_global : float (with units)
+            Target z position (e.g., 3.0*nanometer)
+
+    Returns:
+    --------
+    openmm.Force
+        The created force object (CustomCentroidBondForce or CustomExternalForce)
+
+    Example:
+    --------
+    >>> # Option 1: Constrain distance between two molecules
+    >>> force = set_umbrella_potential(
+    ...     simulation, system, topology,
+    ...     molecule_name='ION',
+    ...     force_constant=100*kilocalories_per_mole/angstrom**2,
+    ...     mol2='ELEC',
+    ...     atomtype='C1',
+    ...     r0centroid=0.5*nanometer
+    ... )
+
+    >>> # Option 2: Fix molecule at z=3.0 nm
+    >>> force = set_umbrella_potential(
+    ...     simulation, system, topology,
+    ...     molecule_name='ION',
+    ...     force_constant=100*kilocalories_per_mole/angstrom**2,
+    ...     z_global=3.0*nanometer
+    ... )
+
+    Notes:
+    ------
+    - After adding force, context is reinitialized
+    - Exact replication of Original MM_classes.setumbrella() (照抄為原則)
+    - Uses OpenMM's CustomCentroidBondForce or CustomExternalForce
+    """
+    from openmm import CustomCentroidBondForce, CustomExternalForce
+
+    # Create mol1 group for centroid
+    g1 = []
+    for res in topology.residues():
+        if res.name == molecule_name:
+            for atom in res.atoms():
+                g1.append(atom.index)
+            break
+
+    if not g1:
+        raise ValueError(f"Molecule '{molecule_name}' not found in topology")
+
+    # Option 1: Distance constraint between two centroids
+    if ('mol2' in kwargs) and ('atomtype' in kwargs) and ('r0centroid' in kwargs):
+        mol2 = kwargs['mol2']
+        atomtype = kwargs['atomtype']
+        r0centroid = kwargs['r0centroid']
+
+        # Create mol2 group
+        g2 = []
+        for res in topology.residues():
+            if res.name == mol2:
+                for atom in res.atoms():
+                    if atom.name == atomtype:
+                        g2.append(atom.index)
+                break
+
+        if not g2:
+            raise ValueError(f"Atom type '{atomtype}' in molecule '{mol2}' not found")
+
+        # Create centroid bond force
+        centroid_force = CustomCentroidBondForce(2, "0.5*k*(distance(g1,g2)-r0centroid)^2")
+        system.addForce(centroid_force)
+        centroid_force.addPerBondParameter("k")
+        centroid_force.addPerBondParameter("r0centroid")
+        centroid_force.addGroup(g1)
+        centroid_force.addGroup(g2)
+        bondgroups = [0, 1]
+        bondparam = [force_constant, r0centroid]
+        centroid_force.addBond(bondgroups, bondparam)
+        centroid_force.setUsesPeriodicBoundaryConditions(True)
+        centroid_force.addGlobalParameter('r0centroid', r0centroid)
+
+        # Set force groups
+        for i in range(system.getNumForces()):
+            f = system.getForce(i)
+            f.setForceGroup(i)
+
+        force_obj = centroid_force
+
+    # Option 2: Absolute z-position constraint
+    elif 'z_global' in kwargs:
+        z_global = kwargs['z_global']
+
+        # Create external force for z-constraint
+        z_force = CustomExternalForce("0.5 * k * periodicdistance(x,y,z,x,y,z0)^2")
+        system.addForce(z_force)
+
+        # Add particles to force
+        for index in g1:
+            z_force.addParticle(index)
+
+        z_force.addGlobalParameter('z0', z_global)
+        z_force.addGlobalParameter('k', force_constant)
+
+        force_obj = z_force
+
+    else:
+        raise ValueError("Must provide either (mol2, atomtype, r0centroid) or (z_global) in kwargs")
+
+    # Reinitialize context with new force
+    positions = simulation.context.getState(getPositions=True).getPositions()
+    simulation.context.reinitialize(preserveState=True)
+    simulation.context.setPositions(positions)
+
+    return force_obj
+
+
+def set_periodic_residue(system, flag):
+    """
+    Set periodic boundary conditions for intramolecular forces.
+
+    Replicates: MM_classes.set_periodic_residue() (MM_classes.py:121-132)
+
+    This enables/disables periodic boundary conditions for bonded forces
+    (bonds, angles, torsions) which is important for large molecules like
+    graphene sheets that span periodic boundaries.
+
+    Parameters:
+    -----------
+    system : openmm.System
+        The OpenMM system object
+    flag : bool
+        True to enable PBC for intramolecular interactions, False to disable
+
+    Example:
+    --------
+    >>> system = forcefield.createSystem(...)
+    >>> set_periodic_residue(system, flag=True)  # Enable PBC for bonds/angles/torsions
+
+    Notes:
+    ------
+    - Sets force groups for all forces (each force gets unique group = index)
+    - Only affects HarmonicBondForce, HarmonicAngleForce, PeriodicTorsionForce, RBTorsionForce
+    - DrudeForce does not have setUsesPeriodicBoundaryConditions() method
+    - Exact replication of Original (照抄為原則)
+    """
+    from openmm import HarmonicBondForce, HarmonicAngleForce, PeriodicTorsionForce, RBTorsionForce
+
+    for i in range(system.getNumForces()):
+        f = system.getForce(i)
+        f.setForceGroup(i)
+
+        # If using PBC, enable for bonded forces
+        if flag:
+            if type(f) in [HarmonicBondForce, HarmonicAngleForce, PeriodicTorsionForce, RBTorsionForce]:
+                f.setUsesPeriodicBoundaryConditions(True)
+                f.usesPeriodicBoundaryConditions()
+
+
+def set_pme_parameters(system, pme_alpha, pme_grid_a, pme_grid_b, pme_grid_c):
+    """
+    Set PME (Particle Mesh Ewald) parameters for electrostatics.
+
+    Replicates: MM_classes.setPMEParameters() (MM_classes.py:135-136)
+
+    The PME grid size is important for accuracy of external potential in
+    DFT/QM-MM quadrature, since potential is interpolated from PME grid.
+
+    Parameters:
+    -----------
+    system : openmm.System
+        The OpenMM system object
+    pme_alpha : float (1/length units)
+        Ewald separation parameter (e.g., 0.35/nanometer)
+    pme_grid_a : int
+        PME grid size along a axis
+    pme_grid_b : int
+        PME grid size along b axis
+    pme_grid_c : int
+        PME grid size along c axis
+
+    Example:
+    --------
+    >>> from openmm import NonbondedForce
+    >>> set_pme_parameters(system, 0.35/nanometer, 64, 64, 128)
+
+    Notes:
+    ------
+    - Finds NonbondedForce automatically
+    - Grid sizes should be powers of 2 for FFT efficiency
+    - Higher grid density = more accurate but slower
+    - Exact replication of Original (照抄為原則)
+    """
+    from openmm import NonbondedForce
+
+    # Find NonbondedForce
+    nbonded_force = None
+    for i in range(system.getNumForces()):
+        f = system.getForce(i)
+        if type(f) == NonbondedForce:
+            nbonded_force = f
+            break
+
+    if nbonded_force is None:
+        raise ValueError("NonbondedForce not found in system")
+
+    nbonded_force.setPMEParameters(pme_alpha, pme_grid_a, pme_grid_b, pme_grid_c)
+
+
+def get_element_charge_for_atom_lists(system, topology, atom_lists):
+    """
+    Get element symbols and charges for lists of atom indices.
+
+    Replicates: MM_classes.get_element_charge_for_atom_lists() (MM_classes.py:855-878)
+
+    Used in QM/MM simulations to extract atomic information for QM region.
+
+    Parameters:
+    -----------
+    system : openmm.System
+        The OpenMM system object
+    topology : openmm.app.Topology
+        The system topology
+    atom_lists : list of list of int
+        List of atom index lists (e.g., [[0,1,2], [10,11,12]])
+
+    Returns:
+    --------
+    element_lists : list of list of str
+        Element symbols for each atom list
+    charge_lists : list of list of float
+        Partial charges (e) for each atom list
+
+    Example:
+    --------
+    >>> qm_atoms = [0, 1, 2, 3]  # QM region atoms
+    >>> mm_atoms = [100, 101, 102]  # MM boundary atoms
+    >>> elements, charges = get_element_charge_for_atom_lists(
+    ...     system, topology, [qm_atoms, mm_atoms]
+    ... )
+    >>> print(elements)  # [['C', 'C', 'H', 'H'], ['O', 'H', 'H']]
+    >>> print(charges)   # [[0.1, 0.1, -0.05, -0.05], [-0.8, 0.4, 0.4]]
+
+    Notes:
+    ------
+    - Returns one-to-one correspondence between atom_lists and output lists
+    - Charges extracted from NonbondedForce
+    - Used for QM/MM interfacing (Psi4, etc.)
+    - Exact replication of Original (照抄為原則)
+    """
+    from openmm import NonbondedForce
+
+    # Find NonbondedForce
+    nbonded_force = None
+    for i in range(system.getNumForces()):
+        f = system.getForce(i)
+        if type(f) == NonbondedForce:
+            nbonded_force = f
+            break
+
+    if nbonded_force is None:
+        raise ValueError("NonbondedForce not found in system")
+
+    element_lists = []
+    charge_lists = []
+
+    # Loop over lists in atom_lists
+    for atom_list in atom_lists:
+        element_list = []
+        charge_list = []
+
+        # Loop over atoms in topology and match atoms from list
+        for atom in topology.atoms():
+            if atom.index in atom_list:
+                element = atom.element
+                # Get atomic charge from force field
+                (q_i, sig, eps) = nbonded_force.getParticleParameters(atom.index)
+                # Add to lists
+                element_list.append(element.symbol)
+                charge_list.append(q_i._value)
+
+        # Add to element_lists, charge_lists
+        element_lists.append(element_list)
+        charge_lists.append(charge_list)
+
+    return element_lists, charge_lists
+
+
+def get_positions_for_atom_lists(simulation, atom_lists):
+    """
+    Get positions for lists of atom indices.
+
+    Replicates: MM_classes.get_positions_for_atom_lists() (MM_classes.py:885-898)
+
+    Used in QM/MM simulations to extract coordinates for QM region.
+
+    Parameters:
+    -----------
+    simulation : openmm.app.Simulation
+        The OpenMM simulation object
+    atom_lists : list of list of int
+        List of atom index lists (e.g., [[0,1,2], [10,11,12]])
+
+    Returns:
+    --------
+    position_lists : list of list of list of float
+        Positions (nm) for each atom list
+        Format: [[[x1,y1,z1], [x2,y2,z2]], [[x10,y10,z10], ...]]
+
+    Example:
+    --------
+    >>> qm_atoms = [0, 1, 2]
+    >>> positions = get_positions_for_atom_lists(simulation, [qm_atoms])
+    >>> print(positions[0])  # [[1.0, 2.0, 3.0], [1.1, 2.1, 3.1], ...]
+
+    Notes:
+    ------
+    - Returns one-to-one correspondence with atom_lists
+    - Positions in nanometers (OpenMM internal units)
+    - Used for QM/MM interfacing
+    - Exact replication of Original (照抄為原則)
+    """
+    state = simulation.context.getState(getPositions=True)
+    positions = state.getPositions()
+
+    position_lists = []
+
+    # Loop over lists in atom_lists
+    for atom_list in atom_lists:
+        position_list = []
+        for index in atom_list:
+            position_list.append([
+                positions[index][0]._value,
+                positions[index][1]._value,
+                positions[index][2]._value
+            ])
+        # Add to position_lists
+        position_lists.append(position_list)
+
+    return position_lists
+
+
+def add_nanotube_conductor(integrator, topology, system, positions, voltage,
+                           nanotube_identifier, nanotube_axis,
+                           chain=True, exclude_element=("H",)):
+    """
+    Add a carbon nanotube conductor to the electrode (REQUIRES C++ SUPPORT - NOT YET IMPLEMENTED).
+
+    Would replicate: Nanotube_Virtual class (Fixed_Voltage_routines.py:482-589)
+
+    WARNING: This function is a PLACEHOLDER. Full nanotube support requires:
+    1. C++ API in ConstantVForce.h (addNanotubeConductor method)
+    2. Cylindrical geometry calculations in ReferenceConstantVKernels.cpp
+    3. Normal vector projection perpendicular to nanotube axis
+    4. Cylindrical area calculation: 2π × radius × length / Natoms
+
+    The Original Python code supports carbon nanotubes as cylindrical conductors
+    with virtual+real atom layers, but this requires significant C++ kernel work
+    similar to the Buckyball implementation.
+
+    Parameters:
+    -----------
+    integrator : ConstantVLangevinIntegrator
+        The integrator object
+    topology : openmm.app.Topology
+        System topology
+    system : openmm.System
+        OpenMM system
+    positions : list
+        Atomic positions
+    voltage : float (with units)
+        Applied voltage (e.g., 1.0*volt)
+    nanotube_identifier : tuple of int
+        (virtual_chain_index, real_chain_index)
+    nanotube_axis : tuple of float
+        Unit vector for nanotube axis, e.g., (1.0, 0.0, 0.0) for x-axis
+    chain : bool
+        Must be True for nanotubes (identifies by chain index)
+    exclude_element : tuple of str
+        Elements to exclude (default: hydrogen)
+
+    Raises:
+    -------
+    NotImplementedError
+        Always raises - C++ support not yet implemented
+
+    Notes:
+    ------
+    - See Fixed_Voltage_routines.py:482-589 for original implementation
+    - Nanotubes have two layers: virtual (field calculation) and real (physical atoms)
+    - Geometry: cylindrical surface with radial normal vectors
+    - Area per atom: 2π × radius × length / Natoms
+    - Length assumed equal to 'a' box vector
+    - Different from Buckyball (spherical vs cylindrical geometry)
+
+    To implement this feature, add to C++ kernel:
+    1. NanotubeConductor struct with axis, radius, length
+    2. initializeNanotubeGeometry() method
+    3. projectOrthogonalToAxis() helper for radial vectors
+    4. Update numericalChargeConductor() to handle cylindrical geometry
+
+    Example (when implemented):
+    --------
+    >>> # This will work once C++ support is added
+    >>> add_nanotube_conductor(
+    ...     integrator, topology, system, positions,
+    ...     voltage=1.0*volt,
+    ...     nanotube_identifier=(2, 3),  # (virtual_chain, real_chain)
+    ...     nanotube_axis=(1.0, 0.0, 0.0),  # Along x-axis
+    ...     chain=True
+    ... )
+    """
+    raise NotImplementedError(
+        "Nanotube conductor support requires C++ kernel implementation.\n"
+        "See ReferenceConstantVKernels.cpp line 313 TODO comment.\n"
+        "Original implementation: Fixed_Voltage_routines.py:482-589\n"
+        "\n"
+        "To add support:\n"
+        "1. Add NanotubeConductor API to ConstantVForce.h\n"
+        "2. Implement cylindrical geometry in ReferenceConstantVKernels.cpp\n"
+        "3. Add projectOrthogonalToAxis() helper for radial normal vectors\n"
+        "4. Update numericalChargeConductor() with nanotube branch\n"
+        "\n"
+        "For now, use buckyball conductors as an alternative for curved surfaces."
+    )

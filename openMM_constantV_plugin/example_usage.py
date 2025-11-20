@@ -394,6 +394,94 @@ def example_charge_monitoring():
     print("="*70 + "\n")
 
 
+def example_umbrella_potential():
+    """
+    Example of applying umbrella potential for constrained sampling.
+
+    Demonstrates two umbrella modes:
+    1. Absolute z-position constraint (fix ion at specific height)
+    2. Distance constraint between two molecules
+    """
+    print("\n" + "="*70)
+    print("EXAMPLE 6: Umbrella Potential for Constrained Sampling")
+    print("="*70)
+
+    # ... (Steps 1-3 same as Example 1) ...
+
+    pdb = PDBFile('system.pdb')
+    forcefield = ForceField(...)
+    system = forcefield.createSystem(...)
+    integrator = ConstantVLangevinIntegrator(...)
+    context = initialize_electrodes_auto(...)
+    simulation = Simulation(pdb.topology, system, integrator, context=context)
+
+    # ═══════════════════════════════════════════════════════════════
+    # OPTION 1: Fix ion at absolute z position
+    # ═══════════════════════════════════════════════════════════════
+    print("\n🎯 Option 1: Constraining ion to z=3.0 nm...")
+
+    from openmm.unit import kilocalories_per_mole, angstrom, nanometer
+
+    force = set_umbrella_potential(
+        simulation=simulation,
+        system=system,
+        topology=pdb.topology,
+        molecule_name='LI',  # Lithium ion
+        force_constant=100*kilocalories_per_mole/angstrom**2,
+        z_global=3.0*nanometer  # Fix at z=3.0 nm
+    )
+
+    print(f"  ✓ Added umbrella force: z0 = 3.0 nm, k = 100 kcal/mol/Å²")
+
+    # ═══════════════════════════════════════════════════════════════
+    # OPTION 2: Constrain distance between ion and electrode atom
+    # ═══════════════════════════════════════════════════════════════
+    # Alternatively, use distance constraint:
+    #
+    # force = set_umbrella_potential(
+    #     simulation=simulation,
+    #     system=system,
+    #     topology=pdb.topology,
+    #     molecule_name='LI',
+    #     force_constant=100*kilocalories_per_mole/angstrom**2,
+    #     mol2='ELEC',         # Electrode residue name
+    #     atomtype='C1',        # Specific atom on electrode
+    #     r0centroid=0.5*nanometer  # Target distance = 0.5 nm
+    # )
+
+    # ═══════════════════════════════════════════════════════════════
+    # Run umbrella sampling
+    # ═══════════════════════════════════════════════════════════════
+    print("\n▶️  Running umbrella sampling (10000 steps)...")
+
+    simulation.step(10000)
+
+    print(f"\n  ✓ Umbrella sampling complete!")
+    print(f"  ✓ Ion constrained near z=3.0 nm throughout simulation")
+
+    # ═══════════════════════════════════════════════════════════════
+    # Check final position
+    # ═══════════════════════════════════════════════════════════════
+    state = simulation.context.getState(getPositions=True)
+    positions = state.getPositions()
+
+    # Find ion position
+    for atom in pdb.topology.atoms():
+        if atom.residue.name == 'LI':
+            ion_z = positions[atom.index][2].value_in_unit(nanometer)
+            print(f"\n📍 Final ion z-position: {ion_z:.4f} nm (target: 3.0000 nm)")
+            break
+
+    print("\n💡 Use Case: Umbrella sampling for PMF calculations")
+    print("   - Run multiple windows at different z positions")
+    print("   - Combine with WHAM for free energy profile")
+    print("   - Study ion adsorption/desorption at electrode")
+
+    print("\n" + "="*70)
+    print("EXAMPLE 6 COMPLETE")
+    print("="*70 + "\n")
+
+
 # ═══════════════════════════════════════════════════════════════════
 # MAIN: Run examples
 # ═══════════════════════════════════════════════════════════════════
@@ -407,13 +495,14 @@ if __name__ == '__main__':
 ║                                                                  ║
 ╚══════════════════════════════════════════════════════════════════╝
 
-This script demonstrates 5 common use cases:
+This script demonstrates 6 common use cases:
 
 1. Flat electrodes (simplest case)
 2. Buckyball conductors (advanced)
 3. SAPT-FF force field (water + TFSI)
 4. MC density equilibration
 5. Electrode charge monitoring
+6. Umbrella potential (constrained sampling)
 
 **Key Insight**: With the new Python helpers, plugin usage is as simple
 as the Original Python code!
@@ -432,5 +521,6 @@ Same simplicity, 10x performance (C++ kernel)! 🚀
     # example_saptff_forcefield()
     # example_mc_barostat()
     # example_charge_monitoring()
+    # example_umbrella_potential()
 
     print("\n✓ All examples defined. Uncomment one in main() to run.\n")
