@@ -173,6 +173,35 @@ void ReferenceCalcConstantVKernel::initialize(const System& system, const Consta
     }
 
     // ───────────────────────────────────────────────────────
+    // 从Force获取Nanotube导体
+    // 对应: Nanotube_Virtual class
+    // ───────────────────────────────────────────────────────
+    int numNanotubes = force.getNumNanotubeConductors();
+    nanotubeConductors.resize(numNanotubes);
+
+    for (int i = 0; i < numNanotubes; i++) {
+        std::vector<int> virtualAtoms, realAtoms;
+        std::string electrodeType;
+        double voltage;
+        std::vector<double> axis;
+        force.getNanotubeConductorParameters(i, virtualAtoms, realAtoms, electrodeType, voltage, axis);
+
+        NanotubeConductor& conductor = nanotubeConductors[i];
+        conductor.virtualAtomIndices = virtualAtoms;
+        conductor.realAtomIndices = realAtoms;
+        conductor.electrodeType = electrodeType;
+        conductor.voltageKjMol = voltage * 96.487;  // V -> kJ/mol
+        conductor.axis[0] = axis[0];
+        conductor.axis[1] = axis[1];
+        conductor.axis[2] = axis[2];
+        conductor.closeThreshold = 1.5;  // nm
+        conductor.closeToElectrode = true;
+        conductor.contactAtomIndex = -1;
+        conductor.dr_center_contact = 0.0;
+        // 几何参数将在initializeElectrodeCharges()中计算
+    }
+
+    // ───────────────────────────────────────────────────────
     // 从Force获取系统几何参数
     // ───────────────────────────────────────────────────────
     voltage = force.getVoltage() * 96.487;  // V -> kJ/mol（完全照抄教授的转换）
@@ -259,6 +288,28 @@ void ReferenceCalcConstantVKernel::initializeElectrodeCharges(ContextImpl& conte
 
         std::cout << "[Reference] Initialized " << buckyballConductors.size()
                   << " Buckyball conductor(s)" << std::endl;
+    }
+
+    // ───────────────────────────────────────────────────────
+    // Initialize Nanotube conductors (对应 Nanotube_Virtual.__init__)
+    // ───────────────────────────────────────────────────────
+    if (!nanotubeConductors.empty()) {
+        // Get positions and box vectors for geometry calculation
+        vector<Vec3>& positions = extractPositions(context);
+        Vec3 boxVectors[3];
+        context.getOwner().getPeriodicBoxVectors(boxVectors[0], boxVectors[1], boxVectors[2]);
+
+        for (NanotubeConductor& conductor : nanotubeConductors) {
+            // Line 517-572: Initialize geometry (center, radius, length, normals)
+            initializeNanotubeGeometry(conductor, positions, boxVectors);
+
+            // Line 564: Find contact neighbor conductor
+            // TODO: Implement findContactNeighborNanotube if needed
+            // For now skip - most Nanotubes don't have contact neighbors
+        }
+
+        std::cout << "[Reference] Initialized " << nanotubeConductors.size()
+                  << " Nanotube conductor(s)" << std::endl;
     }
 
     chargesInitialized = true;
@@ -441,6 +492,141 @@ void ReferenceCalcConstantVKernel::initializeBuckyballGeometry(
               << conductor.r_center[0] << "," << conductor.r_center[1] << "," << conductor.r_center[2]
               << "), radius=" << conductor.radius
               << ", area_atom=" << conductor.area_atom << std::endl;
+}
+
+// ═══════════════════════════════════════════════════════════
+// initializeNanotubeGeometry()
+// 翻译自: Nanotube_Virtual.__init__ (Line 517-572)
+// ═══════════════════════════════════════════════════════════
+
+void ReferenceCalcConstantVKernel::initializeNanotubeGeometry(
+    NanotubeConductor& conductor,
+    const vector<Vec3>& positions,
+    const Vec3 boxVectors[3]
+) {
+    int Natoms = conductor.virtualAtomIndices.size();
+
+    // Line 521-529: Find center of nanotube (完全照抄)
+    // self.r_center = [ 0.0 , 0.0 , 0.0 ] # in nm
+    // for atom in self.electrode_atoms:
+    //     self.r_center[0] += positions[atom.atom_index][0]._value
+    //     self.r_center[1] += positions[atom.atom_index][1]._value
+    //     self.r_center[2] += positions[atom.atom_index][2]._value
+    // self.r_center[0] = self.r_center[0] / self.Natoms
+    // self.r_center[1] = self.r_center[1] / self.Natoms
+    // self.r_center[2] = self.r_center[2] / self.Natoms
+    conductor.r_center[0] = 0.0;
+    conductor.r_center[1] = 0.0;
+    conductor.r_center[2] = 0.0;
+
+    for (int atomIdx : conductor.virtualAtomIndices) {
+        conductor.r_center[0] += positions[atomIdx][0];
+        conductor.r_center[1] += positions[atomIdx][1];
+        conductor.r_center[2] += positions[atomIdx][2];
+    }
+
+    conductor.r_center[0] /= Natoms;
+    conductor.r_center[1] /= Natoms;
+    conductor.r_center[2] /= Natoms;
+
+    // Line 532-536: Assume nanotube length = box 'a' vector length (完全照抄)
+    // print( 'WARNING:  Assuming Nanotube length is equal to length of "a" box vector.  Need to modify code if this is not the case!')
+    // boxVecs = MMsys.simmd.topology.getPeriodicBoxVectors()
+    // self.length = boxVecs[0][0] / nanometer
+    conductor.length = boxVectors[0][0];
+    std::cout << "[Reference] WARNING: Assuming Nanotube length = box 'a' vector length ("
+              << conductor.length << " nm)" << std::endl;
+
+    // Line 539-558: Compute radial vector at each atom, get radius (完全照抄)
+    // Make sure radius is approximately the same for all atoms
+    // radius_threshold=0.001
+    // self.radius= -1.0
+    // for atom in self.electrode_atoms:
+    //     dr = [0] * 3
+    //     for i in range(3):
+    //         dr[i] = positions[atom.atom_index][i]._value - self.r_center[i]
+    //     # project out radial component
+    //     radial_vector =  self.project_orthogonal_to_axis( numpy.asarray(dr) )
+    //     radius = sqrt( radial_vector[0]**2 + radial_vector[1]**2 + radial_vector[2]**2 )
+    //     # check that radius matches stored value for nanotube
+    //     if self.radius < 0:
+    //         self.radius = radius
+    //     else:
+    //         if abs( self.radius - radius ) > radius_threshold :
+    //             print( atom.atom_index , radius , self.radius )
+    //             print( 'different radius for atoms in nanotube, something is wrong!')
+    //             sys.exit()
+    //     # store radial vector for atom
+    //     atom.nx = radial_vector[0] / radius ; atom.ny = radial_vector[1] / radius ; atom.nz = radial_vector[2] / radius ;
+
+    double radius_threshold = 0.001;
+    conductor.radius = -1.0;
+    conductor.normalVectors.resize(3 * Natoms);
+
+    for (size_t i = 0; i < conductor.virtualAtomIndices.size(); i++) {
+        int atomIdx = conductor.virtualAtomIndices[i];
+
+        // dr = position - center
+        double dr[3];
+        dr[0] = positions[atomIdx][0] - conductor.r_center[0];
+        dr[1] = positions[atomIdx][1] - conductor.r_center[1];
+        dr[2] = positions[atomIdx][2] - conductor.r_center[2];
+
+        // Project out radial component (perpendicular to axis)
+        double radial_vector[3];
+        projectOrthogonalToAxis(dr, conductor.axis, radial_vector);
+
+        double radius = sqrt(radial_vector[0]*radial_vector[0] +
+                           radial_vector[1]*radial_vector[1] +
+                           radial_vector[2]*radial_vector[2]);
+
+        // Check radius consistency
+        if (conductor.radius < 0) {
+            conductor.radius = radius;
+        } else {
+            if (fabs(conductor.radius - radius) > radius_threshold) {
+                std::cerr << "[Reference] ERROR: Atom " << atomIdx
+                          << " has different radius (" << radius
+                          << " vs " << conductor.radius << ")" << std::endl;
+                throw OpenMMException("Different radius for atoms in nanotube!");
+            }
+        }
+
+        // Store radial normal vector (normalized)
+        conductor.normalVectors[3*i + 0] = radial_vector[0] / radius;
+        conductor.normalVectors[3*i + 1] = radial_vector[1] / radius;
+        conductor.normalVectors[3*i + 2] = radial_vector[2] / radius;
+    }
+
+    // Line 561: Compute area per atom (圆柱侧面积)
+    // self.area_atom = 2.0 * numpy.pi * self.radius * self.length / self.Natoms
+    conductor.area_atom = 2.0 * M_PI * conductor.radius * conductor.length / Natoms;
+
+    std::cout << "[Reference] Nanotube geometry initialized: r_center=("
+              << conductor.r_center[0] << "," << conductor.r_center[1] << "," << conductor.r_center[2]
+              << "), radius=" << conductor.radius
+              << ", length=" << conductor.length
+              << ", area_atom=" << conductor.area_atom << std::endl;
+}
+
+// ═══════════════════════════════════════════════════════════
+// projectOrthogonalToAxis()
+// 翻译自: Nanotube_Virtual.project_orthogonal_to_axis (Line 576-579)
+// ═══════════════════════════════════════════════════════════
+
+void ReferenceCalcConstantVKernel::projectOrthogonalToAxis(
+    const double vec_in[3],
+    const double axis[3],
+    double vec_out[3]
+) {
+    // Line 577-578: Project out component parallel to axis (完全照抄)
+    // axis_local = numpy.asarray( self.axis )
+    // vec_out = vec_in - axis_local * numpy.dot( vec_in , axis_local )
+    double dot_product = vec_in[0]*axis[0] + vec_in[1]*axis[1] + vec_in[2]*axis[2];
+
+    vec_out[0] = vec_in[0] - axis[0] * dot_product;
+    vec_out[1] = vec_in[1] - axis[1] * dot_product;
+    vec_out[2] = vec_in[2] - axis[2] * dot_product;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1049,6 +1235,36 @@ void ReferenceIntegrateConstantVStepKernel::initialize(
         if (numBuckyballs > 0) {
             std::cout << "[Reference Integrator] Loaded " << numBuckyballs << " Buckyball conductor(s) from Force" << std::endl;
         }
+
+        // Nanotube conductors
+        int numNanotubes = constantVForce->getNumNanotubeConductors();
+        nanotubeConductors.resize(numNanotubes);
+
+        for (int i = 0; i < numNanotubes; i++) {
+            std::vector<int> virtualAtoms, realAtoms;
+            std::string electrodeType;
+            double voltageV;
+            std::vector<double> axis;
+            constantVForce->getNanotubeConductorParameters(i, virtualAtoms, realAtoms, electrodeType, voltageV, axis);
+
+            NanotubeConductor& conductor = nanotubeConductors[i];
+            conductor.virtualAtomIndices = virtualAtoms;
+            conductor.realAtomIndices = realAtoms;
+            conductor.electrodeType = electrodeType;
+            conductor.voltageKjMol = voltageV * CONVERSION_EV_KJMOL;
+            conductor.axis[0] = axis[0];
+            conductor.axis[1] = axis[1];
+            conductor.axis[2] = axis[2];
+            conductor.closeThreshold = 1.5;  // nm
+            conductor.closeToElectrode = true;
+            conductor.contactAtomIndex = -1;
+            conductor.dr_center_contact = 0.0;
+            // 几何参数将在第一次execute时计算
+        }
+
+        if (numNanotubes > 0) {
+            std::cout << "[Reference Integrator] Loaded " << numNanotubes << " Nanotube conductor(s) from Force" << std::endl;
+        }
     }
 
     // 从NonbondedForce初始化currentCharges（修復Bug #3）
@@ -1363,6 +1579,19 @@ void ReferenceIntegrateConstantVStepKernel::scf_iteration(ContextImpl& context) 
         }
         buckyballInitialized = true;
         std::cout << "[Reference Integrator] Buckyball conductors initialized" << std::endl;
+    }
+
+    static bool nanotubeInitialized = false;
+    if (!nanotubeInitialized && !nanotubeConductors.empty()) {
+        Vec3 boxVectors[3];
+        context.getPeriodicBoxVectors(boxVectors[0], boxVectors[1], boxVectors[2]);
+
+        for (NanotubeConductor& conductor : nanotubeConductors) {
+            initializeNanotubeGeometry(conductor, positions, boxVectors);
+            // Skip findContactNeighbor for now
+        }
+        nanotubeInitialized = true;
+        std::cout << "[Reference Integrator] Nanotube conductors initialized" << std::endl;
     }
 
     computeElectrodeChargeAnalytic(

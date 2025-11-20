@@ -55,6 +55,26 @@ private:
     };
     std::vector<BuckyballConductor> buckyballConductors;
 
+    // Nanotube导体（对应Nanotube_Virtual class）
+    // Fixed_Voltage_routines.py:482-589
+    struct NanotubeConductor {
+        std::vector<int> virtualAtomIndices;   // 虚拟层原子
+        std::vector<int> realAtomIndices;      // 真实层原子
+        std::string electrodeType;             // "cathode" or "anode"
+        double voltageKjMol;                   // 电压 (kJ/mol)
+        double axis[3];                        // 纳米管轴向单位向量
+        double r_center[3];                    // 中心位置 (nm)
+        double radius;                         // 半径 (nm)
+        double length;                         // 长度 (nm) = box 'a' vector
+        double area_atom;                      // 每原子面积 (nm^2) = 2π*r*L/N
+        std::vector<double> normalVectors;     // 径向法向量 [nx0,ny0,nz0, nx1,ny1,nz1, ...]
+        int contactAtomIndex;                  // 最近接触电极原子
+        double dr_center_contact;              // 径向距离 (nm)
+        bool closeToElectrode;                 // 是否靠近主电极
+        double closeThreshold;                 // 接近阈值 (nm)
+    };
+    std::vector<NanotubeConductor> nanotubeConductors;
+
     // 系统几何参数（对应MMsys成员）
     double voltage;     // self.Cathode.Voltage (kJ/mol, 已转换)
     double Lgap;        // self.Lgap (nm)
@@ -157,6 +177,40 @@ private:
      */
     void numericalChargeConductor(BuckyballConductor& conductor,
                                    const std::vector<OpenMM::Vec3>& forces,
+                                   OpenMM::ContextImpl& context);
+
+    /**
+     * Initialize Nanotube geometry (center, radius, length, axis, normals)
+     * 翻译自: Nanotube_Virtual.__init__ (Line 517-572)
+     * @param conductor     Nanotube导体对象
+     * @param positions     所有原子位置
+     * @param boxVectors    盒子向量（获取长度）
+     */
+    void initializeNanotubeGeometry(NanotubeConductor& conductor,
+                                    const std::vector<OpenMM::Vec3>& positions,
+                                    const OpenMM::Vec3 boxVectors[3]);
+
+    /**
+     * Project vector orthogonal to nanotube axis
+     * 翻译自: Nanotube_Virtual.project_orthogonal_to_axis (Line 576-579)
+     * vec_out = vec_in - axis * dot(vec_in, axis)
+     * @param vec_in       输入向量
+     * @param axis         纳米管轴向
+     * @param vec_out      输出向量（垂直分量）
+     */
+    void projectOrthogonalToAxis(const double vec_in[3],
+                                 const double axis[3],
+                                 double vec_out[3]);
+
+    /**
+     * Numerical charge for Nanotube conductor
+     * Same as Buckyball but uses cylindrical geometry
+     * @param conductor     Nanotube导体对象
+     * @param forces        所有原子受力
+     * @param context       OpenMM context
+     */
+    void numericalChargeNanotube(NanotubeConductor& conductor,
+                                 const std::vector<OpenMM::Vec3>& forces,
                                    OpenMM::ContextImpl& context);
 };
 

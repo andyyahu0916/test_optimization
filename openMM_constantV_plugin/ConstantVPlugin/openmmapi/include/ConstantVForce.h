@@ -130,6 +130,48 @@ public:
                                           double& voltage) const;
 
     // ═══════════════════════════════════════════════════════════
+    // Nanotube Conductor API
+    // 对应: Nanotube_Virtual class (Fixed_Voltage_routines.py:482-589)
+    // ═══════════════════════════════════════════════════════════
+
+    /**
+     * 添加碳纳米管导体（圆柱形）
+     * 对应: Nanotube_Virtual(electrode_identifier, electrode_type, Voltage, MMsys, chain_flag, exclude_element, axis)
+     *
+     * 纳米管使用圆柱几何，法向量为径向（垂直于轴）
+     * 面积: 2π × radius × length / Natoms
+     *
+     * @param virtualAtoms     虚拟层原子索引列表（用于静电）
+     * @param realAtoms        真实层原子索引列表（用于VDW/steric）
+     * @param electrodeType    "cathode" 或 "anode"
+     * @param voltage          施加电压（V）
+     * @param axis             纳米管轴向单位向量 [ax, ay, az] (e.g., [1,0,0] for x-axis)
+     * @return Nanotube导体列表中的索引
+     */
+    int addNanotubeConductor(const std::vector<int>& virtualAtoms,
+                             const std::vector<int>& realAtoms,
+                             const std::string& electrodeType,
+                             double voltage,
+                             const std::vector<double>& axis);
+
+    /**
+     * 获取Nanotube导体数量
+     */
+    int getNumNanotubeConductors() const {
+        return nanotubeConductors.size();
+    }
+
+    /**
+     * 获取Nanotube导体参数
+     */
+    void getNanotubeConductorParameters(int index,
+                                        std::vector<int>& virtualAtoms,
+                                        std::vector<int>& realAtoms,
+                                        std::string& electrodeType,
+                                        double& voltage,
+                                        std::vector<double>& axis) const;
+
+    // ═══════════════════════════════════════════════════════════
     // 系统几何参数（对应MMsys.Lgap, Lcell等）
     // ═══════════════════════════════════════════════════════════
 
@@ -202,6 +244,7 @@ private:
 
     // 导体信息（Conductor support）
     class BuckyballConductorInfo;
+    class NanotubeConductorInfo;
 
     std::vector<CathodeAtomInfo> cathodeAtoms;
     std::vector<int> cathodeAtomIndices;
@@ -217,6 +260,7 @@ private:
 
     // 导体信息
     std::vector<BuckyballConductorInfo> buckyballConductors;
+    std::vector<NanotubeConductorInfo> nanotubeConductors;
 
     // 系统参数（对应教授的MMsys成员）
     double voltageVolts;    // 输入电压（V）
@@ -334,6 +378,98 @@ public:
         closeToElectrode(true),
         closeThreshold(1.5)
     {
+        r_center[0] = r_center[1] = r_center[2] = 0.0;
+        // normalVectors will be initialized later (3 * virtualAtoms.size())
+    }
+};
+
+/**
+ * ═══════════════════════════════════════════════════════════════
+ * NanotubeConductorInfo - 碳纳米管导体信息
+ * 对应: Nanotube_Virtual class (Fixed_Voltage_routines.py:482-589)
+ * ═══════════════════════════════════════════════════════════════
+ *
+ * 关键物理概念：
+ * - 圆柱几何：轴向(axis)、半径(radius)、长度(length)
+ * - 法向量：径向(radial direction)，垂直于轴
+ * - 面积: 2π × radius × length / Natoms （圆柱侧面积）
+ * - project_orthogonal_to_axis: vec_out = vec_in - axis * dot(vec_in, axis)
+ * - 边界条件：圆柱面上径向电场为零
+ */
+class ConstantVForce::NanotubeConductorInfo {
+public:
+    // 原子列表
+    std::vector<int> virtualAtomIndices;  // 虚拟层原子索引（对应 electrode_atoms）
+    std::vector<int> realAtomIndices;     // 真实层原子索引（对应 electrode_atoms_real）
+
+    // 电极类型和电压
+    std::string electrodeType;  // "cathode" 或 "anode"
+    double voltageVolts;        // 输入电压（V）
+    double voltageKjMol;        // 内部使用（kJ/mol，= voltageVolts * 96.487）
+
+    // 圆柱几何参数（将在初始化时计算）
+    double axis[3];             // 纳米管轴向单位向量 (Line 497, 577-578)
+    double r_center[3];         // 中心位置 (nm) (Line 521-529)
+    double radius;              // 半径 (nm) (Line 541-556)
+    double length;              // 长度 (nm) = box 'a' vector length (Line 532-536)
+    double area_atom;           // 每原子面积 (nm^2) = 2π*r*L/N (Line 561)
+
+    // 每个原子的径向法向量（在初始化时计算）
+    // 法向量 = radial direction perpendicular to axis
+    // 对应: atom.nx, atom.ny, atom.nz (Line 558)
+    std::vector<double> normalVectors;  // 扁平化: [nx0,ny0,nz0, nx1,ny1,nz1, ...]
+
+    // 接触导体信息（用于电荷转移计算）
+    // 对应: find_contact_neighbor_conductor (Line 564)
+    int contactAtomIndex;              // 最近的接触电极原子索引
+    double dr_center_contact;          // 径向距离 (nm) (Line 567-570)
+    bool closeToElectrode;             // 是否靠近主电极
+    double closeThreshold;             // 接近阈值 (nm)，默认1.5
+
+    // 默认构造函数
+    NanotubeConductorInfo() :
+        electrodeType(""),
+        voltageVolts(0.0),
+        voltageKjMol(0.0),
+        radius(0.0),
+        length(0.0),
+        area_atom(0.0),
+        contactAtomIndex(-1),
+        dr_center_contact(0.0),
+        closeToElectrode(true),
+        closeThreshold(1.5)
+    {
+        axis[0] = axis[1] = axis[2] = 0.0;
+        r_center[0] = r_center[1] = r_center[2] = 0.0;
+    }
+
+    // 完整构造函数
+    NanotubeConductorInfo(const std::vector<int>& virtualAtoms,
+                          const std::vector<int>& realAtoms,
+                          const std::string& type,
+                          double voltage,
+                          const std::vector<double>& axisVec) :
+        virtualAtomIndices(virtualAtoms),
+        realAtomIndices(realAtoms),
+        electrodeType(type),
+        voltageVolts(voltage),
+        voltageKjMol(voltage * 96.487),  // conversion_eV_Kjmol
+        radius(0.0),
+        length(0.0),
+        area_atom(0.0),
+        contactAtomIndex(-1),
+        dr_center_contact(0.0),
+        closeToElectrode(true),
+        closeThreshold(1.5)
+    {
+        // 复制axis向量（应该是单位向量）
+        if (axisVec.size() == 3) {
+            axis[0] = axisVec[0];
+            axis[1] = axisVec[1];
+            axis[2] = axisVec[2];
+        } else {
+            axis[0] = 1.0; axis[1] = 0.0; axis[2] = 0.0;  // default x-axis
+        }
         r_center[0] = r_center[1] = r_center[2] = 0.0;
         // normalVectors will be initialized later (3 * virtualAtoms.size())
     }
