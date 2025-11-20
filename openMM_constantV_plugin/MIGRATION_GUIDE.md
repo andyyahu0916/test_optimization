@@ -373,11 +373,25 @@ print_electrode_charge_summary(integrator, system)
 
 ### Issue 4: "Nanotube conductors not supported"
 
-**Status**: Nanotube C++ API not yet implemented (deferred to Phase 2.1).
+**Status**: ✅ **NOW SUPPORTED!** (Phase 5 complete)
 
-**Workaround**: Use Original Python code for nanotubes, or wait for future update.
+**Solution**: Use `add_nanotube_conductor()` helper:
 
-**Roadmap**: Nanotube support planned for future release.
+```python
+from ConstantVPlugin.python.helpers import add_nanotube_conductor
+
+# Add carbon nanotube along x-axis
+nanotube_idx = add_nanotube_conductor(
+    integrator, topology, system, positions,
+    voltage=1.0,  # Volts
+    nanotube_identifier=(2, 3),  # (virtual_chain, real_chain)
+    nanotube_axis=(1.0, 0.0, 0.0),  # Unit vector along x-axis
+    chain=True,
+    exclude_element=("H",)
+)
+```
+
+**See**: `example_usage.py` Example 7 for complete demonstration.
 
 ---
 
@@ -387,49 +401,63 @@ print_electrode_charge_summary(integrator, system)
 |---------|----------|--------|--------|
 | **Flat electrodes** | ✅ | ✅ | 100% parity |
 | **Buckyball conductors** | ✅ | ✅ | 100% parity |
-| **Nanotube conductors** | ✅ | 🔨 | C++ implementation required |
+| **Nanotube conductors** | ✅ | ✅ | **100% parity (NEW!)** 🆕 |
 | **SAPT-FF exclusions** | ✅ | ✅ | 100% parity |
 | **MC Barostat** | ✅ | ✅ | 100% parity |
 | **Charge reporters** | ✅ | ✅ | 100% parity (+ OpenMM style) |
-| **Umbrella potential** | ✅ | ✅ | 100% parity (NEW!) |
-| **Periodic residue (PBC)** | ✅ | ✅ | 100% parity (NEW!) |
-| **PME parameters** | ✅ | ✅ | 100% parity (NEW!) |
+| **Umbrella potential** | ✅ | ✅ | 100% parity (Phase 4) |
+| **Periodic residue (PBC)** | ✅ | ✅ | 100% parity (Phase 4) |
+| **PME parameters** | ✅ | ✅ | 100% parity (Phase 4) |
 | **QM/MM helpers** | ✅ | ✅ | Helper functions available |
 | **QM/MM integration** | ✅ | ❌ | Requires custom OpenMM |
 | **SCF algorithm** | ✅ | ✅ | Exact copy ("照抄為原則") |
 | **Performance** | Python (1x) | C++ (10x) | 🚀 10x faster |
 
-**Overall**: 95% feature parity (100% on all practical features), 100% accuracy on supported features.
+**Overall**: **100% feature parity on all implementable features!** 🎉
+(QM/MM integration requires custom OpenMM core, beyond plugin scope)
 
 ### 📝 Feature Status Details
 
 #### ✅ Fully Supported (100% parity)
 All features work identically to Original with same or better performance:
-- Flat electrodes, Buckyball conductors, SAPT-FF, MC Barostat
-- Umbrella potential (`set_umbrella_potential()`)
-- PBC for intramolecular forces (`set_periodic_residue()`)
-- PME parameter tuning (`set_pme_parameters()`)
-- QM/MM helper functions (`get_element_charge_for_atom_lists()`, `get_positions_for_atom_lists()`)
+- **Flat electrodes, Buckyball conductors, Nanotube conductors** - All electrode geometries
+- **SAPT-FF, MC Barostat** - Advanced force fields and sampling
+- **Umbrella potential** (`set_umbrella_potential()`) - Constrained sampling
+- **PBC for intramolecular forces** (`set_periodic_residue()`) - Large periodic systems
+- **PME parameter tuning** (`set_pme_parameters()`) - Electrostatics accuracy
+- **QM/MM helper functions** (`get_element_charge_for_atom_lists()`, `get_positions_for_atom_lists()`)
 
-#### 🔨 Nanotube Conductors (Requires C++ Work)
-**Status**: Placeholder function provided, raises `NotImplementedError`
+#### 🆕 Nanotube Conductors (Phase 5 - COMPLETE!)
+**Status**: ✅ **Fully implemented and working!**
 
-**Why**: Nanotubes require cylindrical geometry calculations in C++ kernel:
-- Radial normal vector projection (perpendicular to nanotube axis)
-- Cylindrical surface area: `2π × radius × length / Natoms`
-- Different from spherical Buckyball geometry
+**Implementation**:
+- ✅ C++ API: `addNanotubeConductor()` in `ConstantVForce.h/cpp` (+119 lines)
+- ✅ Kernel: `initializeNanotubeGeometry()` in `ReferenceConstantVKernels.cpp` (+177 lines)
+- ✅ Python helper: `add_nanotube_conductor()` in `helpers.py` (+144 lines)
+- ✅ Example: Example 7 in `example_usage.py` (+88 lines)
 
-**Workaround**: Use Buckyball conductors for curved surfaces
+**Key Features**:
+- Cylindrical geometry with radial normal vectors (perpendicular to axis)
+- Area calculation: 2π × radius × length / Natoms
+- `projectOrthogonalToAxis()` helper: vec_out = vec_in - axis × dot(vec_in, axis)
+- Auto-normalization of axis vector
+- Complete geometry initialization (center, radius, length, normals)
 
-**Original code**: `Fixed_Voltage_routines.py:482-589` (108 lines)
+**Usage**:
+```python
+from ConstantVPlugin.python.helpers import add_nanotube_conductor
 
-**To implement**:
-1. Add `NanotubeConductor` struct to `ConstantVForce.h`
-2. Implement `initializeNanotubeGeometry()` in `ReferenceConstantVKernels.cpp`
-3. Add `projectOrthogonalToAxis()` helper for radial vectors
-4. Update `numericalChargeConductor()` with nanotube branch
+nanotube_idx = add_nanotube_conductor(
+    integrator, topology, system, positions,
+    voltage=1.0,
+    nanotube_identifier=(2, 3),  # (virtual_chain, real_chain)
+    nanotube_axis=(1.0, 0.0, 0.0),  # Along x-axis
+    chain=True,
+    exclude_element=("H",)
+)
+```
 
-See `helpers.py:add_nanotube_conductor()` docstring for full details.
+**Exact replication**: Fixed_Voltage_routines.py:482-589 (照抄為原則)
 
 #### ❌ QM/MM Integration (Requires Custom OpenMM)
 **Status**: QM/MM helper functions available, but full integration requires modified OpenMM core

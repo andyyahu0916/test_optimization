@@ -2301,82 +2301,144 @@ def add_nanotube_conductor(integrator, topology, system, positions, voltage,
                            nanotube_identifier, nanotube_axis,
                            chain=True, exclude_element=("H",)):
     """
-    Add a carbon nanotube conductor to the electrode (REQUIRES C++ SUPPORT - NOT YET IMPLEMENTED).
+    Add a carbon nanotube conductor to the electrode.
 
-    Would replicate: Nanotube_Virtual class (Fixed_Voltage_routines.py:482-589)
+    Replicates: Nanotube_Virtual class (Fixed_Voltage_routines.py:482-589)
 
-    WARNING: This function is a PLACEHOLDER. Full nanotube support requires:
-    1. C++ API in ConstantVForce.h (addNanotubeConductor method)
-    2. Cylindrical geometry calculations in ReferenceConstantVKernels.cpp
-    3. Normal vector projection perpendicular to nanotube axis
-    4. Cylindrical area calculation: 2π × radius × length / Natoms
+    Carbon nanotubes are cylindrical conductors with two atom layers:
+    - Virtual layer: Used for electrostatic calculations (image charges)
+    - Real layer: Physical atoms for VDW/steric interactions
 
-    The Original Python code supports carbon nanotubes as cylindrical conductors
-    with virtual+real atom layers, but this requires significant C++ kernel work
-    similar to the Buckyball implementation.
+    Geometry:
+    - Cylindrical surface with radial normal vectors (perpendicular to axis)
+    - Area per atom: 2π × radius × length / Natoms
+    - Length assumed equal to box 'a' vector (WARNING printed by C++ kernel)
 
     Parameters:
     -----------
     integrator : ConstantVLangevinIntegrator
-        The integrator object
+        The integrator object (not used, kept for API consistency)
     topology : openmm.app.Topology
         System topology
     system : openmm.System
         OpenMM system
     positions : list
-        Atomic positions
-    voltage : float (with units)
-        Applied voltage (e.g., 1.0*volt)
+        Atomic positions (not used in Python, kept for Original API compatibility)
+    voltage : float
+        Applied voltage in Volts (NOT kJ/mol - C++ will convert)
     nanotube_identifier : tuple of int
         (virtual_chain_index, real_chain_index)
-    nanotube_axis : tuple of float
+    nanotube_axis : tuple or list of float
         Unit vector for nanotube axis, e.g., (1.0, 0.0, 0.0) for x-axis
+        Will be auto-normalized if not already a unit vector
     chain : bool
-        Must be True for nanotubes (identifies by chain index)
+        Must be True for nanotubes (chain index identification required)
     exclude_element : tuple of str
-        Elements to exclude (default: hydrogen)
+        Elements to exclude (default: ("H",) for dummy hydrogen)
 
-    Raises:
-    -------
-    NotImplementedError
-        Always raises - C++ support not yet implemented
+    Returns:
+    --------
+    int
+        Index of the added Nanotube conductor in the force's conductor list
+
+    Example:
+    --------
+    >>> # Add a carbon nanotube along x-axis
+    >>> idx = add_nanotube_conductor(
+    ...     integrator, topology, system, positions,
+    ...     voltage=1.0,
+    ...     nanotube_identifier=(2, 3),  # (virtual_chain, real_chain)
+    ...     nanotube_axis=(1.0, 0.0, 0.0),  # Along x-axis
+    ...     chain=True,
+    ...     exclude_element=("H",)
+    ... )
 
     Notes:
     ------
-    - See Fixed_Voltage_routines.py:482-589 for original implementation
-    - Nanotubes have two layers: virtual (field calculation) and real (physical atoms)
-    - Geometry: cylindrical surface with radial normal vectors
-    - Area per atom: 2π × radius × length / Natoms
-    - Length assumed equal to 'a' box vector
-    - Different from Buckyball (spherical vs cylindrical geometry)
-
-    To implement this feature, add to C++ kernel:
-    1. NanotubeConductor struct with axis, radius, length
-    2. initializeNanotubeGeometry() method
-    3. projectOrthogonalToAxis() helper for radial vectors
-    4. Update numericalChargeConductor() to handle cylindrical geometry
-
-    Example (when implemented):
-    --------
-    >>> # This will work once C++ support is added
-    >>> add_nanotube_conductor(
-    ...     integrator, topology, system, positions,
-    ...     voltage=1.0*volt,
-    ...     nanotube_identifier=(2, 3),  # (virtual_chain, real_chain)
-    ...     nanotube_axis=(1.0, 0.0, 0.0),  # Along x-axis
-    ...     chain=True
-    ... )
+    - Axis must be a unit vector (norm ~ 1.0), auto-normalized if not
+    - Virtual atoms: Outer layer for electrostatics (ghost atoms)
+    - Real atoms: Inner layer with physical charges
+    - Geometry (center, radius, length, normals) computed by C++ kernel
+    - Exact replication of Original (照抄為原則)
     """
-    raise NotImplementedError(
-        "Nanotube conductor support requires C++ kernel implementation.\n"
-        "See ReferenceConstantVKernels.cpp line 313 TODO comment.\n"
-        "Original implementation: Fixed_Voltage_routines.py:482-589\n"
-        "\n"
-        "To add support:\n"
-        "1. Add NanotubeConductor API to ConstantVForce.h\n"
-        "2. Implement cylindrical geometry in ReferenceConstantVKernels.cpp\n"
-        "3. Add projectOrthogonalToAxis() helper for radial normal vectors\n"
-        "4. Update numericalChargeConductor() with nanotube branch\n"
-        "\n"
-        "For now, use buckyball conductors as an alternative for curved surfaces."
+    from openmm import unit
+    import math
+
+    # Validation: chain must be True (Line 489-491)
+    if not chain:
+        raise ValueError("Must use chain=True for Nanotube (chain index identification required)")
+
+    # Validation: identifier must be tuple of 2 ints (Line 492-494)
+    if not (isinstance(nanotube_identifier, tuple) and len(nanotube_identifier) == 2):
+        raise ValueError("nanotube_identifier must be tuple of (virtual_chain_index, real_chain_index)")
+
+    # Validation: axis must be 3-element vector (Line 497)
+    if not (isinstance(nanotube_axis, (tuple, list)) and len(nanotube_axis) == 3):
+        raise ValueError("nanotube_axis must be a 3-element tuple/list [ax, ay, az]")
+
+    # Normalize axis to unit vector (not in Original but good practice)
+    axis_norm = math.sqrt(sum(a*a for a in nanotube_axis))
+    if abs(axis_norm - 1.0) > 0.01:
+        # Auto-normalize
+        nanotube_axis = [a / axis_norm for a in nanotube_axis]
+        print(f"⚠️  Nanotube axis auto-normalized to unit vector: {nanotube_axis}")
+
+    virtual_chain, real_chain = nanotube_identifier
+
+    # Extract virtual atoms from virtual_chain (Lines 502-514 via parent class)
+    virtual_atoms = []
+    for chain_obj in topology.chains():
+        if chain_obj.index == virtual_chain:
+            for atom in chain_obj.atoms():
+                element = atom.element
+                if element.symbol not in exclude_element:
+                    virtual_atoms.append(atom.index)
+            break
+
+    if len(virtual_atoms) == 0:
+        raise ValueError(f"No virtual atoms found in chain {virtual_chain} (after excluding {exclude_element})")
+
+    # Extract real atoms from real_chain (Lines 502-514 for real layer)
+    real_atoms = []
+    for chain_obj in topology.chains():
+        if chain_obj.index == real_chain:
+            for atom in chain_obj.atoms():
+                element = atom.element
+                if element.symbol not in exclude_element:
+                    real_atoms.append(atom.index)
+            break
+
+    if len(real_atoms) == 0:
+        raise ValueError(f"No real atoms found in chain {real_chain} (after excluding {exclude_element})")
+
+    # Find ConstantVForce in the system
+    constantv_force = None
+    for i in range(system.getNumForces()):
+        force = system.getForce(i)
+        if force.__class__.__name__ == 'ConstantVForce':
+            constantv_force = force
+            break
+
+    if constantv_force is None:
+        raise RuntimeError("ConstantVForce not found in system. Make sure to add it before calling this function.")
+
+    # Call C++ API to add the Nanotube conductor
+    # API: addNanotubeConductor(virtualAtoms, realAtoms, electrodeType, voltage, axis)
+    # Note: voltage is in Volts here, C++ will convert to kJ/mol internally
+    conductor_index = constantv_force.addNanotubeConductor(
+        virtual_atoms,
+        real_atoms,
+        "cathode",  # Default to cathode (matching Buckyball behavior)
+        voltage,
+        nanotube_axis
     )
+
+    print(f"✓ Added Nanotube conductor #{conductor_index}:")
+    print(f"  - Virtual atoms: {len(virtual_atoms)} atoms from chain {virtual_chain}")
+    print(f"  - Real atoms: {len(real_atoms)} atoms from chain {real_chain}")
+    print(f"  - Axis: {nanotube_axis}")
+    print(f"  - Voltage: {voltage} V")
+    print(f"  - Electrode type: cathode (default)")
+
+    return conductor_index
+

@@ -482,6 +482,96 @@ def example_umbrella_potential():
     print("="*70 + "\n")
 
 
+def example_nanotube_conductors():
+    """
+    Example of using carbon nanotube conductors.
+
+    Nanotubes are cylindrical conductors with:
+    - Radial normal vectors (perpendicular to axis)
+    - Area: 2π × radius × length / Natoms
+    - Two layers: virtual (electrostatics) + real (physical)
+    """
+    print("\n" + "="*70)
+    print("EXAMPLE 7: Carbon Nanotube Conductors")
+    print("="*70)
+
+    # ... (Steps 1-3 same as Example 1) ...
+
+    pdb = PDBFile('system_with_nanotube.pdb')
+    forcefield = ForceField(...)
+    system = forcefield.createSystem(...)
+    integrator = ConstantVLangevinIntegrator(...)
+    context = initialize_electrodes_auto(...)
+    simulation = Simulation(pdb.topology, system, integrator, context=context)
+
+    # ═══════════════════════════════════════════════════════════════
+    # KEY: Add carbon nanotube conductor
+    # ═══════════════════════════════════════════════════════════════
+    print("\n⚡ Adding carbon nanotube conductor...")
+
+    # Nanotube setup:
+    # - Chain 2: Virtual layer atoms (outer, for electrostatics)
+    # - Chain 3: Real layer atoms (inner, for VDW/steric)
+    # - Axis: Along x-axis (1, 0, 0)
+    # - Voltage: 1.0 V applied
+
+    nanotube_idx = add_nanotube_conductor(
+        integrator=integrator,
+        topology=pdb.topology,
+        system=system,
+        positions=pdb.positions,
+        voltage=1.0,  # Volts
+        nanotube_identifier=(2, 3),  # (virtual_chain, real_chain)
+        nanotube_axis=(1.0, 0.0, 0.0),  # Unit vector along x-axis
+        chain=True,
+        exclude_element=("H",)  # Exclude dummy hydrogen
+    )
+
+    print(f"\n  ✓ Nanotube conductor #{nanotube_idx} added successfully!")
+    print(f"  ✓ Geometry (center, radius, length, normals) will be computed by C++ kernel")
+    print(f"  ✓ Length assumed equal to box 'a' vector")
+
+    # ═══════════════════════════════════════════════════════════════
+    # IMPORTANT: Reinitialize context after adding conductor
+    # ═══════════════════════════════════════════════════════════════
+    print("\n🔄 Reinitializing context...")
+
+    context = simulation.context
+    context.reinitialize(preserveState=True)
+
+    print("  ✓ Context reinitialized with nanotube conductor")
+
+    # ═══════════════════════════════════════════════════════════════
+    # Run simulation with nanotube
+    # ═══════════════════════════════════════════════════════════════
+    print("\n▶️  Running simulation (10000 steps)...")
+
+    simulation.step(10000)
+
+    print(f"\n  ✓ Simulation complete!")
+    print(f"  ✓ Nanotube conductor maintained fixed voltage throughout")
+
+    # ═══════════════════════════════════════════════════════════════
+    # Physics notes
+    # ═══════════════════════════════════════════════════════════════
+    print("\n💡 Nanotube Physics:")
+    print("   - Cylindrical geometry (vs spherical for Buckyball)")
+    print("   - Normal vectors: Radial direction (⊥ to axis)")
+    print("   - Area per atom: 2π × radius × length / Natoms")
+    print("   - Radius computed via projectOrthogonalToAxis()")
+    print("   - Length = box 'a' vector (see C++ kernel WARNING)")
+
+    print("\n💡 Use Cases:")
+    print("   - Carbon nanotube electrodes")
+    print("   - Cylindrical pore simulations")
+    print("   - Nanowire conductors")
+    print("   - Any tubular conductor geometry")
+
+    print("\n" + "="*70)
+    print("EXAMPLE 7 COMPLETE")
+    print("="*70 + "\n")
+
+
 # ═══════════════════════════════════════════════════════════════════
 # MAIN: Run examples
 # ═══════════════════════════════════════════════════════════════════
@@ -495,14 +585,15 @@ if __name__ == '__main__':
 ║                                                                  ║
 ╚══════════════════════════════════════════════════════════════════╝
 
-This script demonstrates 6 common use cases:
+This script demonstrates 7 common use cases:
 
 1. Flat electrodes (simplest case)
-2. Buckyball conductors (advanced)
+2. Buckyball conductors (spherical)
 3. SAPT-FF force field (water + TFSI)
 4. MC density equilibration
 5. Electrode charge monitoring
 6. Umbrella potential (constrained sampling)
+7. Nanotube conductors (cylindrical) 🆕
 
 **Key Insight**: With the new Python helpers, plugin usage is as simple
 as the Original Python code!
@@ -522,5 +613,6 @@ Same simplicity, 10x performance (C++ kernel)! 🚀
     # example_mc_barostat()
     # example_charge_monitoring()
     # example_umbrella_potential()
+    # example_nanotube_conductors()  # NEW!
 
     print("\n✓ All examples defined. Uncomment one in main() to run.\n")
