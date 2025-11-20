@@ -1673,3 +1673,249 @@ class MC_Barostat:
             'acceptance_ratio': self.get_acceptance_ratio(),
             'shiftscale': self.shiftscale
         }
+
+
+# ═══════════════════════════════════════════════════════════════════
+# DIAGNOSTIC & DEBUGGING UTILITIES (P2 - Config Parameters)
+# ═══════════════════════════════════════════════════════════════════
+
+def get_electrode_charge_summary(integrator, system):
+    """
+    Get comprehensive electrode charge statistics for debugging and monitoring.
+
+    This function provides insights into the SCF convergence and charge distribution,
+    which is essential for validating simulations.
+
+    Parameters:
+    -----------
+    integrator : ConstantVLangevinIntegrator or ConstantVDrudeLangevinIntegrator
+        The integrator containing electrode atom lists
+    system : openmm.System
+        The system containing NonbondedForce
+
+    Returns:
+    --------
+    dict
+        Dictionary with keys:
+        - 'cathode_total_charge': Total charge on cathode (e)
+        - 'anode_total_charge': Total charge on anode (e)
+        - 'conductor_charges': List of total charges on conductors (e)
+        - 'charge_balance': cathode + anode + conductors (should be ~0)
+        - 'cathode_atoms': Number of cathode atoms
+        - 'anode_atoms': Number of anode atoms
+        - 'conductor_atoms': List of atom counts per conductor
+        - 'voltage': Applied voltage (V)
+
+    Example:
+    --------
+    >>> summary = get_electrode_charge_summary(integrator, system)
+    >>> print(f"Cathode charge: {summary['cathode_total_charge']:.6f} e")
+    >>> print(f"Anode charge: {summary['anode_total_charge']:.6f} e")
+    >>> print(f"Charge balance: {summary['charge_balance']:.2e} e")
+    >>>
+    >>> # Check charge conservation (should be small)
+    >>> if abs(summary['charge_balance']) > 1e-6:
+    ...     print("Warning: Charge not conserved!")
+
+    Notes:
+    ------
+    - Charges are in elementary charge units (e)
+    - charge_balance should be close to zero if SCF converged properly
+    - This function does NOT query Q_analytic (internal SCF variable)
+    - Replicates diagnostic functionality from Original MM_classes.py
+    """
+    from openmm import NonbondedForce
+
+    # Find NonbondedForce
+    nonbonded_force = None
+    for i in range(system.getNumForces()):
+        force = system.getForce(i)
+        if isinstance(force, NonbondedForce):
+            nonbonded_force = force
+            break
+
+    if nonbonded_force is None:
+        raise RuntimeError("NonbondedForce not found in system")
+
+    # Get cathode atoms
+    cathode_atoms = []
+    try:
+        # Try ConstantVDrudeLangevinIntegrator API
+        cathode_atoms = list(integrator.getCathodeAtomIndices())
+    except AttributeError:
+        # Fall back to ConstantVLangevinIntegrator API
+        num_cathode = integrator.getNumCathodeAtoms()
+        for i in range(num_cathode):
+            particle, area = integrator.getCathodeAtomParameters(i)
+            cathode_atoms.append(particle)
+
+    # Get anode atoms
+    anode_atoms = []
+    try:
+        anode_atoms = list(integrator.getAnodeAtomIndices())
+    except AttributeError:
+        num_anode = integrator.getNumAnodeAtoms()
+        for i in range(num_anode):
+            particle, area = integrator.getAnodeAtomParameters(i)
+            anode_atoms.append(particle)
+
+    # Get Buckyball conductor atoms
+    conductor_atom_lists = []
+    constantv_force = None
+    for i in range(system.getNumForces()):
+        force = system.getForce(i)
+        if force.__class__.__name__ == 'ConstantVForce':
+            constantv_force = force
+            break
+
+    if constantv_force is not None:
+        num_conductors = constantv_force.getNumBuckyballConductors()
+        for i in range(num_conductors):
+            params = constantv_force.getBuckyballConductorParameters(i)
+            virtual_atoms = params['virtualAtoms']
+            conductor_atom_lists.append(virtual_atoms)
+
+    # Compute total charges
+    cathode_total = 0.0
+    for atom_idx in cathode_atoms:
+        charge, sigma, epsilon = nonbonded_force.getParticleParameters(atom_idx)
+        cathode_total += charge._value
+
+    anode_total = 0.0
+    for atom_idx in anode_atoms:
+        charge, sigma, epsilon = nonbonded_force.getParticleParameters(atom_idx)
+        anode_total += charge._value
+
+    conductor_totals = []
+    for conductor_atoms in conductor_atom_lists:
+        conductor_total = 0.0
+        for atom_idx in conductor_atoms:
+            charge, sigma, epsilon = nonbonded_force.getParticleParameters(atom_idx)
+            conductor_total += charge._value
+        conductor_totals.append(conductor_total)
+
+    # Compute charge balance
+    charge_balance = cathode_total + anode_total + sum(conductor_totals)
+
+    # Get voltage
+    voltage = integrator.getVoltage()
+
+    return {
+        'cathode_total_charge': cathode_total,
+        'anode_total_charge': anode_total,
+        'conductor_charges': conductor_totals,
+        'charge_balance': charge_balance,
+        'cathode_atoms': len(cathode_atoms),
+        'anode_atoms': len(anode_atoms),
+        'conductor_atoms': [len(c) for c in conductor_atom_lists],
+        'voltage': voltage
+    }
+
+
+def print_electrode_charge_summary(integrator, system):
+    """
+    Print a formatted electrode charge summary to console.
+
+    Convenience wrapper around get_electrode_charge_summary() for debugging.
+
+    Example:
+    --------
+    >>> print_electrode_charge_summary(integrator, system)
+    ═══════════════════════════════════════════════════════════
+    Electrode Charge Summary
+    ═══════════════════════════════════════════════════════════
+    Voltage: 1.000 V
+    -----------------------------------------------------------
+    Cathode:
+      - Atoms: 1200
+      - Total charge: +0.045623 e
+      - Average: +0.000038 e/atom
+    -----------------------------------------------------------
+    Anode:
+      - Atoms: 1200
+      - Total charge: -0.045619 e
+      - Average: -0.000038 e/atom
+    -----------------------------------------------------------
+    Conductors:
+      1. 60 atoms, total: +0.000023 e
+    -----------------------------------------------------------
+    Charge Balance: +2.7e-05 e (should be ~0)
+    ═══════════════════════════════════════════════════════════
+    """
+    summary = get_electrode_charge_summary(integrator, system)
+
+    print(f"\n{'='*60}")
+    print(f"Electrode Charge Summary")
+    print(f"{'='*60}")
+    print(f"Voltage: {summary['voltage']:.3f} V")
+    print(f"{'-'*60}")
+
+    # Cathode
+    print(f"Cathode:")
+    print(f"  - Atoms: {summary['cathode_atoms']}")
+    print(f"  - Total charge: {summary['cathode_total_charge']:+.6f} e")
+    if summary['cathode_atoms'] > 0:
+        avg = summary['cathode_total_charge'] / summary['cathode_atoms']
+        print(f"  - Average: {avg:+.6e} e/atom")
+
+    print(f"{'-'*60}")
+
+    # Anode
+    print(f"Anode:")
+    print(f"  - Atoms: {summary['anode_atoms']}")
+    print(f"  - Total charge: {summary['anode_total_charge']:+.6f} e")
+    if summary['anode_atoms'] > 0:
+        avg = summary['anode_total_charge'] / summary['anode_atoms']
+        print(f"  - Average: {avg:+.6e} e/atom")
+
+    # Conductors
+    if summary['conductor_charges']:
+        print(f"{'-'*60}")
+        print(f"Conductors:")
+        for i, (total, num_atoms) in enumerate(zip(summary['conductor_charges'], summary['conductor_atoms'])):
+            avg = total / num_atoms if num_atoms > 0 else 0
+            print(f"  {i+1}. {num_atoms} atoms, total: {total:+.6f} e, avg: {avg:+.6e} e/atom")
+
+    # Balance
+    print(f"{'-'*60}")
+    balance_str = f"{summary['charge_balance']:.2e}" if abs(summary['charge_balance']) > 1e-10 else "~0"
+    status = "✓ OK" if abs(summary['charge_balance']) < 1e-6 else "⚠ WARNING"
+    print(f"Charge Balance: {balance_str} e ({status})")
+
+    if abs(summary['charge_balance']) >= 1e-6:
+        print(f"⚠️  Warning: Charge not conserved! SCF may not have converged.")
+
+    print(f"{'='*60}\n")
+
+
+def get_scf_constants():
+    """
+    Get SCF algorithm constants (for reference/debugging).
+
+    Returns:
+    --------
+    dict
+        Dictionary with SCF parameters:
+        - 'small_threshold': Charge threshold (1e-6 e)
+        - 'conversion_eV_kJmol': 96.487 kJ/(mol·eV)
+        - 'conversion_nmBohr': 18.8973 nm/Bohr
+        - 'conversion_kJmolNm_au': 18.8973/2625.5
+
+    Example:
+    --------
+    >>> constants = get_scf_constants()
+    >>> print(f"Small threshold: {constants['small_threshold']:.2e} e")
+    >>> print(f"Charge below this value may trigger numerical issues")
+
+    Notes:
+    ------
+    - These values are hard-coded in the C++ kernel
+    - small_threshold prevents division by zero in E = F/q
+    - Replicates MM_classes.py:48 and other constants from Original
+    """
+    return {
+        'small_threshold': 1e-6,  # MM_classes.py:48
+        'conversion_eV_kJmol': 96.487,  # MM_classes.py:44
+        'conversion_nmBohr': 18.8973,  # MM_classes.py:45
+        'conversion_kJmolNm_au': 18.8973 / 2625.5  # MM_classes.py:46-47
+    }
