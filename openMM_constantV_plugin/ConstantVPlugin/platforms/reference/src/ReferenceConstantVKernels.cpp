@@ -876,6 +876,128 @@ void ReferenceCalcConstantVKernel::numericalChargeConductor(
 }
 
 // ═══════════════════════════════════════════════════════════
+// numericalChargeNanotube()
+// Same as Buckyball but uses cylindrical geometry
+// 翻译自: MM.Numerical_charge_Conductor (Line 388-497) with Nanotube geometry
+// ═══════════════════════════════════════════════════════════
+
+void ReferenceCalcConstantVKernel::numericalChargeNanotube(
+    NanotubeConductor& conductor,
+    const vector<Vec3>& forces,
+    ContextImpl& context
+) {
+    // ═══════════════════════════════════════════════════════════
+    // Step 1: Image charges on Nanotube (Line 390-422)
+    // Uses radial normal vectors (perpendicular to axis)
+    // ═══════════════════════════════════════════════════════════
+
+    for (size_t i = 0; i < conductor.virtualAtomIndices.size(); i++) {
+        int atomIdx = conductor.virtualAtomIndices[i];
+        double charge, sigma, epsilon;
+        nonbondedForce->getParticleParameters(atomIdx, charge, sigma, epsilon);
+        double q_i = charge;
+
+        // Get radial normal vector (already computed in initializeNanotubeGeometry)
+        double nx = conductor.normalVectors[3*i + 0];
+        double ny = conductor.normalVectors[3*i + 1];
+        double nz = conductor.normalVectors[3*i + 2];
+
+        if (fabs(q_i) > (0.9 * SMALL_THRESHOLD)) {
+            // E_external = F / q
+            double Ex = forces[atomIdx][0] / q_i;
+            double Ey = forces[atomIdx][1] / q_i;
+            double Ez = forces[atomIdx][2] / q_i;
+
+            // Project onto radial normal (perpendicular to nanotube axis)
+            double En_external = Ex * nx + Ey * ny + Ez * nz;
+
+            // Solve for surface charge using cylindrical area
+            // area_atom = 2π × radius × length / Natoms (Line 561 in Original)
+            q_i = 2.0 / (4.0 * M_PI) * conductor.area_atom * En_external * CONVERSION_KJMOLNM_AU;
+        } else {
+            q_i = SMALL_THRESHOLD;  // prevent zero charge
+        }
+
+        currentCharges[atomIdx] = q_i;
+        nonbondedForce->setParticleParameters(atomIdx, q_i, sigma, epsilon);
+    }
+
+    // Update context and get new forces
+    nonbondedForce->updateParametersInContext(context.getOwner());
+    context.calcForcesAndEnergy(true, false, -1);
+    vector<Vec3>& forcesNew = extractForces(context);
+
+    // ═══════════════════════════════════════════════════════════
+    // Step 2: Charge transfer to Nanotube (Line 429-495)
+    // Same logic as Buckyball but using cylindrical geometry
+    // ═══════════════════════════════════════════════════════════
+
+    if (conductor.contactAtomIndex < 0) {
+        std::cout << "[Reference] Warning: No contact atom found for Nanotube, skipping Step 2" << std::endl;
+        return;
+    }
+
+    int conductorAtomIndex = conductor.contactAtomIndex;
+    double charge, sigma, epsilon;
+    nonbondedForce->getParticleParameters(conductorAtomIndex, charge, sigma, epsilon);
+    double q_i = charge;
+
+    // Normal vector for contact atom on electrode
+    double conductor_atom_nx, conductor_atom_ny, conductor_atom_nz;
+
+    if (conductor.electrodeType == "cathode") {
+        conductor_atom_nx = 0.0;
+        conductor_atom_ny = 0.0;
+        conductor_atom_nz = 1.0;
+    } else {
+        conductor_atom_nx = 0.0;
+        conductor_atom_ny = 0.0;
+        conductor_atom_nz = -1.0;
+    }
+
+    // Get field normal to surface
+    double En_external = 0.0;
+
+    if (fabs(q_i) > (0.9 * SMALL_THRESHOLD)) {
+        double Ex = forcesNew[conductorAtomIndex][0] / q_i;
+        double Ey = forcesNew[conductorAtomIndex][1] / q_i;
+        double Ez = forcesNew[conductorAtomIndex][2] / q_i;
+
+        En_external = Ex * conductor_atom_nx + Ey * conductor_atom_ny + Ez * conductor_atom_nz;
+    }
+
+    // Boundary condition
+    double dE_conductor;
+
+    if (conductor.closeToElectrode) {
+        dE_conductor = -(En_external + voltage / Lgap / 2.0) * CONVERSION_KJMOLNM_AU;
+    } else {
+        dE_conductor = -En_external * CONVERSION_KJMOLNM_AU;
+    }
+
+    // Charge transfer (cylindrical geometry)
+    // For Nanotube: same formula as Buckyball (sign=-1.0)
+    double sign = -1.0;
+    double dQ_conductor = sign * dE_conductor * conductor.dr_center_contact * conductor.dr_center_contact;
+
+    // Distribute charge uniformly on all virtual atoms
+    int Natoms = conductor.virtualAtomIndices.size();
+    double dq_atom = dQ_conductor / Natoms;
+
+    for (int atomIdx : conductor.virtualAtomIndices) {
+        double charge_old, sig, eps;
+        nonbondedForce->getParticleParameters(atomIdx, charge_old, sig, eps);
+        double q_i_new = charge_old + dq_atom;  // ADD dq_atom
+
+        currentCharges[atomIdx] = q_i_new;
+        nonbondedForce->setParticleParameters(atomIdx, q_i_new, sig, eps);
+    }
+
+    std::cout << "[Reference] Nanotube charge transfer: dQ=" << dQ_conductor
+              << ", dq_atom=" << dq_atom << ", En_external=" << En_external << std::endl;
+}
+
+// ═══════════════════════════════════════════════════════════
 // execute() - 主循环（SCF迭代）
 // 翻译自: MM_classes.py::Poisson_solver_fixed_voltage (287-374行)
 // ═══════════════════════════════════════════════════════════
@@ -1076,6 +1198,37 @@ double ReferenceCalcConstantVKernel::execute(
             );
 
             std::cout << "[Reference Debug] After conductor processing: Q_analytic_cathode="
+                      << Q_analytic_cathode << ", Q_analytic_anode=" << Q_analytic_anode << std::endl;
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // Process Nanotube conductors (same pattern as Buckyball)
+        // ═══════════════════════════════════════════════════════
+        if (!nanotubeConductors.empty()) {
+            std::cout << "[Reference Debug] Processing " << nanotubeConductors.size() << " Nanotube conductor(s)..." << std::endl;
+
+            // Process each Nanotube conductor
+            for (NanotubeConductor& conductor : nanotubeConductors) {
+                numericalChargeNanotube(conductor, forces, context);
+            }
+
+            // Update context after conductor charge updates
+            nonbondedForce->updateParametersInContext(context.getOwner());
+
+            // Recompute Q_analytic because conductors are "part of electrolyte"
+            const vector<Vec3>& positionsUpdated = state.getPositions();
+
+            computeElectrodeChargeAnalytic(
+                cathodeAtomIndices, positionsUpdated, "cathode",
+                z_anode, Q_analytic_cathode
+            );
+
+            computeElectrodeChargeAnalytic(
+                anodeAtomIndices, positionsUpdated, "anode",
+                z_cathode, Q_analytic_anode
+            );
+
+            std::cout << "[Reference Debug] After Nanotube processing: Q_analytic_cathode="
                       << Q_analytic_cathode << ", Q_analytic_anode=" << Q_analytic_anode << std::endl;
         }
 
@@ -1507,6 +1660,185 @@ void ReferenceIntegrateConstantVStepKernel::numericalChargeConductor(
 }
 
 // ═══════════════════════════════════════════════════════════
+// initializeNanotubeGeometry() - Initialize Nanotube geometry
+// (Integrator kernel version - same as CalcKernel)
+// ═══════════════════════════════════════════════════════════
+
+void ReferenceIntegrateConstantVStepKernel::initializeNanotubeGeometry(
+    NanotubeConductor& conductor,
+    const vector<Vec3>& positions,
+    const Vec3 boxVectors[3]
+) {
+    // Compute center
+    conductor.r_center[0] = 0.0;
+    conductor.r_center[1] = 0.0;
+    conductor.r_center[2] = 0.0;
+
+    for (int idx : conductor.virtualAtomIndices) {
+        conductor.r_center[0] += positions[idx][0];
+        conductor.r_center[1] += positions[idx][1];
+        conductor.r_center[2] += positions[idx][2];
+    }
+
+    int N = conductor.virtualAtomIndices.size();
+    conductor.r_center[0] /= N;
+    conductor.r_center[1] /= N;
+    conductor.r_center[2] /= N;
+
+    // Compute radius (radial distance from axis)
+    conductor.radius = 0.0;
+    for (int idx : conductor.virtualAtomIndices) {
+        double dx = positions[idx][0] - conductor.r_center[0];
+        double dy = positions[idx][1] - conductor.r_center[1];
+        double dz = positions[idx][2] - conductor.r_center[2];
+
+        double proj_x = dx - conductor.axis[0] * (conductor.axis[0]*dx + conductor.axis[1]*dy + conductor.axis[2]*dz);
+        double proj_y = dy - conductor.axis[1] * (conductor.axis[0]*dx + conductor.axis[1]*dy + conductor.axis[2]*dz);
+        double proj_z = dz - conductor.axis[2] * (conductor.axis[0]*dx + conductor.axis[1]*dy + conductor.axis[2]*dz);
+
+        double r = sqrt(proj_x*proj_x + proj_y*proj_y + proj_z*proj_z);
+        conductor.radius += r;
+    }
+    conductor.radius /= N;
+
+    // Length from box 'a' vector
+    conductor.length = sqrt(boxVectors[0][0]*boxVectors[0][0] +
+                           boxVectors[0][1]*boxVectors[0][1] +
+                           boxVectors[0][2]*boxVectors[0][2]);
+
+    // Area per atom: 2π × r × L / N
+    conductor.area_atom = 2.0 * M_PI * conductor.radius * conductor.length / N;
+
+    // Radial normal vectors
+    conductor.normalVectors.resize(3 * N);
+    for (size_t i = 0; i < conductor.virtualAtomIndices.size(); i++) {
+        int idx = conductor.virtualAtomIndices[i];
+
+        double dx = positions[idx][0] - conductor.r_center[0];
+        double dy = positions[idx][1] - conductor.r_center[1];
+        double dz = positions[idx][2] - conductor.r_center[2];
+
+        // Project orthogonal to axis (radial vector)
+        double dot_product = dx*conductor.axis[0] + dy*conductor.axis[1] + dz*conductor.axis[2];
+        double radial_x = dx - conductor.axis[0] * dot_product;
+        double radial_y = dy - conductor.axis[1] * dot_product;
+        double radial_z = dz - conductor.axis[2] * dot_product;
+
+        // Normalize
+        double norm = sqrt(radial_x*radial_x + radial_y*radial_y + radial_z*radial_z);
+        if (norm > 1e-10) {
+            conductor.normalVectors[3*i + 0] = radial_x / norm;
+            conductor.normalVectors[3*i + 1] = radial_y / norm;
+            conductor.normalVectors[3*i + 2] = radial_z / norm;
+        } else {
+            conductor.normalVectors[3*i + 0] = 1.0;
+            conductor.normalVectors[3*i + 1] = 0.0;
+            conductor.normalVectors[3*i + 2] = 0.0;
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+// numericalChargeNanotube() - Numerical charging for Nanotube
+// (Integrator kernel version - same as CalcKernel)
+// ═══════════════════════════════════════════════════════════
+
+void ReferenceIntegrateConstantVStepKernel::numericalChargeNanotube(
+    NanotubeConductor& conductor,
+    const vector<Vec3>& forces,
+    ContextImpl& context
+) {
+    // Step 1: Image charges on Nanotube using radial normals
+    for (size_t i = 0; i < conductor.virtualAtomIndices.size(); i++) {
+        int atomIdx = conductor.virtualAtomIndices[i];
+        double charge, sigma, epsilon;
+        nonbondedForce->getParticleParameters(atomIdx, charge, sigma, epsilon);
+        double q_i = charge;
+
+        // Get radial normal vector (perpendicular to axis)
+        double nx = conductor.normalVectors[3*i + 0];
+        double ny = conductor.normalVectors[3*i + 1];
+        double nz = conductor.normalVectors[3*i + 2];
+
+        if (fabs(q_i) > (0.9 * SMALL_THRESHOLD)) {
+            double Ex = forces[atomIdx][0] / q_i;
+            double Ey = forces[atomIdx][1] / q_i;
+            double Ez = forces[atomIdx][2] / q_i;
+
+            // Project onto radial normal (not axial!)
+            double En_external = Ex * nx + Ey * ny + Ez * nz;
+
+            // Solve for surface charge using cylindrical area
+            q_i = 2.0 / (4.0 * M_PI) * conductor.area_atom * En_external * CONVERSION_KJMOLNM_AU;
+        } else {
+            q_i = SMALL_THRESHOLD;
+        }
+
+        currentCharges[atomIdx] = q_i;
+        nonbondedForce->setParticleParameters(atomIdx, q_i, sigma, epsilon);
+    }
+
+    // Update and recompute forces
+    nonbondedForce->updateParametersInContext(context.getOwner());
+    context.calcForcesAndEnergy(true, false, -1);
+    vector<Vec3>& forcesNew = extractForces(context);
+
+    // Step 2: Charge transfer to Nanotube (same logic as Buckyball)
+    if (conductor.contactAtomIndex < 0) {
+        return;  // No contact atom
+    }
+
+    int conductorAtomIndex = conductor.contactAtomIndex;
+    double charge, sigma, epsilon;
+    nonbondedForce->getParticleParameters(conductorAtomIndex, charge, sigma, epsilon);
+    double q_i = charge;
+
+    // Flat electrode normal
+    double conductor_atom_nx, conductor_atom_ny, conductor_atom_nz;
+    if (conductor.electrodeType == "cathode") {
+        conductor_atom_nx = 0.0;
+        conductor_atom_ny = 0.0;
+        conductor_atom_nz = 1.0;
+    } else {
+        conductor_atom_nx = 0.0;
+        conductor_atom_ny = 0.0;
+        conductor_atom_nz = -1.0;
+    }
+
+    double En_external = 0.0;
+    if (fabs(q_i) > (0.9 * SMALL_THRESHOLD)) {
+        double Ex = forcesNew[conductorAtomIndex][0] / q_i;
+        double Ey = forcesNew[conductorAtomIndex][1] / q_i;
+        double Ez = forcesNew[conductorAtomIndex][2] / q_i;
+
+        En_external = Ex * conductor_atom_nx + Ey * conductor_atom_ny + Ez * conductor_atom_nz;
+    }
+
+    double dE_conductor;
+    if (conductor.closeToElectrode) {
+        dE_conductor = -(En_external + voltage / Lgap / 2.0) * CONVERSION_KJMOLNM_AU;
+    } else {
+        dE_conductor = -En_external * CONVERSION_KJMOLNM_AU;
+    }
+
+    double sign = -1.0;
+    double dQ_conductor = sign * dE_conductor * conductor.dr_center_contact * conductor.dr_center_contact;
+
+    int Natoms = conductor.virtualAtomIndices.size();
+    double dq_atom = dQ_conductor / Natoms;
+
+    // Distribute charge uniformly
+    for (int atomIdx : conductor.virtualAtomIndices) {
+        double charge_old, sig, eps;
+        nonbondedForce->getParticleParameters(atomIdx, charge_old, sig, eps);
+        double q_i_new = charge_old + dq_atom;
+
+        currentCharges[atomIdx] = q_i_new;
+        nonbondedForce->setParticleParameters(atomIdx, q_i_new, sig, eps);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
 // execute() - 执行一个积分步
 // ═══════════════════════════════════════════════════════════
 
@@ -1683,6 +2015,30 @@ void ReferenceIntegrateConstantVStepKernel::scf_iteration(ContextImpl& context) 
             nonbondedForce->updateParametersInContext(context.getOwner());
 
             // Line 358-360: Recompute Q_analytic (conductors are "part of electrolyte")
+            computeElectrodeChargeAnalytic(
+                cathodeAtomIndices, positions, "cathode",
+                z_anode, Q_analytic_cathode
+            );
+
+            computeElectrodeChargeAnalytic(
+                anodeAtomIndices, positions, "anode",
+                z_cathode, Q_analytic_anode
+            );
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // Process Nanotube conductors (same pattern as Buckyball)
+        // ═══════════════════════════════════════════════════════
+        if (!nanotubeConductors.empty()) {
+            // Process each Nanotube conductor
+            for (NanotubeConductor& conductor : nanotubeConductors) {
+                numericalChargeNanotube(conductor, forces, context);
+            }
+
+            // Update context after conductor charge updates
+            nonbondedForce->updateParametersInContext(context.getOwner());
+
+            // Recompute Q_analytic (conductors are "part of electrolyte")
             computeElectrodeChargeAnalytic(
                 cathodeAtomIndices, positions, "cathode",
                 z_anode, Q_analytic_cathode

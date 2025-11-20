@@ -274,6 +274,25 @@ private:
     };
     std::vector<BuckyballConductor> buckyballConductors;
 
+    // Nanotube导体（对应Nanotube_Virtual class）
+    struct NanotubeConductor {
+        std::vector<int> virtualAtomIndices;   // 虚拟层原子
+        std::vector<int> realAtomIndices;      // 真实层原子
+        std::string electrodeType;             // "cathode" or "anode"
+        double voltageKjMol;                   // 电压 (kJ/mol)
+        double axis[3];                        // 纳米管轴向（单位向量）
+        double r_center[3];                    // 中心位置 (nm)
+        double radius;                         // 半径 (nm)
+        double length;                         // 长度 (nm, from box 'a' vector)
+        double area_atom;                      // 每原子面积 (nm^2) = 2πrL/N
+        std::vector<double> normalVectors;     // 径向法向量 [nx0,ny0,nz0, nx1,ny1,nz1, ...]
+        int contactAtomIndex;                  // 最近接触电极原子
+        double dr_center_contact;              // 中心到接触原子距离 (nm)
+        bool closeToElectrode;                 // 是否靠近主电极
+        double closeThreshold;                 // 接近阈值 (nm)
+    };
+    std::vector<NanotubeConductor> nanotubeConductors;
+
     // 系统几何参数（对应MMsys成员）
     double voltage;     // Cathode.Voltage (kJ/mol, 已转换)
     double Lgap;        // MMsys.Lgap (nm)
@@ -348,6 +367,20 @@ private:
     void numericalChargeConductor(BuckyballConductor& conductor,
                                    const std::vector<OpenMM::Vec3>& forces,
                                    OpenMM::ContextImpl& context);
+
+    /**
+     * Initialize Nanotube geometry (center, radius, axis, normals)
+     */
+    void initializeNanotubeGeometry(NanotubeConductor& conductor,
+                                     const std::vector<OpenMM::Vec3>& positions,
+                                     const OpenMM::Vec3 boxVectors[3]);
+
+    /**
+     * Numerical charge calculation for Nanotube conductors
+     */
+    void numericalChargeNanotube(NanotubeConductor& conductor,
+                                  const std::vector<OpenMM::Vec3>& forces,
+                                  OpenMM::ContextImpl& context);
 };
 
 } // namespace ConstantVPlugin
