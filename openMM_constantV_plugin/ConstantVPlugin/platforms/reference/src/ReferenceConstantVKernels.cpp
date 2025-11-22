@@ -978,7 +978,7 @@ void ReferenceCalcConstantVKernel::numericalChargeNanotube(
     // Charge transfer (cylindrical geometry)
     // For Nanotube: same formula as Buckyball (sign=-1.0)
     double sign = -1.0;
-    double dQ_conductor = sign * dE_conductor * conductor.dr_center_contact * conductor.dr_center_contact;
+    double dQ_conductor = sign * dE_conductor * conductor.dr_center_contact * conductor.length / 2.0;
 
     // Distribute charge uniformly on all virtual atoms
     int Natoms = conductor.virtualAtomIndices.size();
@@ -1644,7 +1644,7 @@ void ReferenceIntegrateConstantVStepKernel::numericalChargeConductor(
     }
 
     double sign = -1.0;
-    double dQ_conductor = sign * dE_conductor * conductor.dr_center_contact * conductor.dr_center_contact;
+    double dQ_conductor = sign * dE_conductor * conductor.dr_center_contact * conductor.length / 2.0;
 
     int Natoms = conductor.virtualAtomIndices.size();
     double dq_atom = dQ_conductor / Natoms;
