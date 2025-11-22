@@ -115,6 +115,50 @@ public:
     void setNumIterations(int n);
     int getNumIterations() const;
 
+    // Buckyball Conductor API
+    int addBuckyballConductor(const std::vector<int>& virtualAtoms,
+                               const std::vector<int>& realAtoms,
+                               const std::string& electrodeType,
+                               double voltage);
+    int getNumBuckyballConductors() const;
+    %apply std::vector<int>& OUTPUT {std::vector<int>& virtualAtoms};
+    %apply std::vector<int>& OUTPUT {std::vector<int>& realAtoms};
+    %apply std::string& OUTPUT {std::string& electrodeType};
+    %apply double& OUTPUT {double& voltage};
+    void getBuckyballConductorParameters(int index,
+                                          std::vector<int>& virtualAtoms,
+                                          std::vector<int>& realAtoms,
+                                          std::string& electrodeType,
+                                          double& voltage) const;
+    %clear std::vector<int>& virtualAtoms;
+    %clear std::vector<int>& realAtoms;
+    %clear std::string& electrodeType;
+    %clear double& voltage;
+
+    // Nanotube Conductor API
+    int addNanotubeConductor(const std::vector<int>& virtualAtoms,
+                             const std::vector<int>& realAtoms,
+                             const std::string& electrodeType,
+                             double voltage,
+                             const std::vector<double>& axis);
+    int getNumNanotubeConductors() const;
+    %apply std::vector<int>& OUTPUT {std::vector<int>& virtualAtoms};
+    %apply std::vector<int>& OUTPUT {std::vector<int>& realAtoms};
+    %apply std::string& OUTPUT {std::string& electrodeType};
+    %apply double& OUTPUT {double& voltage};
+    %apply std::vector<double>& OUTPUT {std::vector<double>& axis};
+    void getNanotubeConductorParameters(int index,
+                                        std::vector<int>& virtualAtoms,
+                                        std::vector<int>& realAtoms,
+                                        std::string& electrodeType,
+                                        double& voltage,
+                                        std::vector<double>& axis) const;
+    %clear std::vector<int>& virtualAtoms;
+    %clear std::vector<int>& realAtoms;
+    %clear std::string& electrodeType;
+    %clear double& voltage;
+    %clear std::vector<double>& axis;
+
     %extend {
         static ConstantVPlugin::ConstantVForce& cast(OpenMM::Force& force) {
             return dynamic_cast<ConstantVPlugin::ConstantVForce&>(force);
