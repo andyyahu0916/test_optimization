@@ -6,8 +6,45 @@
 #include "openmm/cuda/CudaContext.h"
 #include "openmm/cuda/CudaArray.h"
 #include <vector>
+#include <string>
 
 namespace ConstantVPlugin {
+
+/**
+ * Struct to hold Buckyball/Nanotube data for CUDA.
+ * We calculate static geometry (normals, areas) on CPU during initialization
+ * and upload to GPU arrays.
+ */
+struct CudaConductorData {
+    std::string electrodeType; // "cathode" or "anode"
+    double voltage;            // kJ/mol
+    double closeThreshold;     // nm
+    bool closeToElectrode;     // Determined at init
+    int contactAtomIndex;      // Determined at init
+    double dr_center_contact;  // Determined at init
+
+    // For Nanotubes
+    double length;
+    std::vector<double> axis;
+
+    // Geometry parameters
+    double radius;
+    double area_atom;
+    std::vector<double> r_center; // [3]
+
+    // GPU Arrays (Owned by this struct, must be deleted)
+    OpenMM::CudaArray* d_virtualAtomIndices; // [Natoms] int
+    OpenMM::CudaArray* d_realAtomIndices;    // [Natoms] int
+    OpenMM::CudaArray* d_normals;            // [3*Natoms] double (nx, ny, nz interleaved)
+
+    CudaConductorData() : d_virtualAtomIndices(nullptr), d_realAtomIndices(nullptr), d_normals(nullptr) {}
+
+    ~CudaConductorData() {
+        delete d_virtualAtomIndices;
+        delete d_realAtomIndices;
+        delete d_normals;
+    }
+};
 
 /**
  * CUDA implementation of CalcConstantVKernel.
@@ -78,6 +115,12 @@ private:
     OpenMM::CudaArray* d_cathode_numeric_partial; // [numBlocks] - partial sums for cathode numeric charge
     OpenMM::CudaArray* d_anode_numeric_partial;   // [numBlocks] - partial sums for anode numeric charge
 
+    // Buffer for Step 2 Charge Transfer (Zero Transfer Architecture)
+    // WARNING: This buffer size is 1.
+    // All kernels writing to this buffer MUST be serialized in the same CUDA stream.
+    // Do not use concurrent streams for different conductors without expanding this buffer.
+    OpenMM::CudaArray* d_contactForceBuffer;
+
     // Pointer to NonbondedForce for charge updates
     OpenMM::NonbondedForce* nonbondedForce;
 
@@ -91,8 +134,30 @@ private:
     std::vector<double> anodeAreas;
     std::vector<int> electrolyteIndices;
 
+    // Complex Conductors (Buckyballs/Nanotubes)
+    // We store pointers to allow CudaConductorData to manage its own CudaArrays
+    std::vector<CudaConductorData*> buckyballs;
+    std::vector<CudaConductorData*> nanotubes;
+
+    // Temporary storage for initialization (cleared after init)
+    struct InitConductorData {
+        std::vector<int> virtualAtoms;
+        std::vector<int> realAtoms;
+        std::string electrodeType;
+        double voltage;
+        std::vector<double> axis; // For nanotubes
+    };
+    std::vector<InitConductorData> buckyballInitData;
+    std::vector<InitConductorData> nanotubeInitData;
+
 private:
     void initializeGPU();  // Defer GPU allocation to first execute()
+
+    // Helper methods for conductor initialization (CPU side logic)
+    void initializeBuckyballGeometry(CudaConductorData* conductor, const std::vector<OpenMM::Vec3>& positions);
+    void initializeNanotubeGeometry(CudaConductorData* conductor, const std::vector<OpenMM::Vec3>& positions, const OpenMM::Vec3 boxVectors[3]);
+    void findContactNeighborConductor(CudaConductorData* conductor, const std::vector<OpenMM::Vec3>& positions);
+    void projectOrthogonalToAxis(const double vec_in[3], const double axis[3], double vec_out[3]);
 };
 
 /**
