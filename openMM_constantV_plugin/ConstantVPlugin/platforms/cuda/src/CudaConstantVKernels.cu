@@ -250,8 +250,11 @@ __global__ void computeAndApplyChargeTransferKernel(
     double length, // For Nanotube (use 0.0 for Buckyball to switch logic? No, easier to pass pre-calc factor)
     double geometricFactor, // Buckyball: dr^2, Nanotube: dr*L/2
     int sign_electrode, // +1 for cathode contact, -1 for anode contact
-    int contactAtomIndex // Replaced q_contact
+    int contactAtomIndex,
+    int useLowVoltageTerm
 ) {
+    (void)dr_center_contact;
+    (void)length;
     // Part 1: Calculate dq (Thread 0 only)
     __shared__ double dq_atom;
 
@@ -273,7 +276,8 @@ __global__ void computeAndApplyChargeTransferKernel(
             En_external = Ez * normal_z;
         }
 
-        double dE_conductor = -(En_external + voltage / Lgap / 2.0) * CONVERSION_KJMOLNM_AU;
+        double boundaryTerm = (useLowVoltageTerm != 0) ? (voltage / Lgap / 2.0) : 0.0;
+        double dE_conductor = -(En_external + boundaryTerm) * CONVERSION_KJMOLNM_AU;
         double dQ = -1.0 * dE_conductor * geometricFactor;
         dq_atom = dQ / numAtoms;
     }
@@ -524,7 +528,7 @@ __global__ void computeScaleAndNormalizeKernel(
 // ═══════════════════════════════════════════════════════════
 
 CudaCalcConstantVKernel::CudaCalcConstantVKernel(string name, const Platform& platform, CudaContext& cu) :
-    CalcConstantVKernel(name, platform), cu(cu), gpuInitialized(false) {
+    CalcConstantVKernel(name, platform), cu(cu), gpuInitialized(false), virtualLJApplied(false) {
 
     // Initialize pointers to nullptr
     d_cathodeIndices = nullptr;
@@ -583,6 +587,9 @@ void CudaCalcConstantVKernel::initialize(const System& system, const ConstantVFo
     z_anode = force.getZAnode();
     nIterations = force.getNumIterations();
 
+    virtualSiteIndices.clear();
+    virtualSiteIndices.reserve(force.getNumCathodeAtoms() + force.getNumAnodeAtoms());
+
     // Load Cathode/Anode/Electrolyte (same as before)
     numCathodes = force.getNumCathodeAtoms();
     cathodeIndices.resize(numCathodes);
@@ -593,6 +600,7 @@ void CudaCalcConstantVKernel::initialize(const System& system, const ConstantVFo
         force.getCathodeAtomParameters(i, particle, area);
         cathodeIndices[i] = particle;
         cathodeAreas[i] = area;
+        virtualSiteIndices.push_back(particle);
     }
 
     numAnodes = force.getNumAnodeAtoms();
@@ -604,6 +612,7 @@ void CudaCalcConstantVKernel::initialize(const System& system, const ConstantVFo
         force.getAnodeAtomParameters(i, particle, area);
         anodeIndices[i] = particle;
         anodeAreas[i] = area;
+        virtualSiteIndices.push_back(particle);
     }
 
     // Sorting for coalescing
@@ -636,6 +645,8 @@ void CudaCalcConstantVKernel::initialize(const System& system, const ConstantVFo
             buckyballInitData[i].realAtoms,
             buckyballInitData[i].electrodeType,
             buckyballInitData[i].voltage);
+        virtualSiteIndices.insert(virtualSiteIndices.end(),
+            buckyballInitData[i].virtualAtoms.begin(), buckyballInitData[i].virtualAtoms.end());
     }
 
     // Load Nanotubes
@@ -648,7 +659,12 @@ void CudaCalcConstantVKernel::initialize(const System& system, const ConstantVFo
             nanotubeInitData[i].electrodeType,
             nanotubeInitData[i].voltage,
             nanotubeInitData[i].axis);
+        virtualSiteIndices.insert(virtualSiteIndices.end(),
+            nanotubeInitData[i].virtualAtoms.begin(), nanotubeInitData[i].virtualAtoms.end());
     }
+
+    std::sort(virtualSiteIndices.begin(), virtualSiteIndices.end());
+    virtualSiteIndices.erase(std::unique(virtualSiteIndices.begin(), virtualSiteIndices.end()), virtualSiteIndices.end());
 
     // Get NonbondedForce
     nonbondedForce = nullptr;
@@ -947,37 +963,28 @@ void CudaCalcConstantVKernel::initializeGPU() {
     std::cout << "[CUDA] initializeGPU() complete. Loaded " << buckyballs.size() << " Buckyballs, " << nanotubes.size() << " Nanotubes." << std::endl;
 }
 
+void CudaCalcConstantVKernel::enforceVirtualSiteParameters(ContextImpl& context) {
+    if (virtualLJApplied || nonbondedForce == nullptr)
+        return;
+
+    for (int index : virtualSiteIndices) {
+        double charge, sigma, epsilon;
+        nonbondedForce->getParticleParameters(index, charge, sigma, epsilon);
+        nonbondedForce->setParticleParameters(index, charge, 1.0, 0.0);
+    }
+
+    nonbondedForce->updateParametersInContext(context.getOwner());
+    virtualLJApplied = true;
+}
+
 double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces, bool includeEnergy) {
     // Initialize on first execute
     if (!gpuInitialized) {
         initializeGPU();
+    }
 
-        // P1 FIX: Enforce Virtual Site Parameters (Inline Logic)
-        // Collect all virtual indices
-        std::vector<int> allVirtualIndices;
-        allVirtualIndices.insert(allVirtualIndices.end(), cathodeIndices.begin(), cathodeIndices.end());
-        allVirtualIndices.insert(allVirtualIndices.end(), anodeIndices.begin(), anodeIndices.end());
-
-        for(auto* c : buckyballs) {
-            std::vector<int> idx(c->d_virtualAtomIndices->getSize());
-            c->d_virtualAtomIndices->download(idx);
-            allVirtualIndices.insert(allVirtualIndices.end(), idx.begin(), idx.end());
-        }
-        for(auto* c : nanotubes) {
-            std::vector<int> idx(c->d_virtualAtomIndices->getSize());
-            c->d_virtualAtomIndices->download(idx);
-            allVirtualIndices.insert(allVirtualIndices.end(), idx.begin(), idx.end());
-        }
-
-        // Update Parameters on Host
-        for(int index : allVirtualIndices) {
-            double charge, sigma, epsilon;
-            nonbondedForce->getParticleParameters(index, charge, sigma, epsilon);
-            // Force sigma=1.0, epsilon=0.0 (Matches Python usage)
-            nonbondedForce->setParticleParameters(index, charge, 1.0, 0.0);
-        }
-
-        nonbondedForce->updateParametersInContext(context.getOwner());
+    if (!virtualLJApplied) {
+        enforceVirtualSiteParameters(context);
     }
 
     CudaArray& posq = cu.getPosq();
@@ -1094,7 +1101,7 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
 
             // --- Buckyballs Step 2 ---
             for(CudaConductorData* c : buckyballs) {
-                if(!c->closeToElectrode || c->contactAtomIndex < 0) continue;
+                if(c->contactAtomIndex < 0) continue;
 
                 // 1. Extract force of contact atom to buffer
                 extractContactForceKernel<<<1, 1, 0, cu.getCurrentStream()>>>(
@@ -1106,6 +1113,7 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
                 int nb = (N + blockSize - 1) / blockSize;
 
                 int sign_electrode = (c->electrodeType == "cathode") ? 1 : -1;
+                int useLowVoltageTerm = c->closeToElectrode ? 1 : 0;
 
                 computeAndApplyChargeTransferKernel<<<nb, blockSize, 0, cu.getCurrentStream()>>>(
                     N, (const int*)c->d_virtualAtomIndices->getDevicePointer(),
@@ -1114,13 +1122,14 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
                     voltage, Lgap, c->dr_center_contact, 0.0, // length unused for Bucky
                     c->dr_center_contact * c->dr_center_contact, // geometricFactor = dr^2
                     sign_electrode,
-                    c->contactAtomIndex // New arg
+                    c->contactAtomIndex,
+                    useLowVoltageTerm
                 );
             }
 
             // --- Nanotubes Step 2 ---
             for(CudaConductorData* c : nanotubes) {
-                if(!c->closeToElectrode || c->contactAtomIndex < 0) continue;
+                if(c->contactAtomIndex < 0) continue;
 
                 extractContactForceKernel<<<1, 1, 0, cu.getCurrentStream()>>>(
                     c->contactAtomIndex, (const float4*)forces.getDevicePointer(), (float4*)d_contactForceBuffer->getDevicePointer()
@@ -1129,6 +1138,7 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
                 int N = c->d_virtualAtomIndices->getSize();
                 int nb = (N + blockSize - 1) / blockSize;
                 int sign_electrode = (c->electrodeType == "cathode") ? 1 : -1;
+                int useLowVoltageTerm = c->closeToElectrode ? 1 : 0;
 
                 computeAndApplyChargeTransferKernel<<<nb, blockSize, 0, cu.getCurrentStream()>>>(
                     N, (const int*)c->d_virtualAtomIndices->getDevicePointer(),
@@ -1137,7 +1147,8 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
                     voltage, Lgap, c->dr_center_contact, c->length,
                     c->dr_center_contact * c->length / 2.0, // geometricFactor = dr*L/2
                     sign_electrode,
-                    c->contactAtomIndex
+                    c->contactAtomIndex,
+                    useLowVoltageTerm
                 );
             }
         }
@@ -1211,52 +1222,4 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
 
     cu.invalidateMolecules();
     return 0.0;
-}
-
-// (Kernel definitions need to match call signatures)
-// Updated computeAndApplyChargeTransferKernel definition:
-__global__ void computeAndApplyChargeTransferKernel(
-    int numAtoms,
-    const int* __restrict__ indices,
-    const float4* __restrict__ d_contactForce,
-    float4* __restrict__ posq,
-    double voltage,
-    double Lgap,
-    double dr_center_contact,
-    double length,
-    double geometricFactor,
-    int sign_electrode,
-    int contactAtomIndex // Replaced q_contact
-) {
-    __shared__ double dq_atom;
-
-    if (threadIdx.x == 0) {
-        float4 f = d_contactForce[0];
-        // Read q_contact from global memory
-        double q_i = (double)posq[contactAtomIndex].w;
-
-        double En_external = 0.0;
-        if (fabs(q_i) > (0.9 * SMALL_THRESHOLD)) {
-            double Ex = (double)f.x / q_i;
-            double Ey = (double)f.y / q_i;
-            double Ez = (double)f.z / q_i;
-
-            // P2 FIX: Correct Anode Sign Logic
-            // Cathode (sign=1) -> Normal +Z (1.0)
-            // Anode (sign=-1)  -> Normal -Z (-1.0)
-            double normal_z = (sign_electrode > 0) ? 1.0 : -1.0;
-            En_external = Ez * normal_z;
-        }
-
-        double dE_conductor = -(En_external + voltage / Lgap / 2.0) * CONVERSION_KJMOLNM_AU;
-        double dQ = -1.0 * dE_conductor * geometricFactor;
-        dq_atom = dQ / numAtoms;
-    }
-    __syncthreads();
-
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i >= numAtoms) return;
-
-    int atomIdx = indices[i];
-    posq[atomIdx].w += (float)dq_atom;
 }

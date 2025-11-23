@@ -160,7 +160,7 @@ def add_electrode_exclusions(constantv_obj, nonbonded_force, custom_nonbonded_fo
     print(f"{'='*60}\n")
 
 
-def configure_geometry_from_context(context, integrator, cathode_atom_idx, anode_atom_idx):
+def configure_geometry_from_context(context, constantv_obj, cathode_atom_idx, anode_atom_idx):
     """
     Automatically compute and set electrode geometry parameters from context.
 
@@ -172,8 +172,8 @@ def configure_geometry_from_context(context, integrator, cathode_atom_idx, anode
     ----------
     context : openmm.Context
         The simulation context (must be created with positions set)
-    integrator : ConstantVIntegrator
-        The integrator to configure
+        constantv_obj : ConstantVIntegrator or ConstantVForce
+            ConstantV object whose geometry parameters will be updated
     cathode_atom_idx : int
         Index of any cathode atom (for z position)
     anode_atom_idx : int
@@ -189,7 +189,7 @@ def configure_geometry_from_context(context, integrator, cathode_atom_idx, anode
     >>> context = mm.Context(system, integrator)
     >>> context.setPositions(positions)
     >>> params = configure_geometry_from_context(
-    ...     context, integrator,
+    ...     context, constantv_force,
     ...     cathode_atoms[0],  # First cathode atom
     ...     anode_atoms[0]     # First anode atom
     ... )
@@ -245,13 +245,13 @@ def configure_geometry_from_context(context, integrator, cathode_atom_idx, anode
     total_area_nm2 = cross_mag.value_in_unit(unit.nanometer**2)
 
     # ═══════════════════════════════════════════════════════════
-    # Set in integrator
+    # Set on ConstantV object (Force or Integrator)
     # ═══════════════════════════════════════════════════════════
-    integrator.setLgap(Lgap)
-    integrator.setLcell(Lcell)
-    integrator.setTotalArea(total_area_nm2)
-    integrator.setZCathode(z_cathode)
-    integrator.setZAnode(z_anode)
+    constantv_obj.setLgap(Lgap)
+    constantv_obj.setLcell(Lcell)
+    constantv_obj.setTotalArea(total_area_nm2)
+    constantv_obj.setZCathode(z_cathode)
+    constantv_obj.setZAnode(z_anode)
 
     # ═══════════════════════════════════════════════════════════
     # Print summary
@@ -275,7 +275,7 @@ def configure_geometry_from_context(context, integrator, cathode_atom_idx, anode
     }
 
 
-def add_electrolyte_atoms_auto(topology, system, integrator, nonbonded_force,
+def add_electrolyte_atoms_auto(topology, system, constantv_obj, nonbonded_force,
                                natom_cutoff=100, exclude_chains=None):
     """
     Automatically identify and add electrolyte atoms/particles (including Drude).
@@ -307,8 +307,8 @@ def add_electrolyte_atoms_auto(topology, system, integrator, nonbonded_force,
         The system topology (used only to identify electrode chains)
     system : openmm.System
         The OpenMM System object (source of truth for particles)
-    integrator : ConstantVIntegrator
-        The integrator to add particles to
+    constantv_obj : ConstantVIntegrator or ConstantVForce
+        ConstantV object that stores electrolyte particles
     nonbonded_force : openmm.NonbondedForce
         The NonbondedForce (to get charges for all particles)
     natom_cutoff : int, default=100
@@ -384,7 +384,7 @@ def add_electrolyte_atoms_auto(topology, system, integrator, nonbonded_force,
             # (Threshold: 1e-6 to avoid floating point issues)
             if abs(charge._value) > 1e-6:
                 electrolyte_particles.append(particle_idx)
-                integrator.addElectrolyteAtom(particle_idx, charge._value)
+                constantv_obj.addElectrolyteAtom(particle_idx, charge._value)
 
                 # Statistics: is this a Drude particle or regular atom?
                 if particle_idx in topology_atom_indices:
@@ -469,7 +469,7 @@ def compute_electrode_area_per_atom(topology, electrode_atom_indices):
     return area_per_atom, total_area
 
 
-def validate_setup(context, integrator):
+def validate_setup(context, constantv_obj):
     """
     Validate that the ConstantV setup is correct.
 
@@ -482,8 +482,8 @@ def validate_setup(context, integrator):
     ----------
     context : openmm.Context
         The simulation context
-    integrator : ConstantVIntegrator
-        The integrator
+    constantv_obj : ConstantVIntegrator or ConstantVForce
+        ConstantV object backing the simulation
 
     Returns
     -------
@@ -502,9 +502,9 @@ def validate_setup(context, integrator):
 
     # Check geometry parameters
     try:
-        Lgap = integrator.getLgap()
-        Lcell = integrator.getLcell()
-        totalArea = integrator.getTotalArea()
+        Lgap = constantv_obj.getLgap()
+        Lcell = constantv_obj.getLcell()
+        totalArea = constantv_obj.getTotalArea()
 
         print(f"✓ Geometry parameters set:")
         print(f"  Lgap = {Lgap:.4f} nm")
@@ -519,8 +519,8 @@ def validate_setup(context, integrator):
         valid = False
 
     # Check electrode atoms
-    num_cathode = integrator.getNumCathodeAtoms()
-    num_anode = integrator.getNumAnodeAtoms()
+    num_cathode = constantv_obj.getNumCathodeAtoms()
+    num_anode = constantv_obj.getNumAnodeAtoms()
 
     print(f"✓ Electrode atoms:")
     print(f"  Cathode: {num_cathode} atoms")
@@ -531,7 +531,7 @@ def validate_setup(context, integrator):
         valid = False
 
     # Check electrolyte atoms
-    num_electrolyte = integrator.getNumElectrolyteAtoms()
+    num_electrolyte = constantv_obj.getNumElectrolyteAtoms()
     print(f"✓ Electrolyte atoms: {num_electrolyte}")
 
     if num_electrolyte == 0:
@@ -551,3 +551,19 @@ def validate_setup(context, integrator):
         print()
 
     return valid, messages
+
+
+def trigger_constantv_scf(context, force_group=31):
+    """Force an SCF update by evaluating the ConstantV force group.
+
+    Parameters
+    ----------
+    context : openmm.Context
+        Active simulation context.
+    force_group : int, optional
+        Force group index assigned to ConstantVForce (default 31).
+    """
+
+    group_mask = 1 << force_group
+    # Request forces to guarantee kernel execution even when energy isn't needed.
+    context.getState(getEnergy=False, getForces=True, groups=group_mask)

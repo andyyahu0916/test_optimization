@@ -149,9 +149,12 @@ private:
     };
     std::vector<InitConductorData> buckyballInitData;
     std::vector<InitConductorData> nanotubeInitData;
+    std::vector<int> virtualSiteIndices; // Cached list of all virtual-site atoms (flat + conductors)
+    bool virtualLJApplied;
 
 private:
     void initializeGPU();  // Defer GPU allocation to first execute()
+    void enforceVirtualSiteParameters(OpenMM::ContextImpl& context);
 
     // Helper methods for conductor initialization (CPU side logic)
     void initializeBuckyballGeometry(CudaConductorData* conductor, const std::vector<OpenMM::Vec3>& positions);

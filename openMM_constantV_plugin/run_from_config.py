@@ -13,18 +13,25 @@ import os
 import shutil
 from datetime import datetime
 
+# Ensure local ConstantV Python bindings are importable without installation
+REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
+PLUGIN_PY_PATH = os.path.join(REPO_ROOT, 'ConstantVPlugin', 'build', 'python')
+if os.path.isdir(PLUGIN_PY_PATH) and PLUGIN_PY_PATH not in sys.path:
+    sys.path.insert(0, PLUGIN_PY_PATH)
+
 import openmm as mm
 import openmm.app as app
 import openmm.unit as unit
 
 # Import plugin
-from constantvplugin import ConstantVIntegrator
+from constantvplugin import ConstantVForce
 from constantvplugin_helpers import (
     add_electrode_exclusions,
     configure_geometry_from_context,
     add_electrolyte_atoms_auto,
     compute_electrode_area_per_atom,
-    validate_setup
+    validate_setup,
+    trigger_constantv_scf
 )
 
 # Import config parser
@@ -126,21 +133,24 @@ def main():
         print("✗ 错误: 找不到NonbondedForce")
         sys.exit(1)
 
+    scf_frequency_steps = config.calculate_scf_frequency_steps()
+
     # ═══════════════════════════════════════════════════════════
-    # 步骤5: 创建ConstantVIntegrator
+    # 步骤5: 创建ConstantVForce
     # ═══════════════════════════════════════════════════════════
     print("\n" + "="*70)
-    print("创建ConstantVIntegrator")
+    print("创建ConstantVForce")
     print("="*70)
 
-    integrator = ConstantVIntegrator(config.timestep_ps)
-    integrator.setVoltage(config.voltage)
+    constantv_force = ConstantVForce()
+    constantv_force.setVoltage(config.voltage)
+    constantv_force.setNumIterations(config.num_scf_iterations)
     print(f"✓ 电压: {config.voltage} V")
-
-    integrator.setNumSCFIterations(config.num_scf_iterations)
-    integrator.setSCFFrequency(config.calculate_scf_frequency_steps())
     print(f"✓ SCF迭代次数: {config.num_scf_iterations}")
-    print(f"✓ SCF频率: 每{config.scf_frequency_fs} fs ({config.calculate_scf_frequency_steps()}步)")
+    print(f"✓ SCF频率: 每{config.scf_frequency_fs} fs ({scf_frequency_steps}步)")
+
+    # Force must be part of the system before creating the Context
+    system.addForce(constantv_force)
 
     # ═══════════════════════════════════════════════════════════
     # 步骤6: 识别并添加电极atoms
@@ -185,12 +195,12 @@ def main():
     print(f"✓ Anode面积/atom: {anode_area_per_atom:.6f} nm²")
     print(f"✓ 总面积: {total_area:.4f} nm²")
 
-    # 添加到integrator
+    # 添加到ConstantVForce
     for atom_idx in cathode_atoms:
-        integrator.addCathodeAtom(atom_idx, cathode_area_per_atom)
+        constantv_force.addCathodeAtom(atom_idx, cathode_area_per_atom)
 
     for atom_idx in anode_atoms:
-        integrator.addAnodeAtom(atom_idx, anode_area_per_atom)
+        constantv_force.addAnodeAtom(atom_idx, anode_area_per_atom)
 
     print(f"✓ 已添加 {len(cathode_atoms)} 个cathode atoms")
     print(f"✓ 已添加 {len(anode_atoms)} 个anode atoms")
@@ -204,7 +214,8 @@ def main():
 
     electrolyte_atoms = add_electrolyte_atoms_auto(
         pdb.topology,
-        integrator,
+        system,
+        constantv_force,
         nonbonded_force,
         natom_cutoff=config.natom_cutoff,
         exclude_chains=list(config.cathode_chains) + list(config.anode_chains)
@@ -228,7 +239,7 @@ def main():
 
     geometry_params = configure_geometry_from_context(
         temp_context,
-        integrator,
+        constantv_force,
         cathode_atoms[0],
         anode_atoms[0]
     )
@@ -248,16 +259,52 @@ def main():
 
     # 根据配置决定是否添加CustomNonbondedForce exclusions
     if config.sapt_ff_exclusions and custom_nonbonded_force is not None:
-        add_electrode_exclusions(integrator, nonbonded_force, custom_nonbonded_force)
+        add_electrode_exclusions(constantv_force, nonbonded_force, custom_nonbonded_force)
     else:
-        add_electrode_exclusions(integrator, nonbonded_force, None)
+        add_electrode_exclusions(constantv_force, nonbonded_force, None)
 
     final_exceptions = nonbonded_force.getNumExceptions()
     print(f"  最终exceptions: {final_exceptions}")
     print(f"  新增: {final_exceptions - initial_exceptions}")
 
     # ═══════════════════════════════════════════════════════════
-    # 步骤10: 创建Context
+    # 步骤10: 选择积分器 (Drude or standard Langevin)
+    # ═══════════════════════════════════════════════════════════
+    print("\n" + "="*70)
+    print("选择积分器")
+    print("="*70)
+
+    timestep = config.timestep_ps * unit.picoseconds
+    temperature = config.temperature * unit.kelvin
+    friction = config.friction_per_ps / unit.picosecond
+
+    has_drude = any(isinstance(force, mm.DrudeForce) for force in system.getForces())
+
+    if has_drude:
+        drude_temp = config.temperature_drude * unit.kelvin
+        drude_friction = config.friction_drude_per_ps / unit.picosecond
+        integrator = mm.DrudeLangevinIntegrator(
+            temperature,
+            friction,
+            drude_temp,
+            drude_friction,
+            timestep
+        )
+        integrator.setMaxDrudeDistance(0.02)
+        print(f"✓ 检测到Drude粒子，使用DrudeLangevinIntegrator")
+    else:
+        integrator = mm.LangevinIntegrator(temperature, friction, timestep)
+        print(f"✓ 使用LangevinIntegrator")
+
+    # ConstantVForce将由手动SCF触发，因此从积分器力群中排除
+    integration_groups = integrator.getIntegrationForceGroups()
+    constantv_group = 31
+    integration_groups &= ~(1 << constantv_group)
+    integrator.setIntegrationForceGroups(integration_groups)
+    print(f"✓ 已从积分器力群中移除ConstantV force group ({constantv_group})")
+
+    # ═══════════════════════════════════════════════════════════
+    # 步骤11: 创建Context
     # ═══════════════════════════════════════════════════════════
     print("\n" + "="*70)
     print("创建Context")
@@ -288,6 +335,10 @@ def main():
     context.reinitialize(preserveState=True)
     print("✓ Context reinitialized")
 
+    print("\n运行首次SCF以初始化电极电荷...")
+    trigger_constantv_scf(context)
+    print("✓ 初始SCF完成")
+
     # ═══════════════════════════════════════════════════════════
     # 步骤11: 验证Setup
     # ═══════════════════════════════════════════════════════════
@@ -295,7 +346,7 @@ def main():
     print("验证setup")
     print("="*70)
 
-    valid, messages = validate_setup(context, integrator)
+    valid, messages = validate_setup(context, constantv_force)
     if not valid:
         print("\n✗ Setup验证失败:")
         for msg in messages:
@@ -374,17 +425,31 @@ def main():
     # ═══════════════════════════════════════════════════════════
     # 步骤14: 运行模拟
     # ═══════════════════════════════════════════════════════════
+    total_steps = config.calculate_total_steps()
+
     print("\n" + "="*70)
     print("运行Constant Voltage MD模拟")
     print("="*70)
     print(f"开始时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"总步数: {config.calculate_total_steps()}")
+    print(f"总步数: {total_steps}")
+    print(f"SCF间隔: 每{scf_frequency_steps}步触发一次")
     print("="*70 + "\n")
 
     t1 = datetime.now()
+    steps_completed = 0
+    scf_cycles = 0
 
     try:
-        simulation.step(config.calculate_total_steps())
+        while steps_completed < total_steps:
+            steps_to_run = min(scf_frequency_steps, total_steps - steps_completed)
+            simulation.step(steps_to_run)
+            steps_completed += steps_to_run
+
+            trigger_constantv_scf(context)
+            scf_cycles += 1
+
+            if scf_cycles <= 5 or steps_completed == total_steps or scf_cycles % 50 == 0:
+                print(f"  ↻ SCF #{scf_cycles} 完成 (累计 {steps_completed}/{total_steps} 步)")
     except Exception as e:
         print(f"\n✗ 模拟出错: {e}")
         print("\n可能的原因:")

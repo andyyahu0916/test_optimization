@@ -142,6 +142,11 @@ private:
         bool printFlag = false
     );
 
+    void scaleCathodeAndConductorCharges(
+        double Q_target,
+        bool printFlag = false
+    );
+
 private:
     /**
      * Initialize electrode charges (deferred from initialize() to first execute())
@@ -339,6 +344,8 @@ private:
         const std::vector<int>& electrodeAtomIndices,
         double Q_analytic
     );
+
+    void scaleCathodeAndConductorCharges(double Q_target);
 
     /**
      * SCF迭代主循环

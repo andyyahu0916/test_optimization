@@ -120,6 +120,9 @@ class SimulationConfig:
         self.total_time_ns = section.getfloat('total_time_ns', 0.5)
         self.timestep_ps = section.getfloat('timestep_ps', 0.001)
         self.temperature = section.getfloat('temperature', 300.0)
+        self.temperature_drude = section.getfloat('temperature_drude', 1.0)
+        self.friction_per_ps = section.getfloat('friction_per_ps', 1.0)
+        self.friction_drude_per_ps = section.getfloat('friction_drude_per_ps', 1.0)
 
     def _parse_output(self):
         """解析[Output] section"""
@@ -163,7 +166,11 @@ class SimulationConfig:
         int : SCF频率（多少步做一次SCF）
         """
         timestep_fs = self.timestep_ps * 1000  # ps -> fs
-        return int(self.scf_frequency_fs / timestep_fs)
+        if timestep_fs <= 0:
+            raise ValueError("时间步长必须为正数")
+
+        steps = int(self.scf_frequency_fs / timestep_fs)
+        return max(1, steps)
 
     def calculate_trajectory_output_steps(self) -> int:
         """
@@ -241,6 +248,9 @@ class SimulationConfig:
         print(f"  总时间: {self.total_time_ns} ns ({self.calculate_total_steps()}步)")
         print(f"  时间步长: {self.timestep_ps} ps")
         print(f"  温度: {self.temperature} K")
+        print(f"  Drude温度: {self.temperature_drude} K")
+        print(f"  摩擦系数: {self.friction_per_ps} 1/ps")
+        print(f"  Drude摩擦: {self.friction_drude_per_ps} 1/ps")
 
         print("\n[输出设置]")
         print(f"  输出目录: {self.output_dir}")

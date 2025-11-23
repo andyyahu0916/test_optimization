@@ -61,6 +61,8 @@ static constexpr double CONVERSION_EV_KJMOL = 96.487;
 // self.small_threshold = 1e-6
 static constexpr double SMALL_THRESHOLD = 1e-6;
 
+static const int CONSTANTV_FORCE_GROUP = 31;
+
 // ═══════════════════════════════════════════════════════════
 // initialize() - 缓存参数
 // 注意：这个函数暂时保留原有逻辑，等Force类修改后再更新
@@ -360,6 +362,27 @@ void ReferenceCalcConstantVKernel::computeElectrodeChargeAnalytic(
         Q_analytic += (z_distance / Lcell) * (-q_i);
     }
 
+    // Buckyball/Nanotube virtual atoms behave as electrolyte charges for image term
+    for (const auto& conductor : buckyballConductors) {
+        for (int atomIdx : conductor.virtualAtomIndices) {
+            double charge, sigma, epsilon;
+            nonbondedForce->getParticleParameters(atomIdx, charge, sigma, epsilon);
+            double z_atom = positions[atomIdx][2];
+            double z_distance = fabs(z_atom - z_opposite);
+            Q_analytic += (z_distance / Lcell) * (-charge);
+        }
+    }
+
+    for (const auto& conductor : nanotubeConductors) {
+        for (int atomIdx : conductor.virtualAtomIndices) {
+            double charge, sigma, epsilon;
+            nonbondedForce->getParticleParameters(atomIdx, charge, sigma, epsilon);
+            double z_atom = positions[atomIdx][2];
+            double z_distance = fabs(z_atom - z_opposite);
+            Q_analytic += (z_distance / Lcell) * (-charge);
+        }
+    }
+
     // Line 335-344: 导体贡献（第一版跳过）
     // TODO: 实现Buckyball/Nanotube支持
 }
@@ -410,6 +433,57 @@ void ReferenceCalcConstantVKernel::scaleChargesAnalytic(
                 1.0,
                 0.0
             );
+        }
+    }
+}
+
+void ReferenceCalcConstantVKernel::scaleCathodeAndConductorCharges(
+    double Q_target,
+    bool printFlag
+) {
+    double Q_numeric = 0.0;
+    for (int atomIdx : cathodeAtomIndices) {
+        Q_numeric += currentCharges[atomIdx];
+    }
+    for (const auto& conductor : buckyballConductors) {
+        for (int atomIdx : conductor.virtualAtomIndices) {
+            Q_numeric += currentCharges[atomIdx];
+        }
+    }
+    for (const auto& conductor : nanotubeConductors) {
+        for (int atomIdx : conductor.virtualAtomIndices) {
+            Q_numeric += currentCharges[atomIdx];
+        }
+    }
+
+    if (printFlag) {
+        cout << "Q_numeric (Cathode+Conductors) = " << Q_numeric
+             << ", Q_target = " << Q_target << endl;
+    }
+
+    double scale_factor = -1.0;
+    if (fabs(Q_numeric) > SMALL_THRESHOLD) {
+        scale_factor = Q_target / Q_numeric;
+    }
+
+    if (scale_factor > 0.0) {
+        auto scaleAtom = [&](int atomIdx) {
+            currentCharges[atomIdx] = currentCharges[atomIdx] * scale_factor;
+            nonbondedForce->setParticleParameters(atomIdx, currentCharges[atomIdx], 1.0, 0.0);
+        };
+
+        for (int atomIdx : cathodeAtomIndices) {
+            scaleAtom(atomIdx);
+        }
+        for (const auto& conductor : buckyballConductors) {
+            for (int atomIdx : conductor.virtualAtomIndices) {
+                scaleAtom(atomIdx);
+            }
+        }
+        for (const auto& conductor : nanotubeConductors) {
+            for (int atomIdx : conductor.virtualAtomIndices) {
+                scaleAtom(atomIdx);
+            }
         }
     }
 }
@@ -766,7 +840,9 @@ void ReferenceCalcConstantVKernel::numericalChargeConductor(
     nonbondedForce->updateParametersInContext(context.getOwner());
 
     // Recompute forces after Step 1 charge update
-    context.calcForcesAndEnergy(true, false, -1);
+    int forceGroups = context.getIntegrator().getIntegrationForceGroups();
+    forceGroups &= ~(1U << CONSTANTV_FORCE_GROUP);
+    context.calcForcesAndEnergy(true, false, forceGroups);
     vector<Vec3>& forcesNew = extractForces(context);
 
     // ═══════════════════════════════════════════════════════════
@@ -924,7 +1000,9 @@ void ReferenceCalcConstantVKernel::numericalChargeNanotube(
 
     // Update context and get new forces
     nonbondedForce->updateParametersInContext(context.getOwner());
-    context.calcForcesAndEnergy(true, false, -1);
+    int forceGroups = context.getIntegrator().getIntegrationForceGroups();
+    forceGroups &= ~(1U << CONSTANTV_FORCE_GROUP);
+    context.calcForcesAndEnergy(true, false, forceGroups);
     vector<Vec3>& forcesNew = extractForces(context);
 
     // ═══════════════════════════════════════════════════════════
@@ -1237,8 +1315,15 @@ double ReferenceCalcConstantVKernel::execute(
         // ═══════════════════════════════════════════════════════
         // self.Scale_charges_analytic_general()
         std::cout << "[Reference Debug] Scaling charges (Green's correction)..." << std::endl;
-        scaleChargesAnalytic(cathodeAtomIndices, Q_analytic_cathode, false);
-        scaleChargesAnalytic(anodeAtomIndices, Q_analytic_anode, false);
+        bool hasConductors = (!buckyballConductors.empty() || !nanotubeConductors.empty());
+        if (hasConductors) {
+            scaleChargesAnalytic(anodeAtomIndices, Q_analytic_anode, false);
+            double Q_target = -Q_analytic_anode;
+            scaleCathodeAndConductorCharges(Q_target, false);
+        } else {
+            scaleChargesAnalytic(cathodeAtomIndices, Q_analytic_cathode, false);
+            scaleChargesAnalytic(anodeAtomIndices, Q_analytic_anode, false);
+        }
         std::cout << "[Reference Debug] Charges scaled" << std::endl;
 
         // ═══════════════════════════════════════════════════════
@@ -1256,8 +1341,15 @@ double ReferenceCalcConstantVKernel::execute(
     // ───────────────────────────────────────────────────────
     // self.Scale_charges_analytic_general(print_flag=True)
     std::cout << "[Reference Debug] Final scaling with print..." << std::endl;
-    scaleChargesAnalytic(cathodeAtomIndices, Q_analytic_cathode, true);
-    scaleChargesAnalytic(anodeAtomIndices, Q_analytic_anode, true);
+    bool hasConductors = (!buckyballConductors.empty() || !nanotubeConductors.empty());
+    if (hasConductors) {
+        scaleChargesAnalytic(anodeAtomIndices, Q_analytic_anode, true);
+        double Q_target = -Q_analytic_anode;
+        scaleCathodeAndConductorCharges(Q_target, true);
+    } else {
+        scaleChargesAnalytic(cathodeAtomIndices, Q_analytic_cathode, true);
+        scaleChargesAnalytic(anodeAtomIndices, Q_analytic_anode, true);
+    }
 
     std::cout << "[Reference Debug] execute() finished successfully" << std::endl;
     return 0.0;  // 不贡献能量
@@ -1600,7 +1692,9 @@ void ReferenceIntegrateConstantVStepKernel::numericalChargeConductor(
     nonbondedForce->updateParametersInContext(context.getOwner());
 
     // Recompute forces
-    context.calcForcesAndEnergy(true, false, -1);
+    int forceGroups = context.getIntegrator().getIntegrationForceGroups();
+    forceGroups &= ~(1U << CONSTANTV_FORCE_GROUP);
+    context.calcForcesAndEnergy(true, false, forceGroups);
     vector<Vec3>& forcesNew = extractForces(context);
 
     // Step 2: Charge transfer
@@ -2051,8 +2145,15 @@ void ReferenceIntegrateConstantVStepKernel::scf_iteration(ContextImpl& context) 
         }
 
         // Line 362-365: Green's校正 + 更新Context
-        scaleChargesAnalytic(cathodeAtomIndices, Q_analytic_cathode);
-        scaleChargesAnalytic(anodeAtomIndices, Q_analytic_anode);
+        bool hasConductors = (!buckyballConductors.empty() || !nanotubeConductors.empty());
+        if (hasConductors) {
+            scaleChargesAnalytic(anodeAtomIndices, Q_analytic_anode);
+            double Q_target = -Q_analytic_anode;
+            scaleCathodeAndConductorCharges(Q_target);
+        } else {
+            scaleChargesAnalytic(cathodeAtomIndices, Q_analytic_cathode);
+            scaleChargesAnalytic(anodeAtomIndices, Q_analytic_anode);
+        }
         nonbondedForce->updateParametersInContext(context.getOwner());
     }
 }
@@ -2119,6 +2220,49 @@ void ReferenceIntegrateConstantVStepKernel::scaleChargesAnalytic(
         for (int atomIdx : electrodeAtomIndices) {
             currentCharges[atomIdx] = currentCharges[atomIdx] * scale_factor;
             nonbondedForce->setParticleParameters(atomIdx, currentCharges[atomIdx], 1.0, 0.0);
+        }
+    }
+}
+
+void ReferenceIntegrateConstantVStepKernel::scaleCathodeAndConductorCharges(double Q_target) {
+    double Q_numeric = 0.0;
+    for (int atomIdx : cathodeAtomIndices) {
+        Q_numeric += currentCharges[atomIdx];
+    }
+    for (const auto& conductor : buckyballConductors) {
+        for (int atomIdx : conductor.virtualAtomIndices) {
+            Q_numeric += currentCharges[atomIdx];
+        }
+    }
+    for (const auto& conductor : nanotubeConductors) {
+        for (int atomIdx : conductor.virtualAtomIndices) {
+            Q_numeric += currentCharges[atomIdx];
+        }
+    }
+
+    double scale_factor = -1.0;
+    if (fabs(Q_numeric) > SMALL_THRESHOLD) {
+        scale_factor = Q_target / Q_numeric;
+    }
+
+    if (scale_factor > 0.0) {
+        auto scaleAtom = [&](int atomIdx) {
+            currentCharges[atomIdx] = currentCharges[atomIdx] * scale_factor;
+            nonbondedForce->setParticleParameters(atomIdx, currentCharges[atomIdx], 1.0, 0.0);
+        };
+
+        for (int atomIdx : cathodeAtomIndices) {
+            scaleAtom(atomIdx);
+        }
+        for (const auto& conductor : buckyballConductors) {
+            for (int atomIdx : conductor.virtualAtomIndices) {
+                scaleAtom(atomIdx);
+            }
+        }
+        for (const auto& conductor : nanotubeConductors) {
+            for (int atomIdx : conductor.virtualAtomIndices) {
+                scaleAtom(atomIdx);
+            }
         }
     }
 }
