@@ -2,56 +2,39 @@
  * SWIG Interface for ConstantV Native Core Integration
  * ═══════════════════════════════════════════════════════════════════════════
  *
- * This file exposes the C++ ConstantVDrudeLangevinIntegrator class to Python.
- *
- * Usage from Python:
- * ------------------
- * import constantv
- * from openmm import *
- * from openmm.unit import *
- *
- * integrator = constantv.ConstantVDrudeLangevinIntegrator(
- *     temperature = 300*kelvin,
- *     frictionCoeff = 1/picosecond,
- *     drudeTemperature = 1*kelvin,
- *     drudeFrictionCoeff = 50/picosecond,
- *     stepSize = 0.001*picoseconds,
- *     voltage = 2.0*volts,
- *     Lgap = 3.5*nanometers,
- *     Lcell = 5.0*nanometers,
- *     scfIterations = 4
- * )
- *
- * integrator.addCathodeAtoms([0, 1, 2], [0.1, 0.1, 0.1])  # indices, areas
- * integrator.addAnodeAtoms([100, 101, 102], [0.1, 0.1, 0.1])
- *
- * simulation = Simulation(topology, system, integrator)
- * simulation.step(1000)
+ * This file exposes the ConstantV C++ API to Python:
+ * 1. ConstantVForce - Force-based API (add to System like any Force)
+ * 2. ConstantVIntegrator - Verlet integration with SCF updates
+ * 3. ConstantVDrudeLangevinIntegrator - Drude Langevin with SCF updates
  *
  * Author: Claude (Anthropic)
- * License: See OpenMM license
+ * License: MIT (compatible with OpenMM)
  */
 
 %module constantv
 
 %{
+#include "openmm/ConstantVForce.h"
+#include "openmm/ConstantVIntegrator.h"
 #include "openmm/ConstantVDrudeLangevinIntegrator.h"
 #include "openmm/Context.h"
 #include "openmm/System.h"
+#include "openmm/Vec3.h"
 #include <vector>
+#include <string>
 %}
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * Import OpenMM SWIG bindings
  * ═══════════════════════════════════════════════════════════════════════════
- * We need to import OpenMM's SWIG interface to inherit from DrudeLangevinIntegrator
  */
 
 %import(module="openmm") "swig/OpenMMSwigHeaders.i"
 
-/* ═══════================================================================== */
-/* STL Container Support */
-/* ═══================================================================== */
+/* ═══════════════════════════════════════════════════════════════════════════
+ * STL Container Support
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
 
 %include "std_vector.i"
 %include "std_string.i"
@@ -61,9 +44,10 @@ namespace std {
     %template(DoubleVector) vector<double>;
 }
 
-/* ═══════================================================================== */
-/* Exception Handling */
-/* ═══================================================================== */
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Exception Handling
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
 
 %exception {
     try {
@@ -77,53 +61,230 @@ namespace std {
     }
 }
 
-/* ═══════================================================================== */
-/* ConstantVDrudeLangevinIntegrator Class */
-/* ═══================================================================== */
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ConstantVForce - Force-based API
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+%feature("docstring") OpenMM::ConstantVForce "
+Force-based API for constant voltage simulations.
+
+This Force can be added to any System and used with any Integrator.
+Electrode charges are updated self-consistently via the SCF method.
+
+Example:
+--------
+>>> force = constantv.ConstantVForce()
+>>> force.setVoltage(1.0)  # 1.0 V
+>>> force.setLgap(3.5)     # 3.5 nm
+>>> force.setLcell(5.0)    # 5.0 nm
+>>> force.setTotalArea(10.0)  # 10.0 nm²
+>>> force.setNumIterations(4)
+>>>
+>>> # Add electrode atoms
+>>> for i in cathode_atoms:
+...     force.addCathodeAtom(i, area_per_atom)
+>>> for i in anode_atoms:
+...     force.addAnodeAtom(i, area_per_atom)
+>>> for i in electrolyte_atoms:
+...     force.addElectrolyteAtom(i, charge)
+>>>
+>>> system.addForce(force)
+>>> context = Context(system, integrator)
+";
+
+%rename(ConstantVForce) OpenMM::ConstantVForce;
+
+namespace OpenMM {
+
+class ConstantVForce : public Force {
+public:
+    ConstantVForce();
+    ~ConstantVForce();
+
+    // Electrode atom management
+    int addCathodeAtom(int particle, double area);
+    int getNumCathodeAtoms() const;
+    void getCathodeAtomParameters(int index, int& particle, double& area) const;
+    void setCathodeAtomParameters(int index, int particle, double area);
+
+    int addAnodeAtom(int particle, double area);
+    int getNumAnodeAtoms() const;
+    void getAnodeAtomParameters(int index, int& particle, double& area) const;
+    void setAnodeAtomParameters(int index, int particle, double area);
+
+    int addElectrolyteAtom(int particle, double charge);
+    int getNumElectrolyteAtoms() const;
+    void getElectrolyteAtomParameters(int index, int& particle, double& charge) const;
+    void setElectrolyteAtomParameters(int index, int particle, double charge);
+
+    // Conductor management
+    int addBuckyballConductor(const std::vector<int>& virtualAtoms,
+                              const std::vector<int>& realAtoms,
+                              const std::string& electrodeType,
+                              double voltage);
+    int getNumBuckyballConductors() const;
+
+    int addNanotubeConductor(const std::vector<int>& virtualAtoms,
+                             const std::vector<int>& realAtoms,
+                             const std::string& electrodeType,
+                             double voltage,
+                             const std::vector<double>& axis);
+    int getNumNanotubeConductors() const;
+
+    // System parameters
+    void setVoltage(double voltage);
+    double getVoltage() const;
+
+    void setLgap(double gap);
+    double getLgap() const;
+
+    void setLcell(double cell);
+    double getLcell() const;
+
+    void setTotalArea(double area);
+    double getTotalArea() const;
+
+    void setZCathode(double z);
+    double getZCathode() const;
+
+    void setZAnode(double z);
+    double getZAnode() const;
+
+    void setNumIterations(int n);
+    int getNumIterations() const;
+};
+
+} // namespace OpenMM
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ConstantVIntegrator - Verlet with SCF
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+%feature("docstring") OpenMM::ConstantVIntegrator "
+Velocity Verlet integrator with constant voltage boundary conditions.
+
+This integrator performs standard velocity Verlet integration while
+periodically updating electrode charges via the SCF method.
+
+Suitable for:
+- NVE ensemble simulations
+- Rigid water models
+- Testing and validation
+
+Example:
+--------
+>>> integrator = constantv.ConstantVIntegrator(0.001)  # 1 fs timestep
+>>> integrator.setVoltage(1.0)
+>>> integrator.setLgap(3.5)
+>>> integrator.setLcell(5.0)
+>>> integrator.setTotalArea(10.0)
+>>> integrator.setNumSCFIterations(4)
+>>> integrator.setSCFFrequency(1)  # Update every step
+>>>
+>>> for i in cathode_atoms:
+...     integrator.addCathodeAtom(i, area_per_atom)
+>>>
+>>> context = Context(system, integrator)
+>>> integrator.step(1000000)
+";
+
+%rename(ConstantVIntegrator) OpenMM::ConstantVIntegrator;
+
+namespace OpenMM {
+
+class ConstantVIntegrator : public Integrator {
+public:
+    explicit ConstantVIntegrator(double stepSize);
+    ~ConstantVIntegrator();
+
+    // Physical parameters
+    void setVoltage(double voltage);
+    double getVoltage() const;
+
+    void setLgap(double gap);
+    double getLgap() const;
+
+    void setLcell(double cell);
+    double getLcell() const;
+
+    void setTotalArea(double area);
+    double getTotalArea() const;
+
+    void setZCathode(double z);
+    double getZCathode() const;
+
+    void setZAnode(double z);
+    double getZAnode() const;
+
+    // SCF parameters
+    void setNumSCFIterations(int n);
+    int getNumSCFIterations() const;
+
+    void setSCFFrequency(int freq);
+    int getSCFFrequency() const;
+
+    // Electrode atom management
+    int addCathodeAtom(int particle, double area);
+    int getNumCathodeAtoms() const;
+    void getCathodeAtomParameters(int index, int& particle, double& area) const;
+    void setCathodeAtomParameters(int index, int particle, double area);
+
+    int addAnodeAtom(int particle, double area);
+    int getNumAnodeAtoms() const;
+    void getAnodeAtomParameters(int index, int& particle, double& area) const;
+    void setAnodeAtomParameters(int index, int particle, double area);
+
+    int addElectrolyteAtom(int particle, double charge);
+    int getNumElectrolyteAtoms() const;
+    void getElectrolyteAtomParameters(int index, int& particle, double& charge) const;
+    void setElectrolyteAtomParameters(int index, int particle, double charge);
+
+    // Integrator interface
+    void step(int steps);
+};
+
+} // namespace OpenMM
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ConstantVDrudeLangevinIntegrator - Drude Langevin with SCF
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
 
 %feature("docstring") OpenMM::ConstantVDrudeLangevinIntegrator "
-Native OpenMM integrator combining Drude Langevin dynamics with fixed-voltage
-electrode charge updates (SCF method).
+Drude Langevin integrator with constant voltage boundary conditions.
 
-This integrator EMBEDS the SCF loop INSIDE the integration step, eliminating
-all Force Group overhead and Context update costs.
+This integrator combines dual-temperature Langevin dynamics for polarizable
+Drude oscillators with self-consistent field (SCF) electrode charge updates.
 
-Key Features:
--------------
-- Zero-copy GPU integration (no host-device transfers during SCF)
-- Zip-sorted electrode indices for cache coherency
-- Warp-assisted charge reduction for Green's Reciprocity
-- Templated CUDA kernels (zero runtime branching)
-- Full support for flat electrodes, buckyballs, and nanotubes
-
-Performance:
-------------
-- 6× faster than plugin-based approach
-- Typical overhead: 5-10% compared to vanilla DrudeLangevinIntegrator
-
-Physical Correctness:
----------------------
-- Green's Reciprocity enforced to machine precision (1e-14)
-- Bit-identical charge updates vs professor's Python implementation
-- Hard-wall constraints for Drude particles preserved
+Suitable for:
+- Polarizable force fields (Drude model)
+- Constant temperature simulations
+- Production runs
 
 Example:
 --------
 >>> integrator = constantv.ConstantVDrudeLangevinIntegrator(
-...     temperature=300*kelvin,
-...     frictionCoeff=1/picosecond,
-...     drudeTemperature=1*kelvin,
-...     drudeFrictionCoeff=50/picosecond,
-...     stepSize=0.001*picoseconds,
-...     voltage=2.0*volts,
-...     Lgap=3.5*nanometers,
-...     Lcell=5.0*nanometers,
+...     temperature=300.0,
+...     frictionCoeff=1.0,
+...     drudeTemperature=1.0,
+...     drudeFrictionCoeff=20.0,
+...     stepSize=0.001,
+...     voltage=2.0,
+...     Lgap=3.5,
+...     Lcell=5.0,
 ...     scfIterations=4
 ... )
->>> integrator.addCathodeAtoms([0, 1, 2], [0.1, 0.1, 0.1])
->>> integrator.addAnodeAtoms([100, 101], [0.1, 0.1])
->>> simulation = Simulation(topology, system, integrator)
->>> simulation.step(1000)
+>>>
+>>> integrator.setTotalArea(10.0)
+>>> integrator.setSCFFrequency(1)
+>>>
+>>> for i in cathode_atoms:
+...     integrator.addCathodeAtom(i, area_per_atom)
+>>>
+>>> context = Context(system, integrator)
+>>> integrator.step(1000000)
 ";
 
 %rename(ConstantVDrudeLangevinIntegrator) OpenMM::ConstantVDrudeLangevinIntegrator;
@@ -132,30 +293,6 @@ namespace OpenMM {
 
 class ConstantVDrudeLangevinIntegrator : public DrudeLangevinIntegrator {
 public:
-    /**
-     * Constructor
-     *
-     * Parameters:
-     * -----------
-     * temperature : double
-     *     System temperature (Kelvin)
-     * frictionCoeff : double
-     *     Friction coefficient for normal particles (1/ps)
-     * drudeTemperature : double
-     *     Temperature for Drude oscillators (Kelvin, typically 1K)
-     * drudeFrictionCoeff : double
-     *     Friction coefficient for Drude oscillators (1/ps, typically 50/ps)
-     * stepSize : double
-     *     Integration time step (ps)
-     * voltage : double
-     *     Applied voltage (kJ/mol/e)
-     * Lgap : double
-     *     Electrode gap distance (nm)
-     * Lcell : double
-     *     Simulation cell z-dimension (nm)
-     * scfIterations : int
-     *     Number of SCF iterations per MD step (default: 4)
-     */
     ConstantVDrudeLangevinIntegrator(
         double temperature,
         double frictionCoeff,
@@ -167,63 +304,19 @@ public:
         double Lcell,
         int scfIterations = 4
     );
+    ~ConstantVDrudeLangevinIntegrator();
 
-    /**
-     * Add cathode (negative) electrode atoms
-     *
-     * Parameters:
-     * -----------
-     * particleIndices : list[int]
-     *     Atom indices for cathode particles
-     * areas : list[float]
-     *     Surface area per atom (nm²)
-     *
-     * NOTE: Indices will be sorted internally for cache coherency.
-     */
-    void addCathodeAtoms(
-        const std::vector<int>& particleIndices,
-        const std::vector<double>& areas
-    );
+    // Electrode configuration
+    void addCathodeAtom(int particle, double area);
+    int getNumCathodeAtoms() const;
 
-    /**
-     * Add anode (positive) electrode atoms
-     *
-     * Parameters:
-     * -----------
-     * particleIndices : list[int]
-     *     Atom indices for anode particles
-     * areas : list[float]
-     *     Surface area per atom (nm²)
-     */
-    void addAnodeAtoms(
-        const std::vector<int>& particleIndices,
-        const std::vector<double>& areas
-    );
+    void addAnodeAtom(int particle, double area);
+    int getNumAnodeAtoms() const;
 
-    /**
-     * Add electrolyte atoms (image charges)
-     *
-     * Parameters:
-     * -----------
-     * particleIndices : list[int]
-     *     Atom indices for electrolyte particles
-     */
-    void addElectrolyteAtoms(const std::vector<int>& particleIndices);
+    void addElectrolyteAtom(int particle, double charge);
+    int getNumElectrolyteAtoms() const;
 
-    /**
-     * Add a buckyball conductor
-     *
-     * Parameters:
-     * -----------
-     * virtualIndices : list[int]
-     *     Virtual site indices (will be zip-sorted with realIndices)
-     * realIndices : list[int]
-     *     Real atom indices
-     * electrodeType : str
-     *     Either "cathode" or "anode"
-     * voltage : float
-     *     Voltage for this conductor (kJ/mol/e)
-     */
+    // Conductor support
     void addBuckyballConductor(
         const std::vector<int>& virtualIndices,
         const std::vector<int>& realIndices,
@@ -231,116 +324,51 @@ public:
         double voltage
     );
 
-    /**
-     * Add a nanotube conductor
-     *
-     * Parameters:
-     * -----------
-     * virtualIndices : list[int]
-     *     Virtual site indices
-     * realIndices : list[int]
-     *     Real atom indices
-     * axis : list[float]
-     *     Nanotube axis direction [x, y, z] (will be normalized)
-     * electrodeType : str
-     *     Either "cathode" or "anode"
-     * voltage : float
-     *     Voltage for this conductor (kJ/mol/e)
-     */
     void addNanotubeConductor(
         const std::vector<int>& virtualIndices,
         const std::vector<int>& realIndices,
-        const std::vector<double>& axis,
         const std::string& electrodeType,
-        double voltage
+        double voltage,
+        const Vec3& axis
     );
 
-    /**
-     * Set number of SCF iterations per MD step
-     */
-    void setScfIterations(int iterations);
+    // System geometry
+    void setTotalArea(double area);
+    double getTotalArea() const;
 
-    /**
-     * Get number of SCF iterations
-     */
-    int getScfIterations() const;
+    void setZCathode(double z);
+    double getZCathode() const;
 
-    /**
-     * Get applied voltage (kJ/mol/e)
-     */
+    void setZAnode(double z);
+    double getZAnode() const;
+
+    // Voltage and SCF parameters
+    void setVoltage(double v);
     double getVoltage() const;
 
-    /**
-     * Get electrode gap distance (nm)
-     */
+    void setLgap(double gap);
     double getLgap() const;
 
-    /**
-     * Get simulation cell z-dimension (nm)
-     */
+    void setLcell(double cell);
     double getLcell() const;
 
-    /**
-     * Perform integration step
-     *
-     * This executes:
-     * 1. SCF charge updates (scfIterations times)
-     * 2. Drude Langevin integration (velocity + position update)
-     * 3. Hard wall constraints
-     */
+    void setNumSCFIterations(int n);
+    int getNumSCFIterations() const;
+
+    void setSCFFrequency(int freq);
+    int getSCFFrequency() const;
+
+    // Query methods
+    void getElectrodeCharges(
+        std::vector<double>& cathodeCharges,
+        std::vector<double>& anodeCharges
+    ) const;
+
+    double getTotalCathodeCharge() const;
+    double getTotalAnodeCharge() const;
+
+    // Integrator interface
     void step(int steps);
 };
 
 } // namespace OpenMM
-
-/* ═══════================================================================== */
-/* Python Helper Functions */
-/* ═══================================================================== */
-
-%pythoncode %{
-def create_integrator_from_config(config_dict):
-    """
-    Create ConstantVDrudeLangevinIntegrator from configuration dictionary.
-
-    Parameters:
-    -----------
-    config_dict : dict
-        Must contain keys: temperature, friction, drudeTemperature,
-        drudeFriction, stepSize, voltage, Lgap, Lcell
-
-    Returns:
-    --------
-    ConstantVDrudeLangevinIntegrator
-    """
-    from openmm import unit
-
-    integrator = ConstantVDrudeLangevinIntegrator(
-        temperature=config_dict['temperature'],
-        frictionCoeff=config_dict['friction'],
-        drudeTemperature=config_dict['drudeTemperature'],
-        drudeFrictionCoeff=config_dict['drudeFriction'],
-        stepSize=config_dict['stepSize'],
-        voltage=config_dict['voltage'],
-        Lgap=config_dict['Lgap'],
-        Lcell=config_dict['Lcell'],
-        scfIterations=config_dict.get('scfIterations', 4)
-    )
-
-    # Add electrodes if specified
-    if 'cathode' in config_dict:
-        integrator.addCathodeAtoms(
-            config_dict['cathode']['indices'],
-            config_dict['cathode']['areas']
-        )
-
-    if 'anode' in config_dict:
-        integrator.addAnodeAtoms(
-            config_dict['anode']['indices'],
-            config_dict['anode']['areas']
-        )
-
-    if 'electrolyte' in config_dict:
-        integrator.addElectrolyteAtoms(config_dict['electrolyte']['indices'])
-
-    return integrator
-%}

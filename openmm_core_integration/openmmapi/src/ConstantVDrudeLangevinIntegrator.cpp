@@ -47,6 +47,7 @@ ConstantVDrudeLangevinIntegrator::ConstantVDrudeLangevinIntegrator(
     z_cathode(0.0),
     z_anode(0.0),
     scfIterations(scfIterations),
+    scfFrequency(1),  // Default: update every step
     electrodesInitialized(false)
 {
     if (scfIterations < 1)
@@ -63,68 +64,19 @@ ConstantVDrudeLangevinIntegrator::~ConstantVDrudeLangevinIntegrator() {
 // Electrode Configuration Methods
 // ═══════════════════════════════════════════════════════════════════════════
 
-void ConstantVDrudeLangevinIntegrator::addCathodeAtoms(
-    const vector<int>& particleIndices,
-    const vector<double>& areas
-) {
-    if (particleIndices.size() != areas.size())
-        throw OpenMMException("addCathodeAtoms: particleIndices and areas must have same size");
-
-    cathodeIndices = particleIndices;
-    cathodeAreas = areas;
-
-    // Sort for coalesced memory access (critical for CUDA performance)
-    // Use zip-sort to keep indices and areas synchronized
-    vector<std::pair<int, double>> pairs;
-    pairs.reserve(particleIndices.size());
-    for (size_t i = 0; i < particleIndices.size(); i++)
-        pairs.push_back({particleIndices[i], areas[i]});
-
-    std::sort(pairs.begin(), pairs.end(),
-        [](const std::pair<int, double>& a, const std::pair<int, double>& b) {
-            return a.first < b.first;
-        });
-
-    for (size_t i = 0; i < pairs.size(); i++) {
-        cathodeIndices[i] = pairs[i].first;
-        cathodeAreas[i] = pairs[i].second;
-    }
+void ConstantVDrudeLangevinIntegrator::addCathodeAtom(int particle, double area) {
+    cathodeIndices.push_back(particle);
+    cathodeAreas.push_back(area);
 }
 
-void ConstantVDrudeLangevinIntegrator::addAnodeAtoms(
-    const vector<int>& particleIndices,
-    const vector<double>& areas
-) {
-    if (particleIndices.size() != areas.size())
-        throw OpenMMException("addAnodeAtoms: particleIndices and areas must have same size");
-
-    anodeIndices = particleIndices;
-    anodeAreas = areas;
-
-    // Zip-sort (same as cathode)
-    vector<std::pair<int, double>> pairs;
-    pairs.reserve(particleIndices.size());
-    for (size_t i = 0; i < particleIndices.size(); i++)
-        pairs.push_back({particleIndices[i], areas[i]});
-
-    std::sort(pairs.begin(), pairs.end(),
-        [](const std::pair<int, double>& a, const std::pair<int, double>& b) {
-            return a.first < b.first;
-        });
-
-    for (size_t i = 0; i < pairs.size(); i++) {
-        anodeIndices[i] = pairs[i].first;
-        anodeAreas[i] = pairs[i].second;
-    }
+void ConstantVDrudeLangevinIntegrator::addAnodeAtom(int particle, double area) {
+    anodeIndices.push_back(particle);
+    anodeAreas.push_back(area);
 }
 
-void ConstantVDrudeLangevinIntegrator::addElectrolyteAtoms(
-    const vector<int>& particleIndices
-) {
-    electrolyteIndices = particleIndices;
-
-    // Sort for coalesced access
-    std::sort(electrolyteIndices.begin(), electrolyteIndices.end());
+void ConstantVDrudeLangevinIntegrator::addElectrolyteAtom(int particle, double charge) {
+    electrolyteIndices.push_back(particle);
+    electrolyteCharges.push_back(charge);
 }
 
 void ConstantVDrudeLangevinIntegrator::addBuckyballConductor(
