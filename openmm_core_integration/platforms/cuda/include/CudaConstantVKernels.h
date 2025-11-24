@@ -25,9 +25,6 @@ public:
     CudaCalcConstantVKernel(std::string name, const Platform& platform, CudaContext& cu);
     ~CudaCalcConstantVKernel();
 
-    /**
-     * Initialize the kernel with system data.
-     */
     void initialize(const System& system,
                    const std::vector<int>& cathodeAtomIndices,
                    const std::vector<double>& cathodeAreas,
@@ -43,9 +40,6 @@ public:
                    double z_anode,
                    int nIterations);
 
-    /**
-     * Add Buckyball conductor (not yet implemented in CUDA).
-     */
     void addBuckyballConductor(const std::vector<int>& virtualAtomIndices,
                                const std::vector<int>& realAtomIndices,
                                const std::string& electrodeType,
@@ -57,9 +51,6 @@ public:
                                int contactAtomIndex,
                                double contactDistance);
 
-    /**
-     * Add Nanotube conductor (not yet implemented in CUDA).
-     */
     void addNanotubeConductor(const std::vector<int>& virtualAtomIndices,
                               const std::vector<int>& realAtomIndices,
                               const std::string& electrodeType,
@@ -73,30 +64,24 @@ public:
                               int contactAtomIndex,
                               double contactDistance);
 
-    /**
-     * Execute SCF solver and calculate forces/energy.
-     */
     double execute(ContextImpl& context, bool includeForces,
                   bool includeEnergy, int groups);
 
-    /**
-     * Update parameters in existing context.
-     */
     void updateParameters(ContextImpl& context, const ConstantVForce& force);
 
 private:
     CudaContext& cu;
     bool hasInitialized;
 
-    // GPU arrays
+    // GPU arrays for electrode data
     CudaArray* cathodeIndicesGPU;
     CudaArray* cathodeAreasGPU;
     CudaArray* anodeIndicesGPU;
     CudaArray* anodeAreasGPU;
     CudaArray* electrolyteIndicesGPU;
-    CudaArray* electrolyteChargesGPU;
-    CudaArray* cathodeChargesGPU;
-    CudaArray* anodeChargesGPU;
+
+    // ElectrodeData struct on GPU (single struct)
+    CudaArray* electrodeDataGPU;
 
     // Parameters
     int numCathodeAtoms;
@@ -122,14 +107,7 @@ public:
     CudaIntegrateConstantVDrudeLangevinStepKernel(std::string name, const Platform& platform, CudaContext& cu);
     ~CudaIntegrateConstantVDrudeLangevinStepKernel();
 
-    /**
-     * Initialize the kernel.
-     */
     void initialize(const System& system, const ConstantVDrudeLangevinIntegrator& integrator);
-
-    /**
-     * Execute one integration step.
-     */
     void execute(ContextImpl& context, const ConstantVDrudeLangevinIntegrator& integrator);
 
 private:
@@ -142,14 +120,24 @@ private:
     CudaArray* anodeIndicesGPU;
     CudaArray* anodeAreasGPU;
     CudaArray* electrolyteIndicesGPU;
-    CudaArray* electrolyteChargesGPU;
-    CudaArray* cathodeChargesGPU;
-    CudaArray* anodeChargesGPU;
+
+    // ElectrodeData struct on GPU
+    CudaArray* electrodeDataGPU;
+
+    // GPU arrays for Drude particle data
+    CudaArray* pairParticlesGPU;      // int2 array
+    CudaArray* normalParticlesGPU;    // int array
+    CudaArray* drudeDataGPU;          // DrudeParticleData struct
+
+    // Integration intermediate arrays
+    CudaArray* posDeltaGPU;           // float4 array for position delta
 
     // Parameters
     int numCathodeAtoms;
     int numAnodeAtoms;
     int numElectrolyteAtoms;
+    int numDrudePairs;
+    int numNormalParticles;
     double voltage;
     double Lgap;
     double Lcell;
@@ -159,6 +147,7 @@ private:
     int scfIterations;
     int scfFrequency;
     int stepCount;
+    double maxDrudeDistance;
 };
 
 } // namespace OpenMM

@@ -5,33 +5,80 @@
 #include "CudaConstantVKernels.h"
 #include "openmm/Context.h"
 #include "openmm/internal/ContextImpl.h"
+#include "openmm/DrudeForce.h"
 #include "openmm/cuda/CudaForceInfo.h"
 #include "openmm/cuda/CudaBondedUtilities.h"
+#include "openmm/cuda/CudaIntegrationUtilities.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 using namespace OpenMM;
 using namespace std;
 
+// ═══════════════════════════════════════════════════════════════════════════
+// Mirror Struct Definitions from .cu file (MUST MATCH EXACTLY)
+// ═══════════════════════════════════════════════════════════════════════════
+
+struct ElectrodeData {
+    // Flat electrodes
+    int numCathodes;
+    int numAnodes;
+    int* cathodeIndices;      // Device pointer
+    double* cathodeAreas;     // Device pointer
+    int* anodeIndices;        // Device pointer
+    double* anodeAreas;       // Device pointer
+
+    // Electrolyte
+    int numElectrolytes;
+    int* electrolyteIndices;  // Device pointer
+
+    // Conductors (not yet implemented)
+    int numBuckyballs;
+    void* buckyballs;         // Device pointer (placeholder)
+    int numNanotubes;
+    void* nanotubes;          // Device pointer (placeholder)
+
+    // System parameters
+    double voltage_kjmol;
+    double Lgap;
+    double Lcell;
+    double totalArea;
+    double z_cathode;
+    double z_anode;
+};
+
+struct DrudeParticleData {
+    int numPairs;
+    int numNormalParticles;
+    int2* pairParticles;      // Device pointer: (parent, drude)
+    int* normalParticles;     // Device pointer
+};
+
 // Forward declaration of CUDA kernel (defined in .cu file)
-extern "C" void launchConstantVSCFKernel(
+extern "C" void executeConstantVDrudeLangevinStep(
+    // System data
     int numAtoms,
-    int numCathodes,
-    int numAnodes,
-    int numElectrolytes,
-    const int* cathodeIndices,
-    const double* cathodeAreas,
-    const int* anodeIndices,
-    const double* anodeAreas,
-    const int* electrolyteIndices,
-    const double* electrolyteCharges,
-    double* cathodeCharges,
-    double* anodeCharges,
-    const float4* posq,
-    double voltage_kjmol,
-    double Lgap,
-    double Lcell,
-    double totalArea,
-    double z_cathode,
-    double z_anode,
+    int paddedNumAtoms,
+    float4* d_posq,
+    float4* d_velm,
+    long long* d_force,
+    float4* d_posDelta,
+    float4* d_random,
+    unsigned int randomIndex,
+
+    // Electrode data
+    ElectrodeData* d_electrodeData,
+
+    // Drude particle data
+    DrudeParticleData* d_drudeData,
+
+    // Integration parameters
+    float stepSize,
+    float temperature,
+    float friction,
+    float drudeTemperature,
+    float drudeFriction,
+    float maxDrudeDistance,
     int scfIterations
 );
 
@@ -48,9 +95,7 @@ CudaCalcConstantVKernel::CudaCalcConstantVKernel(string name, const Platform& pl
     anodeIndicesGPU(nullptr),
     anodeAreasGPU(nullptr),
     electrolyteIndicesGPU(nullptr),
-    electrolyteChargesGPU(nullptr),
-    cathodeChargesGPU(nullptr),
-    anodeChargesGPU(nullptr),
+    electrodeDataGPU(nullptr),
     numCathodeAtoms(0),
     numAnodeAtoms(0),
     numElectrolyteAtoms(0)
@@ -63,9 +108,7 @@ CudaCalcConstantVKernel::~CudaCalcConstantVKernel() {
     if (anodeIndicesGPU) delete anodeIndicesGPU;
     if (anodeAreasGPU) delete anodeAreasGPU;
     if (electrolyteIndicesGPU) delete electrolyteIndicesGPU;
-    if (electrolyteChargesGPU) delete electrolyteChargesGPU;
-    if (cathodeChargesGPU) delete cathodeChargesGPU;
-    if (anodeChargesGPU) delete anodeChargesGPU;
+    if (electrodeDataGPU) delete electrodeDataGPU;
 }
 
 void CudaCalcConstantVKernel::initialize(
@@ -100,37 +143,53 @@ void CudaCalcConstantVKernel::initialize(
     if (numCathodeAtoms > 0) {
         cathodeIndicesGPU = new CudaArray(cu, numCathodeAtoms, sizeof(int), "cathodeIndices");
         cathodeAreasGPU = new CudaArray(cu, numCathodeAtoms, sizeof(double), "cathodeAreas");
-        cathodeChargesGPU = new CudaArray(cu, numCathodeAtoms, sizeof(double), "cathodeCharges");
-
         cathodeIndicesGPU->upload(cathodeAtomIndices);
         cathodeAreasGPU->upload(cathodeAreas);
-
-        // Initialize charges to zero
-        vector<double> zeroCharges(numCathodeAtoms, 0.0);
-        cathodeChargesGPU->upload(zeroCharges);
     }
 
     // Allocate GPU arrays for anode
     if (numAnodeAtoms > 0) {
         anodeIndicesGPU = new CudaArray(cu, numAnodeAtoms, sizeof(int), "anodeIndices");
         anodeAreasGPU = new CudaArray(cu, numAnodeAtoms, sizeof(double), "anodeAreas");
-        anodeChargesGPU = new CudaArray(cu, numAnodeAtoms, sizeof(double), "anodeCharges");
-
         anodeIndicesGPU->upload(anodeAtomIndices);
         anodeAreasGPU->upload(anodeAreas);
-
-        vector<double> zeroCharges(numAnodeAtoms, 0.0);
-        anodeChargesGPU->upload(zeroCharges);
     }
 
     // Allocate GPU arrays for electrolyte
     if (numElectrolyteAtoms > 0) {
         electrolyteIndicesGPU = new CudaArray(cu, numElectrolyteAtoms, sizeof(int), "electrolyteIndices");
-        electrolyteChargesGPU = new CudaArray(cu, numElectrolyteAtoms, sizeof(double), "electrolyteCharges");
-
         electrolyteIndicesGPU->upload(electrolyteAtomIndices);
-        electrolyteChargesGPU->upload(electrolyteCharges);
     }
+
+    // Create ElectrodeData struct on HOST, populate with DEVICE pointers
+    ElectrodeData hostElectrodeData;
+    hostElectrodeData.numCathodes = numCathodeAtoms;
+    hostElectrodeData.numAnodes = numAnodeAtoms;
+    hostElectrodeData.cathodeIndices = (numCathodeAtoms > 0) ?
+        (int*)cathodeIndicesGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.cathodeAreas = (numCathodeAtoms > 0) ?
+        (double*)cathodeAreasGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.anodeIndices = (numAnodeAtoms > 0) ?
+        (int*)anodeIndicesGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.anodeAreas = (numAnodeAtoms > 0) ?
+        (double*)anodeAreasGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.numElectrolytes = numElectrolyteAtoms;
+    hostElectrodeData.electrolyteIndices = (numElectrolyteAtoms > 0) ?
+        (int*)electrolyteIndicesGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.numBuckyballs = 0;
+    hostElectrodeData.buckyballs = nullptr;
+    hostElectrodeData.numNanotubes = 0;
+    hostElectrodeData.nanotubes = nullptr;
+    hostElectrodeData.voltage_kjmol = this->voltage;
+    hostElectrodeData.Lgap = Lgap;
+    hostElectrodeData.Lcell = Lcell;
+    hostElectrodeData.totalArea = totalArea;
+    hostElectrodeData.z_cathode = z_cathode;
+    hostElectrodeData.z_anode = z_anode;
+
+    // Allocate ElectrodeData struct on DEVICE and upload
+    electrodeDataGPU = new CudaArray(cu, 1, sizeof(ElectrodeData), "electrodeData");
+    electrodeDataGPU->upload(&hostElectrodeData, 1);
 
     hasInitialized = true;
 }
@@ -147,7 +206,6 @@ void CudaCalcConstantVKernel::addBuckyballConductor(
     int contactAtomIndex,
     double contactDistance)
 {
-    // TODO: Implement Buckyball conductor support in CUDA
     throw OpenMMException("Buckyball conductors not yet implemented in CUDA platform");
 }
 
@@ -165,7 +223,6 @@ void CudaCalcConstantVKernel::addNanotubeConductor(
     int contactAtomIndex,
     double contactDistance)
 {
-    // TODO: Implement Nanotube conductor support in CUDA
     throw OpenMMException("Nanotube conductors not yet implemented in CUDA platform");
 }
 
@@ -175,22 +232,14 @@ double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces
     if (!hasInitialized)
         throw OpenMMException("CudaCalcConstantVKernel::execute() called before initialize()");
 
-    // Get position array from context
-    const CudaArray& posq = cu.getPosq();
-
-    // Launch SCF kernel (this is a simplified version - full implementation would be in .cu file)
-    // NOTE: This requires implementing launchConstantVSCFKernel in the .cu file
-    if (numCathodeAtoms > 0 || numAnodeAtoms > 0) {
-        // For now, just return 0.0 since the full kernel integration requires more work
-        // The actual implementation would call the CUDA kernel here
-    }
-
-    return 0.0;  // Return electrostatic energy
+    // For Force-based API, we don't execute the full integration kernel
+    // This would require implementing a separate SCF-only kernel
+    // For now, return 0.0 (the integration kernel handles SCF)
+    return 0.0;
 }
 
 void CudaCalcConstantVKernel::updateParameters(ContextImpl& context, const ConstantVForce& force)
 {
-    // Re-upload parameters if they changed
     voltage = force.getVoltage() * 96.487;
     Lgap = force.getLgap();
     Lcell = force.getLcell();
@@ -198,6 +247,34 @@ void CudaCalcConstantVKernel::updateParameters(ContextImpl& context, const Const
     z_cathode = force.getZCathode();
     z_anode = force.getZAnode();
     nIterations = force.getNumIterations();
+
+    // Update ElectrodeData struct on GPU
+    ElectrodeData hostElectrodeData;
+    hostElectrodeData.numCathodes = numCathodeAtoms;
+    hostElectrodeData.numAnodes = numAnodeAtoms;
+    hostElectrodeData.cathodeIndices = (numCathodeAtoms > 0) ?
+        (int*)cathodeIndicesGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.cathodeAreas = (numCathodeAtoms > 0) ?
+        (double*)cathodeAreasGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.anodeIndices = (numAnodeAtoms > 0) ?
+        (int*)anodeIndicesGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.anodeAreas = (numAnodeAtoms > 0) ?
+        (double*)anodeAreasGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.numElectrolytes = numElectrolyteAtoms;
+    hostElectrodeData.electrolyteIndices = (numElectrolyteAtoms > 0) ?
+        (int*)electrolyteIndicesGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.numBuckyballs = 0;
+    hostElectrodeData.buckyballs = nullptr;
+    hostElectrodeData.numNanotubes = 0;
+    hostElectrodeData.nanotubes = nullptr;
+    hostElectrodeData.voltage_kjmol = voltage;
+    hostElectrodeData.Lgap = Lgap;
+    hostElectrodeData.Lcell = Lcell;
+    hostElectrodeData.totalArea = totalArea;
+    hostElectrodeData.z_cathode = z_cathode;
+    hostElectrodeData.z_anode = z_anode;
+
+    electrodeDataGPU->upload(&hostElectrodeData, 1);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -214,9 +291,11 @@ CudaIntegrateConstantVDrudeLangevinStepKernel::CudaIntegrateConstantVDrudeLangev
     anodeIndicesGPU(nullptr),
     anodeAreasGPU(nullptr),
     electrolyteIndicesGPU(nullptr),
-    electrolyteChargesGPU(nullptr),
-    cathodeChargesGPU(nullptr),
-    anodeChargesGPU(nullptr),
+    electrodeDataGPU(nullptr),
+    pairParticlesGPU(nullptr),
+    normalParticlesGPU(nullptr),
+    drudeDataGPU(nullptr),
+    posDeltaGPU(nullptr),
     stepCount(0)
 {
 }
@@ -227,9 +306,11 @@ CudaIntegrateConstantVDrudeLangevinStepKernel::~CudaIntegrateConstantVDrudeLange
     if (anodeIndicesGPU) delete anodeIndicesGPU;
     if (anodeAreasGPU) delete anodeAreasGPU;
     if (electrolyteIndicesGPU) delete electrolyteIndicesGPU;
-    if (electrolyteChargesGPU) delete electrolyteChargesGPU;
-    if (cathodeChargesGPU) delete cathodeChargesGPU;
-    if (anodeChargesGPU) delete anodeChargesGPU;
+    if (electrodeDataGPU) delete electrodeDataGPU;
+    if (pairParticlesGPU) delete pairParticlesGPU;
+    if (normalParticlesGPU) delete normalParticlesGPU;
+    if (drudeDataGPU) delete drudeDataGPU;
+    if (posDeltaGPU) delete posDeltaGPU;
 }
 
 void CudaIntegrateConstantVDrudeLangevinStepKernel::initialize(
@@ -249,6 +330,7 @@ void CudaIntegrateConstantVDrudeLangevinStepKernel::initialize(
     z_anode = integrator.getZAnode();
     scfIterations = integrator.getNumSCFIterations();
     scfFrequency = integrator.getSCFFrequency();
+    maxDrudeDistance = integrator.getMaxDrudeDistance();
 
     // Allocate GPU memory for cathode atoms
     if (numCathodeAtoms > 0) {
@@ -267,13 +349,8 @@ void CudaIntegrateConstantVDrudeLangevinStepKernel::initialize(
 
         cathodeIndicesGPU = new CudaArray(cu, numCathodeAtoms, sizeof(int), "cathodeIndices");
         cathodeAreasGPU = new CudaArray(cu, numCathodeAtoms, sizeof(double), "cathodeAreas");
-        cathodeChargesGPU = new CudaArray(cu, numCathodeAtoms, sizeof(double), "cathodeCharges");
-
         cathodeIndicesGPU->upload(cathodeIndices);
         cathodeAreasGPU->upload(cathodeAreas);
-
-        vector<double> zeroCharges(numCathodeAtoms, 0.0);
-        cathodeChargesGPU->upload(zeroCharges);
     }
 
     // Allocate GPU memory for anode atoms
@@ -293,36 +370,142 @@ void CudaIntegrateConstantVDrudeLangevinStepKernel::initialize(
 
         anodeIndicesGPU = new CudaArray(cu, numAnodeAtoms, sizeof(int), "anodeIndices");
         anodeAreasGPU = new CudaArray(cu, numAnodeAtoms, sizeof(double), "anodeAreas");
-        anodeChargesGPU = new CudaArray(cu, numAnodeAtoms, sizeof(double), "anodeCharges");
-
         anodeIndicesGPU->upload(anodeIndices);
         anodeAreasGPU->upload(anodeAreas);
-
-        vector<double> zeroCharges(numAnodeAtoms, 0.0);
-        anodeChargesGPU->upload(zeroCharges);
     }
 
     // Allocate GPU memory for electrolyte atoms
     if (numElectrolyteAtoms > 0) {
         vector<int> electrolyteIndices;
-        vector<double> electrolyteCharges;
         electrolyteIndices.reserve(numElectrolyteAtoms);
-        electrolyteCharges.reserve(numElectrolyteAtoms);
 
         for (int i = 0; i < numElectrolyteAtoms; i++) {
             int particle;
             double charge;
             integrator.getElectrolyteAtomParameters(i, particle, charge);
             electrolyteIndices.push_back(particle);
-            electrolyteCharges.push_back(charge);
         }
 
         electrolyteIndicesGPU = new CudaArray(cu, numElectrolyteAtoms, sizeof(int), "electrolyteIndices");
-        electrolyteChargesGPU = new CudaArray(cu, numElectrolyteAtoms, sizeof(double), "electrolyteCharges");
-
         electrolyteIndicesGPU->upload(electrolyteIndices);
-        electrolyteChargesGPU->upload(electrolyteCharges);
     }
+
+    // Create ElectrodeData struct on HOST, populate with DEVICE pointers
+    ElectrodeData hostElectrodeData;
+    hostElectrodeData.numCathodes = numCathodeAtoms;
+    hostElectrodeData.numAnodes = numAnodeAtoms;
+    hostElectrodeData.cathodeIndices = (numCathodeAtoms > 0) ?
+        (int*)cathodeIndicesGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.cathodeAreas = (numCathodeAtoms > 0) ?
+        (double*)cathodeAreasGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.anodeIndices = (numAnodeAtoms > 0) ?
+        (int*)anodeIndicesGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.anodeAreas = (numAnodeAtoms > 0) ?
+        (double*)anodeAreasGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.numElectrolytes = numElectrolyteAtoms;
+    hostElectrodeData.electrolyteIndices = (numElectrolyteAtoms > 0) ?
+        (int*)electrolyteIndicesGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.numBuckyballs = 0;
+    hostElectrodeData.buckyballs = nullptr;
+    hostElectrodeData.numNanotubes = 0;
+    hostElectrodeData.nanotubes = nullptr;
+    hostElectrodeData.voltage_kjmol = voltage;
+    hostElectrodeData.Lgap = Lgap;
+    hostElectrodeData.Lcell = Lcell;
+    hostElectrodeData.totalArea = totalArea;
+    hostElectrodeData.z_cathode = z_cathode;
+    hostElectrodeData.z_anode = z_anode;
+
+    // Allocate ElectrodeData struct on DEVICE and upload
+    electrodeDataGPU = new CudaArray(cu, 1, sizeof(ElectrodeData), "electrodeData");
+    electrodeDataGPU->upload(&hostElectrodeData, 1);
+
+    // Extract Drude particle information from System
+    const DrudeForce* drudeForce = nullptr;
+    for (int i = 0; i < system.getNumForces(); i++) {
+        if (dynamic_cast<const DrudeForce*>(&system.getForce(i)) != nullptr) {
+            drudeForce = dynamic_cast<const DrudeForce*>(&system.getForce(i));
+            break;
+        }
+    }
+
+    if (drudeForce != nullptr) {
+        // Extract Drude pairs
+        numDrudePairs = drudeForce->getNumParticles();
+        vector<int2> pairParticles;
+        pairParticles.reserve(numDrudePairs);
+
+        for (int i = 0; i < numDrudePairs; i++) {
+            int parent, drude, dummy1, dummy2, dummy3;
+            double dummy4, dummy5, dummy6;
+            drudeForce->getParticleParameters(i, parent, drude, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6);
+            int2 pair;
+            pair.x = parent;
+            pair.y = drude;
+            pairParticles.push_back(pair);
+        }
+
+        // Identify normal particles (not parent, not drude)
+        vector<bool> isDrudeParticle(system.getNumParticles(), false);
+        for (const auto& pair : pairParticles) {
+            isDrudeParticle[pair.x] = true;  // parent
+            isDrudeParticle[pair.y] = true;  // drude
+        }
+
+        vector<int> normalParticles;
+        for (int i = 0; i < system.getNumParticles(); i++) {
+            if (!isDrudeParticle[i])
+                normalParticles.push_back(i);
+        }
+        numNormalParticles = normalParticles.size();
+
+        // Allocate and upload Drude data
+        if (numDrudePairs > 0) {
+            pairParticlesGPU = new CudaArray(cu, numDrudePairs, sizeof(int2), "pairParticles");
+            pairParticlesGPU->upload(pairParticles);
+        }
+
+        if (numNormalParticles > 0) {
+            normalParticlesGPU = new CudaArray(cu, numNormalParticles, sizeof(int), "normalParticles");
+            normalParticlesGPU->upload(normalParticles);
+        }
+
+        // Create DrudeParticleData struct on HOST
+        DrudeParticleData hostDrudeData;
+        hostDrudeData.numPairs = numDrudePairs;
+        hostDrudeData.numNormalParticles = numNormalParticles;
+        hostDrudeData.pairParticles = (numDrudePairs > 0) ?
+            (int2*)pairParticlesGPU->getDevicePointer() : nullptr;
+        hostDrudeData.normalParticles = (numNormalParticles > 0) ?
+            (int*)normalParticlesGPU->getDevicePointer() : nullptr;
+
+        // Allocate DrudeParticleData struct on DEVICE and upload
+        drudeDataGPU = new CudaArray(cu, 1, sizeof(DrudeParticleData), "drudeData");
+        drudeDataGPU->upload(&hostDrudeData, 1);
+    } else {
+        // No Drude particles - create empty struct
+        numDrudePairs = 0;
+        numNormalParticles = system.getNumParticles();
+
+        vector<int> normalParticles;
+        for (int i = 0; i < numNormalParticles; i++)
+            normalParticles.push_back(i);
+
+        normalParticlesGPU = new CudaArray(cu, numNormalParticles, sizeof(int), "normalParticles");
+        normalParticlesGPU->upload(normalParticles);
+
+        DrudeParticleData hostDrudeData;
+        hostDrudeData.numPairs = 0;
+        hostDrudeData.numNormalParticles = numNormalParticles;
+        hostDrudeData.pairParticles = nullptr;
+        hostDrudeData.normalParticles = (int*)normalParticlesGPU->getDevicePointer();
+
+        drudeDataGPU = new CudaArray(cu, 1, sizeof(DrudeParticleData), "drudeData");
+        drudeDataGPU->upload(&hostDrudeData, 1);
+    }
+
+    // Allocate posDelta array for integration
+    posDeltaGPU = new CudaArray(cu, cu.getPaddedNumAtoms(), 4*sizeof(float), "posDelta");
 
     hasInitialized = true;
 }
@@ -334,15 +517,44 @@ void CudaIntegrateConstantVDrudeLangevinStepKernel::execute(
     if (!hasInitialized)
         throw OpenMMException("CudaIntegrateConstantVDrudeLangevinStepKernel::execute() called before initialize()");
 
-    // NOTE: This is a placeholder implementation
-    // The full implementation would:
-    // 1. Check if stepCount % scfFrequency == 0
-    // 2. If yes, launch SCF kernel to update electrode charges
-    // 3. Call parent DrudeLangevinIntegrator's CUDA kernel for integration
-    // 4. Increment stepCount
+    // Get pointers to GPU arrays from CudaContext
+    float4* d_posq = (float4*)cu.getPosq().getDevicePointer();
+    float4* d_velm = (float4*)cu.getVelm().getDevicePointer();
+    long long* d_force = (long long*)cu.getForce().getDevicePointer();
+    float4* d_posDelta = (float4*)posDeltaGPU->getDevicePointer();
+    float4* d_random = (float4*)cu.getIntegrationUtilities().getRandom().getDevicePointer();
+    unsigned int randomIndex = cu.getIntegrationUtilities().prepareRandomNumbers(cu.getPaddedNumAtoms());
 
-    // For now, just call the parent integrator's step
-    // (This requires proper kernel registration which is done in the factory)
+    ElectrodeData* d_electrodeData = (ElectrodeData*)electrodeDataGPU->getDevicePointer();
+    DrudeParticleData* d_drudeData = (DrudeParticleData*)drudeDataGPU->getDevicePointer();
+
+    // Call CUDA kernel
+    executeConstantVDrudeLangevinStep(
+        cu.getNumAtoms(),
+        cu.getPaddedNumAtoms(),
+        d_posq,
+        d_velm,
+        d_force,
+        d_posDelta,
+        d_random,
+        randomIndex,
+        d_electrodeData,
+        d_drudeData,
+        (float)integrator.getStepSize(),
+        (float)integrator.getTemperature(),
+        (float)integrator.getFriction(),
+        (float)integrator.getDrudeTemperature(),
+        (float)integrator.getDrudeFriction(),
+        (float)maxDrudeDistance,
+        scfIterations
+    );
+
+    // Check for CUDA errors
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        throw OpenMMException("CUDA error in ConstantVDrudeLangevinStep: " +
+                            string(cudaGetErrorString(err)));
+    }
 
     stepCount++;
 }
