@@ -82,6 +82,9 @@ include_directories(
 # ═══════════════════════════════════════════════════════════════════════════
 
 set(CORE_API_SOURCES
+    openmmapi/src/ConstantVForce.cpp
+    openmmapi/src/ConstantVForceImpl.cpp
+    openmmapi/src/ConstantVIntegrator.cpp
     openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp
 )
 
