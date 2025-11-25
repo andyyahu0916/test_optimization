@@ -1,0 +1,87 @@
+{
+  "_comment": "Production Configuration for ConstantV Native Core Simulation",
+  "_warning": "This is a TEMPLATE. You MUST update atom indices to match your PDB structure!",
+
+  "system": {
+    "pdb_files": ["nvt_0V_15ns.pdb"],
+    "residue_xml_files": ["residues.xml"],
+    "forcefield_xml_files": [
+      "forcefield_drude.xml",
+      "ffxml/tip4p-fb_cond_drude.xml"
+    ]
+  },
+
+  "electrodes": {
+    "cathode": {
+      "identifier": "CAT",
+      "identification_method": "residue_name",
+      "exclude_elements": ["H"],
+      "_comment_indices": "Auto-identified from residue name 'CAT'. No manual indices needed."
+    },
+    "anode": {
+      "identifier": "ANO",
+      "identification_method": "residue_name",
+      "exclude_elements": ["H"],
+      "_comment_indices": "Auto-identified from residue name 'ANO'. No manual indices needed."
+    }
+  },
+
+  "conductors": {
+    "_comment": "Buckyball/Nanotube conductors (optional)",
+    "_note": "If your system has no conductors, set this to an empty array: []",
+    "buckyballs": [
+      {
+        "virtual_chain_index": 2,
+        "real_chain_index": 3,
+        "electrode_type": "cathode",
+        "voltage": 1.0,
+        "exclude_elements": [],
+        "_comment": "Chain 2 = virtual layer, Chain 3 = real layer"
+      }
+    ],
+    "nanotubes": []
+  },
+
+  "simulation_parameters": {
+    "voltage_volts": 2.0,
+    "temperature_kelvin": 300.0,
+    "temperature_drude_kelvin": 1.0,
+    "timestep_ps": 0.001,
+    "friction_coeff": 1.0,
+    "drude_friction_coeff": 20.0,
+
+    "cutoff_nm": 1.4,
+    "Lgap_nm": 1.4,
+    "Lcell_nm": 2.8,
+
+    "scf_iterations": 4,
+    "scf_frequency": 1,
+
+    "max_drude_distance_nm": 0.025,
+
+    "_comment_area": "Electrode area computed automatically from atom counts"
+  },
+
+  "output": {
+    "output_dcd": "production_trajectory.dcd",
+    "output_charges": "electrode_charges.txt",
+    "output_log": "production.log",
+    "reporter_frequency_steps": 1000,
+    "checkpoint_frequency_steps": 10000,
+    "checkpoint_file": "checkpoint.chk"
+  },
+
+  "run_parameters": {
+    "equilibration_steps": 10000,
+    "production_steps": 100000,
+    "platform": "CUDA",
+    "cuda_precision": "mixed",
+    "_comment_platform": "Options: CUDA, OpenCL, CPU, Reference. CUDA recommended for production."
+  },
+
+  "advanced": {
+    "add_tfsi_exclusions": true,
+    "natom_cutoff_for_electrolyte": 100,
+    "_comment": "Residues with < natom_cutoff atoms are classified as electrolyte"
+  }
+}
