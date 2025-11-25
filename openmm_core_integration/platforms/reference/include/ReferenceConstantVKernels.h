@@ -68,6 +68,35 @@ public:
     void updateParameters(ContextImpl& context, const ConstantVForce& force);
 
 private:
+    // Conductor data structure
+    struct BuckyballConductor {
+        std::vector<int> virtualIndices;
+        std::vector<int> realIndices;
+        std::vector<Vec3> normals;
+        double areaPerAtom;
+        double radius;
+        Vec3 center;
+        int contactAtomIndex;
+        double contactDistance;
+        double voltage_kjmol;
+        char electrodeType;  // 'c' or 'a'
+        std::vector<double> charges;  // Electrode charges
+    };
+
+    struct NanotubeConductor {
+        std::vector<int> virtualIndices;
+        std::vector<int> realIndices;
+        std::vector<Vec3> normals;
+        double areaPerAtom;
+        Vec3 axis;
+        Vec3 center;
+        int contactAtomIndex;
+        double contactDistance;
+        double voltage_kjmol;
+        char electrodeType;  // 'c' or 'a'
+        std::vector<double> charges;  // Electrode charges
+    };
+
     // Electrode data
     std::vector<int> cathodeIndices;
     std::vector<double> cathodeAreas;
@@ -77,6 +106,10 @@ private:
     std::vector<double> electrolyteCharges;
     std::vector<double> cathodeCharges;
     std::vector<double> anodeCharges;
+
+    // Conductor data
+    std::vector<BuckyballConductor> buckyballs;
+    std::vector<NanotubeConductor> nanotubes;
 
     // Parameters
     double voltage;

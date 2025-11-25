@@ -83,6 +83,15 @@ private:
     // ElectrodeData struct on GPU (single struct)
     CudaArray* electrodeDataGPU;
 
+    // Conductor support - "Pointer-to-Pointer" pattern
+    std::vector<CudaArray*> conductorArrays;         // All arrays for cleanup
+    std::vector<void*> buckyballStructsHost;         // BuckyballData with device pointers
+    std::vector<void*> nanotubeStructsHost;          // NanotubeData with device pointers
+    CudaArray* buckyballDataArrayGPU;                // Array of BuckyballData structs on GPU
+    CudaArray* nanotubeDataArrayGPU;                 // Array of NanotubeData structs on GPU
+    int numBuckyballs;
+    int numNanotubes;
+
     // Parameters
     int numCathodeAtoms;
     int numAnodeAtoms;

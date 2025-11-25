@@ -83,8 +83,20 @@ void ReferenceCalcConstantVKernel::addBuckyballConductor(
     int contactAtomIndex,
     double contactDistance)
 {
-    // TODO: Implement Buckyball conductor support
-    throw OpenMMException("Buckyball conductors not yet implemented in Reference platform");
+    BuckyballConductor bucky;
+    bucky.virtualIndices = virtualAtomIndices;
+    bucky.realIndices = realAtomIndices;
+    bucky.normals = normalVectors;
+    bucky.areaPerAtom = areaPerAtom;
+    bucky.radius = radius;
+    bucky.center = center;
+    bucky.contactAtomIndex = contactAtomIndex;
+    bucky.contactDistance = contactDistance;
+    bucky.voltage_kjmol = voltage * conversion_eV_to_kJmol;
+    bucky.electrodeType = (electrodeType == "cathode") ? 'c' : 'a';
+    bucky.charges.resize(virtualAtomIndices.size(), 0.0);
+
+    buckyballs.push_back(bucky);
 }
 
 void ReferenceCalcConstantVKernel::addNanotubeConductor(
@@ -101,8 +113,20 @@ void ReferenceCalcConstantVKernel::addNanotubeConductor(
     int contactAtomIndex,
     double contactDistance)
 {
-    // TODO: Implement Nanotube conductor support
-    throw OpenMMException("Nanotube conductors not yet implemented in Reference platform");
+    NanotubeConductor tube;
+    tube.virtualIndices = virtualAtomIndices;
+    tube.realIndices = realAtomIndices;
+    tube.normals = normalVectors;
+    tube.areaPerAtom = areaPerAtom;
+    tube.axis = axis;
+    tube.center = center;
+    tube.contactAtomIndex = contactAtomIndex;
+    tube.contactDistance = contactDistance;
+    tube.voltage_kjmol = voltage * conversion_eV_to_kJmol;
+    tube.electrodeType = (electrodeType == "cathode") ? 'c' : 'a';
+    tube.charges.resize(virtualAtomIndices.size(), 0.0);
+
+    nanotubes.push_back(tube);
 }
 
 void ReferenceCalcConstantVKernel::runSCF(const vector<Vec3>& positions) {
@@ -206,6 +230,7 @@ void ReferenceCalcConstantVKernel::runSCF(const vector<Vec3>& positions) {
         double dq_anode = (V_anode - phi_anode_avg) * totalArea * EPSILON_0 / (numAnodes + 1e-10);
 
         // Green's Reciprocity: enforce charge conservation
+        // CRITICAL FIX: Include conductor charges in Q_total
         double Q_total = 0.0;
         for (int i = 0; i < numCathodes; i++)
             Q_total += cathodeCharges[i];
@@ -214,14 +239,38 @@ void ReferenceCalcConstantVKernel::runSCF(const vector<Vec3>& positions) {
         for (int i = 0; i < numElectrolytes; i++)
             Q_total += electrolyteCharges[i];
 
-        double correction = -Q_total / (numCathodes + numAnodes + 1e-10);
+        // Sum conductor charges
+        int totalConductorAtoms = 0;
+        for (const auto& bucky : buckyballs) {
+            for (double q : bucky.charges)
+                Q_total += q;
+            totalConductorAtoms += bucky.charges.size();
+        }
+        for (const auto& tube : nanotubes) {
+            for (double q : tube.charges)
+                Q_total += q;
+            totalConductorAtoms += tube.charges.size();
+        }
 
-        // Update charges
+        // Redistribute correction across ALL electrode atoms (flat + conductors)
+        double correction = -Q_total / (numCathodes + numAnodes + totalConductorAtoms + 1e-10);
+
+        // Update flat electrode charges
         for (int i = 0; i < numCathodes; i++)
             cathodeCharges[i] += dq_cathode / numCathodes + correction;
 
         for (int i = 0; i < numAnodes; i++)
             anodeCharges[i] += dq_anode / numAnodes + correction;
+
+        // Update conductor charges
+        for (auto& bucky : buckyballs) {
+            for (double& q : bucky.charges)
+                q += correction;
+        }
+        for (auto& tube : nanotubes) {
+            for (double& q : tube.charges)
+                q += correction;
+        }
     }
 }
 

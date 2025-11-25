@@ -19,6 +19,34 @@ using namespace std;
 // Mirror Struct Definitions from .cu file (MUST MATCH EXACTLY)
 // ═══════════════════════════════════════════════════════════════════════════
 
+struct BuckyballData {
+    int numAtoms;
+    int* virtualIndices;      // Device pointer
+    int* realIndices;         // Device pointer
+    double* normals;          // Device pointer (3 * numAtoms doubles)
+    double area_atom;
+    double radius;
+    double r_center[3];
+    int contactAtomIndex;
+    double dr_center_contact;
+    double voltage_kjmol;
+    char electrodeType;       // 'c' or 'a'
+};
+
+struct NanotubeData {
+    int numAtoms;
+    int* virtualIndices;      // Device pointer
+    int* realIndices;         // Device pointer
+    double* normals;          // Device pointer (3 * numAtoms doubles)
+    double area_atom;
+    double axis[3];           // Normalized axis vector
+    double r_center[3];
+    int contactAtomIndex;
+    double dr_axis_contact;
+    double voltage_kjmol;
+    char electrodeType;       // 'c' or 'a'
+};
+
 struct ElectrodeData {
     // Flat electrodes
     int numCathodes;
@@ -32,11 +60,11 @@ struct ElectrodeData {
     int numElectrolytes;
     int* electrolyteIndices;  // Device pointer
 
-    // Conductors (not yet implemented)
+    // Conductors
     int numBuckyballs;
-    void* buckyballs;         // Device pointer (placeholder)
+    BuckyballData* buckyballs;  // Device pointer to array of structs
     int numNanotubes;
-    void* nanotubes;          // Device pointer (placeholder)
+    NanotubeData* nanotubes;    // Device pointer to array of structs
 
     // System parameters
     double voltage_kjmol;
@@ -96,6 +124,10 @@ CudaCalcConstantVKernel::CudaCalcConstantVKernel(string name, const Platform& pl
     anodeAreasGPU(nullptr),
     electrolyteIndicesGPU(nullptr),
     electrodeDataGPU(nullptr),
+    buckyballDataArrayGPU(nullptr),
+    nanotubeDataArrayGPU(nullptr),
+    numBuckyballs(0),
+    numNanotubes(0),
     numCathodeAtoms(0),
     numAnodeAtoms(0),
     numElectrolyteAtoms(0)
@@ -109,6 +141,18 @@ CudaCalcConstantVKernel::~CudaCalcConstantVKernel() {
     if (anodeAreasGPU) delete anodeAreasGPU;
     if (electrolyteIndicesGPU) delete electrolyteIndicesGPU;
     if (electrodeDataGPU) delete electrodeDataGPU;
+
+    // Clean up conductor arrays
+    for (CudaArray* arr : conductorArrays)
+        delete arr;
+    if (buckyballDataArrayGPU) delete buckyballDataArrayGPU;
+    if (nanotubeDataArrayGPU) delete nanotubeDataArrayGPU;
+
+    // Clean up host-side structs
+    for (void* ptr : buckyballStructsHost)
+        delete (BuckyballData*)ptr;
+    for (void* ptr : nanotubeStructsHost)
+        delete (NanotubeData*)ptr;
 }
 
 void CudaCalcConstantVKernel::initialize(
@@ -176,10 +220,13 @@ void CudaCalcConstantVKernel::initialize(
     hostElectrodeData.numElectrolytes = numElectrolyteAtoms;
     hostElectrodeData.electrolyteIndices = (numElectrolyteAtoms > 0) ?
         (int*)electrolyteIndicesGPU->getDevicePointer() : nullptr;
+
+    // Conductors will be added via addBuckyballConductor/addNanotubeConductor
     hostElectrodeData.numBuckyballs = 0;
     hostElectrodeData.buckyballs = nullptr;
     hostElectrodeData.numNanotubes = 0;
     hostElectrodeData.nanotubes = nullptr;
+
     hostElectrodeData.voltage_kjmol = this->voltage;
     hostElectrodeData.Lgap = Lgap;
     hostElectrodeData.Lcell = Lcell;
@@ -206,7 +253,59 @@ void CudaCalcConstantVKernel::addBuckyballConductor(
     int contactAtomIndex,
     double contactDistance)
 {
-    throw OpenMMException("Buckyball conductors not yet implemented in CUDA platform");
+    int numAtoms = virtualAtomIndices.size();
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Step 1-3: Allocate CudaArrays for virtualIndices, realIndices, normals
+    // ═══════════════════════════════════════════════════════════════════════
+
+    CudaArray* virtualIndicesGPU = new CudaArray(cu, numAtoms, sizeof(int), "buckyball_virtualIndices");
+    CudaArray* realIndicesGPU = new CudaArray(cu, numAtoms, sizeof(int), "buckyball_realIndices");
+    CudaArray* normalsGPU = new CudaArray(cu, numAtoms * 3, sizeof(double), "buckyball_normals");
+
+    // Upload data
+    virtualIndicesGPU->upload(virtualAtomIndices);
+    realIndicesGPU->upload(realAtomIndices);
+
+    // Convert normalVectors (Vec3) to flat double array
+    vector<double> normalsFlat(numAtoms * 3);
+    for (int i = 0; i < numAtoms; i++) {
+        normalsFlat[i * 3 + 0] = normalVectors[i][0];
+        normalsFlat[i * 3 + 1] = normalVectors[i][1];
+        normalsFlat[i * 3 + 2] = normalVectors[i][2];
+    }
+    normalsGPU->upload(normalsFlat);
+
+    // Store for cleanup
+    conductorArrays.push_back(virtualIndicesGPU);
+    conductorArrays.push_back(realIndicesGPU);
+    conductorArrays.push_back(normalsGPU);
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Step 4: Create BuckyballData struct on HOST with DEVICE pointers
+    // ═══════════════════════════════════════════════════════════════════════
+
+    BuckyballData* hostStruct = new BuckyballData();
+    hostStruct->numAtoms = numAtoms;
+    hostStruct->virtualIndices = (int*)virtualIndicesGPU->getDevicePointer();  // DEVICE POINTER!
+    hostStruct->realIndices = (int*)realIndicesGPU->getDevicePointer();        // DEVICE POINTER!
+    hostStruct->normals = (double*)normalsGPU->getDevicePointer();              // DEVICE POINTER!
+    hostStruct->area_atom = areaPerAtom;
+    hostStruct->radius = radius;
+    hostStruct->r_center[0] = center[0];
+    hostStruct->r_center[1] = center[1];
+    hostStruct->r_center[2] = center[2];
+    hostStruct->contactAtomIndex = contactAtomIndex;
+    hostStruct->dr_center_contact = contactDistance;
+    hostStruct->voltage_kjmol = voltage * 96.487;  // V to kJ/mol
+    hostStruct->electrodeType = (electrodeType == "cathode") ? 'c' : 'a';
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Step 5: Store pointer to struct in host-side vector
+    // ═══════════════════════════════════════════════════════════════════════
+
+    buckyballStructsHost.push_back((void*)hostStruct);
+    numBuckyballs++;
 }
 
 void CudaCalcConstantVKernel::addNanotubeConductor(
@@ -223,7 +322,61 @@ void CudaCalcConstantVKernel::addNanotubeConductor(
     int contactAtomIndex,
     double contactDistance)
 {
-    throw OpenMMException("Nanotube conductors not yet implemented in CUDA platform");
+    int numAtoms = virtualAtomIndices.size();
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Step 1-3: Allocate CudaArrays for virtualIndices, realIndices, normals
+    // ═══════════════════════════════════════════════════════════════════════
+
+    CudaArray* virtualIndicesGPU = new CudaArray(cu, numAtoms, sizeof(int), "nanotube_virtualIndices");
+    CudaArray* realIndicesGPU = new CudaArray(cu, numAtoms, sizeof(int), "nanotube_realIndices");
+    CudaArray* normalsGPU = new CudaArray(cu, numAtoms * 3, sizeof(double), "nanotube_normals");
+
+    // Upload data
+    virtualIndicesGPU->upload(virtualAtomIndices);
+    realIndicesGPU->upload(realAtomIndices);
+
+    // Convert normalVectors (Vec3) to flat double array
+    vector<double> normalsFlat(numAtoms * 3);
+    for (int i = 0; i < numAtoms; i++) {
+        normalsFlat[i * 3 + 0] = normalVectors[i][0];
+        normalsFlat[i * 3 + 1] = normalVectors[i][1];
+        normalsFlat[i * 3 + 2] = normalVectors[i][2];
+    }
+    normalsGPU->upload(normalsFlat);
+
+    // Store for cleanup
+    conductorArrays.push_back(virtualIndicesGPU);
+    conductorArrays.push_back(realIndicesGPU);
+    conductorArrays.push_back(normalsGPU);
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Step 4: Create NanotubeData struct on HOST with DEVICE pointers
+    // ═══════════════════════════════════════════════════════════════════════
+
+    NanotubeData* hostStruct = new NanotubeData();
+    hostStruct->numAtoms = numAtoms;
+    hostStruct->virtualIndices = (int*)virtualIndicesGPU->getDevicePointer();  // DEVICE POINTER!
+    hostStruct->realIndices = (int*)realIndicesGPU->getDevicePointer();        // DEVICE POINTER!
+    hostStruct->normals = (double*)normalsGPU->getDevicePointer();              // DEVICE POINTER!
+    hostStruct->area_atom = areaPerAtom;
+    hostStruct->axis[0] = axis[0];
+    hostStruct->axis[1] = axis[1];
+    hostStruct->axis[2] = axis[2];
+    hostStruct->r_center[0] = center[0];
+    hostStruct->r_center[1] = center[1];
+    hostStruct->r_center[2] = center[2];
+    hostStruct->contactAtomIndex = contactAtomIndex;
+    hostStruct->dr_axis_contact = contactDistance;
+    hostStruct->voltage_kjmol = voltage * 96.487;  // V to kJ/mol
+    hostStruct->electrodeType = (electrodeType == "cathode") ? 'c' : 'a';
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Step 5: Store pointer to struct in host-side vector
+    // ═══════════════════════════════════════════════════════════════════════
+
+    nanotubeStructsHost.push_back((void*)hostStruct);
+    numNanotubes++;
 }
 
 double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces,
@@ -248,7 +401,42 @@ void CudaCalcConstantVKernel::updateParameters(ContextImpl& context, const Const
     z_anode = force.getZAnode();
     nIterations = force.getNumIterations();
 
-    // Update ElectrodeData struct on GPU
+    // ═══════════════════════════════════════════════════════════════════════
+    // Upload conductor arrays to GPU (if not already done)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // Upload Buckyball array of structs
+    if (numBuckyballs > 0 && buckyballDataArrayGPU == nullptr) {
+        // Convert void* pointers to BuckyballData* and create vector
+        vector<BuckyballData> buckyballsVec;
+        buckyballsVec.reserve(numBuckyballs);
+        for (void* ptr : buckyballStructsHost) {
+            buckyballsVec.push_back(*((BuckyballData*)ptr));
+        }
+
+        // Allocate GPU array for BuckyballData structs
+        buckyballDataArrayGPU = new CudaArray(cu, numBuckyballs, sizeof(BuckyballData), "buckyballDataArray");
+        buckyballDataArrayGPU->upload(buckyballsVec);
+    }
+
+    // Upload Nanotube array of structs
+    if (numNanotubes > 0 && nanotubeDataArrayGPU == nullptr) {
+        // Convert void* pointers to NanotubeData* and create vector
+        vector<NanotubeData> nanotubesVec;
+        nanotubesVec.reserve(numNanotubes);
+        for (void* ptr : nanotubeStructsHost) {
+            nanotubesVec.push_back(*((NanotubeData*)ptr));
+        }
+
+        // Allocate GPU array for NanotubeData structs
+        nanotubeDataArrayGPU = new CudaArray(cu, numNanotubes, sizeof(NanotubeData), "nanotubeDataArray");
+        nanotubeDataArrayGPU->upload(nanotubesVec);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Update ElectrodeData struct on GPU (with conductor pointers)
+    // ═══════════════════════════════════════════════════════════════════════
+
     ElectrodeData hostElectrodeData;
     hostElectrodeData.numCathodes = numCathodeAtoms;
     hostElectrodeData.numAnodes = numAnodeAtoms;
@@ -263,10 +451,15 @@ void CudaCalcConstantVKernel::updateParameters(ContextImpl& context, const Const
     hostElectrodeData.numElectrolytes = numElectrolyteAtoms;
     hostElectrodeData.electrolyteIndices = (numElectrolyteAtoms > 0) ?
         (int*)electrolyteIndicesGPU->getDevicePointer() : nullptr;
-    hostElectrodeData.numBuckyballs = 0;
-    hostElectrodeData.buckyballs = nullptr;
-    hostElectrodeData.numNanotubes = 0;
-    hostElectrodeData.nanotubes = nullptr;
+
+    // Point to conductor arrays on GPU
+    hostElectrodeData.numBuckyballs = numBuckyballs;
+    hostElectrodeData.buckyballs = (numBuckyballs > 0) ?
+        (BuckyballData*)buckyballDataArrayGPU->getDevicePointer() : nullptr;
+    hostElectrodeData.numNanotubes = numNanotubes;
+    hostElectrodeData.nanotubes = (numNanotubes > 0) ?
+        (NanotubeData*)nanotubeDataArrayGPU->getDevicePointer() : nullptr;
+
     hostElectrodeData.voltage_kjmol = voltage;
     hostElectrodeData.Lgap = Lgap;
     hostElectrodeData.Lcell = Lcell;
