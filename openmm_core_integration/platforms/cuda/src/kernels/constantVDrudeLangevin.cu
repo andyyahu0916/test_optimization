@@ -282,74 +282,287 @@ __global__ void updateBuckyballChargesKernel(
 }
 
 /**
- * Kernel 4: Apply Green's Reciprocity (charge conservation)
+ * Kernel 3b: Update nanotube conductor charges
+ *
+ * Corresponds to: MM_classes.py::Numerical_charge_Conductor() for Nanotube_Virtual
+ *
+ * Similar to Buckyball, but:
+ * - Normal vector is radial (perpendicular to axis)
+ * - Uses cylindrical geometry for area calculation
  */
-__global__ void applyGreensReciprocityKernel(
-    const ElectrodeData* __restrict__ electrodeData,
-    float4* __restrict__ posq
+__global__ void updateNanotubeChargesKernel(
+    const NanotubeData* __restrict__ nanotubes,
+    int nanotubeIndex,
+    const long long* __restrict__ force,
+    float4* __restrict__ posq,
+    const float4* __restrict__ positions,
+    int paddedNumAtoms
 ) {
-    /**
-     * BUG FIX #1: Include conductor charges in Green's Reciprocity
-     *
-     * Green's Reciprocity enforces Q_total = 0 for the ENTIRE electrode system.
-     * Previously, this kernel only considered flat electrodes (cathode/anode),
-     * causing physics mismatch with Reference platform.
-     *
-     * CRITICAL: Must sum charges from ALL electrode atoms:
-     *   - Flat cathodes
-     *   - Flat anodes
-     *   - Buckyball virtual atoms
-     *   - Nanotube virtual atoms
-     *
-     * Algorithm:
-     *   1. Reduce charge sums for each electrode type
-     *   2. Compute correction = -Q_total / total_electrode_atoms
-     *   3. Apply correction to ALL electrode atoms
-     */
+    const NanotubeData& tube = nanotubes[nanotubeIndex];
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= tube.numAtoms) return;
 
-    __shared__ double cathodeSum;
-    __shared__ double anodeSum;
-    __shared__ double conductorSum;
-    __shared__ int totalConductorAtoms;
+    int virtualIdx = tube.virtualIndices[i];
+    int realIdx = tube.realIndices[i];
 
-    // Stage 1: Sum cathode charges
-    double localSum = 0.0;
-    for (int i = threadIdx.x; i < electrodeData->numCathodes; i += blockDim.x) {
-        int idx = electrodeData->cathodeIndices[i];
-        localSum += (double)posq[idx].w;
+    // Read real atom position
+    double rx = (double)positions[realIdx].x;
+    double ry = (double)positions[realIdx].y;
+    double rz = (double)positions[realIdx].z;
+
+    // Compute displacement from center
+    double dx = rx - tube.r_center[0];
+    double dy = ry - tube.r_center[1];
+    double dz = rz - tube.r_center[2];
+
+    // Project out component along axis to get radial vector
+    // radial = (r - center) - axis * dot(r - center, axis)
+    double dot_axis = dx * tube.axis[0] + dy * tube.axis[1] + dz * tube.axis[2];
+    double radial_x = dx - tube.axis[0] * dot_axis;
+    double radial_y = dy - tube.axis[1] * dot_axis;
+    double radial_z = dz - tube.axis[2] * dot_axis;
+
+    // Normalize to get normal vector
+    double r_mag = sqrt(radial_x*radial_x + radial_y*radial_y + radial_z*radial_z);
+    double nx = radial_x / r_mag;
+    double ny = radial_y / r_mag;
+    double nz = radial_z / r_mag;
+
+    // Read old charge and force
+    double q_old = (double)posq[virtualIdx].w;
+    double Fx = (double)force[virtualIdx] / (double)0x100000000;
+    double Fy = (double)force[virtualIdx + paddedNumAtoms] / (double)0x100000000;
+    double Fz = (double)force[virtualIdx + paddedNumAtoms * 2] / (double)0x100000000;
+
+    // Normal component of external field (radial direction for nanotube)
+    double E_n_external = (fabs(q_old) > 0.9 * SMALL_THRESHOLD)
+                          ? (Fx * nx + Fy * ny + Fz * nz) / q_old
+                          : 0.0;
+
+    // Update charge
+    // For nanotube: q = 2/(4π) × area_atom × E_n_external × K_au
+    // Note: No V/radius term since nanotube is at same potential as electrode
+    double factor = 2.0 / FOUR_PI * CONVERSION_KJMOL_NM_TO_AU;
+    double q_new = factor * tube.area_atom * E_n_external;
+
+    posq[virtualIdx].w = (float)q_new;
+}
+
+/**
+ * Kernel 4: Compute Analytic Electrode Charge via Green's Reciprocity
+ *
+ * This implements the COMPLETE Green's Reciprocity formula from
+ * Fixed_Voltage_routines.py::compute_Electrode_charge_analytic()
+ *
+ * Q_analytic = ±1/(4π) × Area × (V/Lgap + V/Lcell) × K_au
+ *              + Σ_electrolyte (z_distance / Lcell) × (-q_i)
+ *
+ * The second term is the IMAGE CHARGE contribution from electrolyte atoms.
+ */
+__global__ void computeAnalyticChargeKernel(
+    const ElectrodeData* __restrict__ electrodeData,
+    const float4* __restrict__ posq,
+    double* __restrict__ Q_analytic_cathode,
+    double* __restrict__ Q_analytic_anode
+) {
+    __shared__ double imageChargeSum_cathode;
+    __shared__ double imageChargeSum_anode;
+
+    // Initialize shared memory
+    if (threadIdx.x == 0) {
+        imageChargeSum_cathode = 0.0;
+        imageChargeSum_anode = 0.0;
     }
-    localSum = blockReduceSum(localSum);
-    if (threadIdx.x == 0) cathodeSum = localSum;
     __syncthreads();
 
-    // Stage 2: Sum anode charges
-    localSum = 0.0;
-    for (int i = threadIdx.x; i < electrodeData->numAnodes; i += blockDim.x) {
-        int idx = electrodeData->anodeIndices[i];
-        localSum += (double)posq[idx].w;
+    double z_cathode = electrodeData->z_cathode;
+    double z_anode = electrodeData->z_anode;
+    double Lcell = electrodeData->Lcell;
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Step 1: Compute Image Charge contribution from electrolyte atoms
+    // Formula: Σ (z_distance / Lcell) × (-q_i)
+    // Corresponds to: Fixed_Voltage_routines.py L333-338
+    // ═══════════════════════════════════════════════════════════════════════
+
+    double localSum_cathode = 0.0;
+    double localSum_anode = 0.0;
+
+    for (int i = threadIdx.x; i < electrodeData->numElectrolytes; i += blockDim.x) {
+        int idx = electrodeData->electrolyteIndices[i];
+        float4 atom = posq[idx];
+        double z_atom = (double)atom.z;
+        double q_i = (double)atom.w;
+
+        // For cathode: distance to opposite electrode (anode)
+        // Corresponds to: z_opposite = self.Anode.z_pos for cathode
+        double z_distance_cathode = fabs(z_atom - z_anode);
+        localSum_cathode += (z_distance_cathode / Lcell) * (-q_i);
+
+        // For anode: distance to opposite electrode (cathode)
+        double z_distance_anode = fabs(z_atom - z_cathode);
+        localSum_anode += (z_distance_anode / Lcell) * (-q_i);
     }
-    localSum = blockReduceSum(localSum);
-    if (threadIdx.x == 0) anodeSum = localSum;
+
+    // Reduce image charge sums
+    localSum_cathode = blockReduceSum(localSum_cathode);
+    localSum_anode = blockReduceSum(localSum_anode);
+
+    if (threadIdx.x == 0) {
+        imageChargeSum_cathode = localSum_cathode;
+        imageChargeSum_anode = localSum_anode;
+    }
     __syncthreads();
 
-    // Stage 3: Sum conductor charges (Buckyballs + Nanotubes)
-    localSum = 0.0;
-    int localAtomCount = 0;
+    // ═══════════════════════════════════════════════════════════════════════
+    // Step 2: Compute Image Charge contribution from Conductor atoms
+    // Conductors are "in the electrolyte" for flat electrode calculation
+    // Corresponds to: Fixed_Voltage_routines.py L340-348
+    // ═══════════════════════════════════════════════════════════════════════
 
-    // Sum Buckyball charges
+    localSum_cathode = 0.0;
+    localSum_anode = 0.0;
+
+    // Buckyball contributions
     for (int buckyIdx = 0; buckyIdx < electrodeData->numBuckyballs; buckyIdx++) {
-        // Load struct via shared memory broadcast
         __shared__ BuckyballData s_bucky;
         if (threadIdx.x == 0) {
             s_bucky = electrodeData->buckyballs[buckyIdx];
         }
         __syncthreads();
 
-        // Each thread processes a subset of virtual atoms
+        for (int i = threadIdx.x; i < s_bucky.numAtoms; i += blockDim.x) {
+            int idx = s_bucky.virtualIndices[i];
+            float4 atom = posq[idx];
+            double z_atom = (double)atom.z;
+            double q_i = (double)atom.w;
+
+            double z_distance_cathode = fabs(z_atom - z_anode);
+            localSum_cathode += (z_distance_cathode / Lcell) * (-q_i);
+
+            double z_distance_anode = fabs(z_atom - z_cathode);
+            localSum_anode += (z_distance_anode / Lcell) * (-q_i);
+        }
+    }
+
+    // Nanotube contributions
+    for (int tubeIdx = 0; tubeIdx < electrodeData->numNanotubes; tubeIdx++) {
+        __shared__ NanotubeData s_tube;
+        if (threadIdx.x == 0) {
+            s_tube = electrodeData->nanotubes[tubeIdx];
+        }
+        __syncthreads();
+
+        for (int i = threadIdx.x; i < s_tube.numAtoms; i += blockDim.x) {
+            int idx = s_tube.virtualIndices[i];
+            float4 atom = posq[idx];
+            double z_atom = (double)atom.z;
+            double q_i = (double)atom.w;
+
+            double z_distance_cathode = fabs(z_atom - z_anode);
+            localSum_cathode += (z_distance_cathode / Lcell) * (-q_i);
+
+            double z_distance_anode = fabs(z_atom - z_cathode);
+            localSum_anode += (z_distance_anode / Lcell) * (-q_i);
+        }
+    }
+
+    // Reduce conductor contributions
+    localSum_cathode = blockReduceSum(localSum_cathode);
+    localSum_anode = blockReduceSum(localSum_anode);
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Step 3: Compute final Q_analytic for each electrode
+    // Q_analytic = Geometric_term + Image_charge_term
+    // Corresponds to: Fixed_Voltage_routines.py L322-328
+    // ═══════════════════════════════════════════════════════════════════════
+
+    if (threadIdx.x == 0) {
+        double V = electrodeData->voltage_kjmol;
+        double Lgap = electrodeData->Lgap;
+        double area = electrodeData->totalArea;
+        double factor = 1.0 / FOUR_PI * CONVERSION_KJMOL_NM_TO_AU;
+
+        // Geometric contribution: ±1/(4π) × Area × (V/Lgap + V/Lcell) × K_au
+        double geom_cathode = +factor * area * (V / Lgap + V / Lcell);
+        double geom_anode   = -factor * area * (V / Lgap + V / Lcell);
+
+        // Total Q_analytic = geometric + image charges
+        *Q_analytic_cathode = geom_cathode + imageChargeSum_cathode + localSum_cathode;
+        *Q_analytic_anode   = geom_anode   + imageChargeSum_anode   + localSum_anode;
+    }
+}
+
+/**
+ * Kernel 5: Scale Electrode Charges to Match Analytic Values
+ *
+ * After SCF iteration, we scale the numerical charges to match
+ * the analytically computed Q_analytic from Green's Reciprocity.
+ *
+ * scale_factor = Q_analytic / Q_numeric
+ * q_scaled = q_numeric × scale_factor
+ *
+ * Corresponds to: Fixed_Voltage_routines.py::Scale_charges_analytic()
+ */
+__global__ void scaleChargesAnalyticKernel(
+    const ElectrodeData* __restrict__ electrodeData,
+    float4* __restrict__ posq,
+    double Q_analytic_cathode,
+    double Q_analytic_anode
+) {
+    __shared__ double Q_numeric_cathode;
+    __shared__ double Q_numeric_anode;
+    __shared__ double Q_numeric_conductors;
+    __shared__ int numConductorAtoms;
+    __shared__ double scale_cathode;
+    __shared__ double scale_anode;
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Stage 1: Sum numeric charges on cathode
+    // ═══════════════════════════════════════════════════════════════════════
+
+    double localSum = 0.0;
+    for (int i = threadIdx.x; i < electrodeData->numCathodes; i += blockDim.x) {
+        int idx = electrodeData->cathodeIndices[i];
+        localSum += (double)posq[idx].w;
+    }
+    localSum = blockReduceSum(localSum);
+    if (threadIdx.x == 0) Q_numeric_cathode = localSum;
+    __syncthreads();
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Stage 2: Sum numeric charges on anode
+    // ═══════════════════════════════════════════════════════════════════════
+
+    localSum = 0.0;
+    for (int i = threadIdx.x; i < electrodeData->numAnodes; i += blockDim.x) {
+        int idx = electrodeData->anodeIndices[i];
+        localSum += (double)posq[idx].w;
+    }
+    localSum = blockReduceSum(localSum);
+    if (threadIdx.x == 0) Q_numeric_anode = localSum;
+    __syncthreads();
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Stage 3: Sum numeric charges on conductors (for combined scaling)
+    // Corresponds to: MM_classes.py::Scale_charges_analytic_general() L509-551
+    // ═══════════════════════════════════════════════════════════════════════
+
+    localSum = 0.0;
+    int localCount = 0;
+
+    // Sum Buckyball charges
+    for (int buckyIdx = 0; buckyIdx < electrodeData->numBuckyballs; buckyIdx++) {
+        __shared__ BuckyballData s_bucky;
+        if (threadIdx.x == 0) {
+            s_bucky = electrodeData->buckyballs[buckyIdx];
+        }
+        __syncthreads();
+
         for (int i = threadIdx.x; i < s_bucky.numAtoms; i += blockDim.x) {
             int idx = s_bucky.virtualIndices[i];
             localSum += (double)posq[idx].w;
-            localAtomCount++;
+            localCount++;
         }
     }
 
@@ -364,39 +577,69 @@ __global__ void applyGreensReciprocityKernel(
         for (int i = threadIdx.x; i < s_tube.numAtoms; i += blockDim.x) {
             int idx = s_tube.virtualIndices[i];
             localSum += (double)posq[idx].w;
-            localAtomCount++;
+            localCount++;
         }
     }
 
-    // Reduce conductor charge sum and atom count
     localSum = blockReduceSum(localSum);
-    localAtomCount = blockReduceSum(localAtomCount);
+    localCount = blockReduceSum(localCount);
     if (threadIdx.x == 0) {
-        conductorSum = localSum;
-        totalConductorAtoms = localAtomCount;
+        Q_numeric_conductors = localSum;
+        numConductorAtoms = localCount;
     }
     __syncthreads();
 
-    // Stage 4: Compute total charge and correction
-    double totalCharge = cathodeSum + anodeSum + conductorSum;
-    int totalAtoms = electrodeData->numCathodes + electrodeData->numAnodes + totalConductorAtoms;
-    double correction = (totalAtoms > 0) ? (-totalCharge / totalAtoms) : 0.0;
+    // ═══════════════════════════════════════════════════════════════════════
+    // Stage 4: Compute scale factors
+    // If no conductors: scale cathode/anode independently
+    // If conductors: scale cathode+conductors together (as in original code)
+    // ═══════════════════════════════════════════════════════════════════════
 
-    // Stage 5: Apply correction to ALL electrode atoms
+    if (threadIdx.x == 0) {
+        if (numConductorAtoms == 0) {
+            // No conductors: scale each electrode independently
+            // Corresponds to: Fixed_Voltage_routines.py::Scale_charges_analytic()
+            scale_cathode = (fabs(Q_numeric_cathode) > SMALL_THRESHOLD)
+                            ? Q_analytic_cathode / Q_numeric_cathode
+                            : 1.0;
+            scale_anode = (fabs(Q_numeric_anode) > SMALL_THRESHOLD)
+                          ? Q_analytic_anode / Q_numeric_anode
+                          : 1.0;
+        } else {
+            // With conductors: cathode + conductors share same scaling
+            // Anode scaled independently
+            // Corresponds to: MM_classes.py::Scale_charges_analytic_general() L527-545
+            double Q_cathode_plus_cond = Q_numeric_cathode + Q_numeric_conductors;
 
-    // Apply to cathodes
+            // Use anode's analytic charge (negated) for cathode side
+            // Because Q_analytic_cathode = -Q_analytic_anode in symmetric case
+            scale_cathode = (fabs(Q_cathode_plus_cond) > SMALL_THRESHOLD)
+                            ? (-Q_analytic_anode) / Q_cathode_plus_cond
+                            : 1.0;
+            scale_anode = (fabs(Q_numeric_anode) > SMALL_THRESHOLD)
+                          ? Q_analytic_anode / Q_numeric_anode
+                          : 1.0;
+        }
+    }
+    __syncthreads();
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Stage 5: Apply scaling to all electrode atoms
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // Scale cathode charges
     for (int i = threadIdx.x; i < electrodeData->numCathodes; i += blockDim.x) {
         int idx = electrodeData->cathodeIndices[i];
-        posq[idx].w += (float)correction;
+        posq[idx].w = (float)((double)posq[idx].w * scale_cathode);
     }
 
-    // Apply to anodes
+    // Scale anode charges
     for (int i = threadIdx.x; i < electrodeData->numAnodes; i += blockDim.x) {
         int idx = electrodeData->anodeIndices[i];
-        posq[idx].w += (float)correction;
+        posq[idx].w = (float)((double)posq[idx].w * scale_anode);
     }
 
-    // Apply to Buckyball virtual atoms
+    // Scale Buckyball charges (same scale as cathode)
     for (int buckyIdx = 0; buckyIdx < electrodeData->numBuckyballs; buckyIdx++) {
         __shared__ BuckyballData s_bucky;
         if (threadIdx.x == 0) {
@@ -406,11 +649,11 @@ __global__ void applyGreensReciprocityKernel(
 
         for (int i = threadIdx.x; i < s_bucky.numAtoms; i += blockDim.x) {
             int idx = s_bucky.virtualIndices[i];
-            posq[idx].w += (float)correction;
+            posq[idx].w = (float)((double)posq[idx].w * scale_cathode);
         }
     }
 
-    // Apply to Nanotube virtual atoms
+    // Scale Nanotube charges (same scale as cathode)
     for (int tubeIdx = 0; tubeIdx < electrodeData->numNanotubes; tubeIdx++) {
         __shared__ NanotubeData s_tube;
         if (threadIdx.x == 0) {
@@ -420,7 +663,7 @@ __global__ void applyGreensReciprocityKernel(
 
         for (int i = threadIdx.x; i < s_tube.numAtoms; i += blockDim.x) {
             int idx = s_tube.virtualIndices[i];
-            posq[idx].w += (float)correction;
+            posq[idx].w = (float)((double)posq[idx].w * scale_cathode);
         }
     }
 }
@@ -792,10 +1035,15 @@ __global__ void applyHardWallConstraintsKernel(
  * Full integration step: SCF + Drude Langevin
  *
  * This function orchestrates the complete integration cycle:
- * 1. SCF iterations (electrode charge updates)
+ * 1. SCF iterations (electrode charge updates with Green's Reciprocity)
  * 2. Velocity update (Langevin thermostat)
  * 3. Position update
  * 4. Hard wall constraints
+ *
+ * FIXED: Now correctly implements Green's Reciprocity with:
+ *   - Image charge calculation from electrolyte atoms
+ *   - Proper Q_analytic computation
+ *   - Scale factor matching original Python implementation
  */
 extern "C" void executeConstantVDrudeLangevinStep(
     // System data
@@ -846,12 +1094,42 @@ extern "C" void executeConstantVDrudeLangevinStep(
     double hardwallscaleDrude = sqrt(BOLTZ * drudeTemperature);
 
     // ═══════════════════════════════════════════════════════════════════════
-    // PHASE 1: SCF Charge Update (BEFORE integration)
+    // Allocate device memory for Q_analytic values (small, persistent allocation)
     // ═══════════════════════════════════════════════════════════════════════
-    // OPTIMIZATION A: Use passed counts instead of cudaMemcpy (eliminates 10-20 µs PCIe latency)
+    static double* d_Q_analytic_cathode = nullptr;
+    static double* d_Q_analytic_anode = nullptr;
+    if (d_Q_analytic_cathode == nullptr) {
+        cudaMalloc(&d_Q_analytic_cathode, sizeof(double));
+        cudaMalloc(&d_Q_analytic_anode, sizeof(double));
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // PHASE 1: Compute Q_analytic ONCE per step (before SCF iterations)
+    // This includes image charges from electrolyte atoms
+    // Corresponds to: MM_classes.py L700-701
+    // ═══════════════════════════════════════════════════════════════════════
+
+    computeAnalyticChargeKernel<<<1, 256>>>(
+        d_electrodeData,
+        d_posq,
+        d_Q_analytic_cathode,
+        d_Q_analytic_anode
+    );
+    cudaDeviceSynchronize();
+
+    // Read Q_analytic values to host for kernel launch
+    double h_Q_analytic_cathode, h_Q_analytic_anode;
+    cudaMemcpy(&h_Q_analytic_cathode, d_Q_analytic_cathode, sizeof(double), cudaMemcpyDeviceToHost);
+    cudaMemcpy(&h_Q_analytic_anode, d_Q_analytic_anode, sizeof(double), cudaMemcpyDeviceToHost);
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // PHASE 2: SCF Charge Update iterations
+    // Corresponds to: MM_classes.py::Poisson_solver_fixed_voltage() L287-367
+    // ═══════════════════════════════════════════════════════════════════════
 
     for (int iter = 0; iter < scfIterations; iter++) {
-        // Update cathode charges
+        // Step 1: Update cathode charges based on E-field
+        // Corresponds to: MM_classes.py L724-742
         if (numCathodes > 0) {
             int blockSize = 256;
             int numBlocks = (numCathodes + blockSize - 1) / blockSize;
@@ -867,7 +1145,8 @@ extern "C" void executeConstantVDrudeLangevinStep(
             );
         }
 
-        // Update anode charges
+        // Step 2: Update anode charges based on E-field
+        // Corresponds to: MM_classes.py L744-760
         if (numAnodes > 0) {
             int blockSize = 256;
             int numBlocks = (numAnodes + blockSize - 1) / blockSize;
@@ -883,21 +1162,60 @@ extern "C" void executeConstantVDrudeLangevinStep(
             );
         }
 
-        // Update buckyball conductors (currently disabled - see TODO below)
+        // Step 3: Update Buckyball conductor charges (if any)
+        // Corresponds to: MM_classes.py::Numerical_charge_Conductor()
         if (numBuckyballs > 0) {
-            // TODO: Implement conductor support for integrator path
-            // Currently conductors are only supported in Force path (CalcConstantVKernel)
-            // To support here, we need to store buckyball device pointers separately
-            // or use kernel fusion to avoid host-side struct member access
+            // Note: Buckyball kernel already exists (updateBuckyballChargesKernel)
+            // Loop over each buckyball and call kernel
+            for (int buckyIdx = 0; buckyIdx < numBuckyballs; buckyIdx++) {
+                updateBuckyballChargesKernel<<<1, 256>>>(
+                    d_electrodeData->buckyballs,
+                    buckyIdx,
+                    d_force,
+                    d_posq,
+                    d_posq,  // positions = posq (xyz components)
+                    paddedNumAtoms
+                );
+            }
         }
 
-        // Update nanotube conductors (currently disabled - see TODO below)
+        // Step 4: Update Nanotube conductor charges (if any)
+        // Corresponds to: MM_classes.py::Numerical_charge_Conductor() for Nanotube
         if (numNanotubes > 0) {
-            // TODO: Implement conductor support for integrator path
+            for (int tubeIdx = 0; tubeIdx < numNanotubes; tubeIdx++) {
+                updateNanotubeChargesKernel<<<1, 256>>>(
+                    d_electrodeData->nanotubes,
+                    tubeIdx,
+                    d_force,
+                    d_posq,
+                    d_posq,  // positions = posq (xyz components)
+                    paddedNumAtoms
+                );
+            }
         }
 
-        // Apply Green's Reciprocity
-        applyGreensReciprocityKernel<<<1, 256>>>(d_electrodeData, d_posq);
+        // Step 5: Recompute Q_analytic if conductors present (they contribute to image charge)
+        // Corresponds to: MM_classes.py L764-766
+        if (numBuckyballs > 0 || numNanotubes > 0) {
+            computeAnalyticChargeKernel<<<1, 256>>>(
+                d_electrodeData,
+                d_posq,
+                d_Q_analytic_cathode,
+                d_Q_analytic_anode
+            );
+            cudaDeviceSynchronize();
+            cudaMemcpy(&h_Q_analytic_cathode, d_Q_analytic_cathode, sizeof(double), cudaMemcpyDeviceToHost);
+            cudaMemcpy(&h_Q_analytic_anode, d_Q_analytic_anode, sizeof(double), cudaMemcpyDeviceToHost);
+        }
+
+        // Step 6: Scale charges to match analytic normalization
+        // Corresponds to: MM_classes.py L768 (Scale_charges_analytic_general)
+        scaleChargesAnalyticKernel<<<1, 256>>>(
+            d_electrodeData,
+            d_posq,
+            h_Q_analytic_cathode,
+            h_Q_analytic_anode
+        );
 
         cudaDeviceSynchronize();
     }

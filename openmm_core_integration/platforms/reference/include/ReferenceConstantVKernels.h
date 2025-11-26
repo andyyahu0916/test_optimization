@@ -120,8 +120,37 @@ private:
     double z_anode;
     int nIterations;
 
-    // Helper method to run SCF
+    // ═══════════════════════════════════════════════════════════════════════
+    // SCF Helper Methods (E-field method matching Python/CUDA)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /**
+     * Run SCF iteration using E-field method.
+     * @param positions  Current atom positions
+     * @param forces     Current forces (needed for Ez = F_z / q calculation)
+     */
+    void runSCF(const std::vector<Vec3>& positions, const std::vector<Vec3>& forces);
+
+    /**
+     * Legacy runSCF without forces (backward compatible, uses zero forces).
+     */
     void runSCF(const std::vector<Vec3>& positions);
+
+    /**
+     * Compute Q_analytic using Green's Reciprocity.
+     * Includes image charge contributions from electrolyte.
+     * @param positions   Current atom positions
+     * @param isCathode   True for cathode, false for anode
+     * @return Q_analytic
+     */
+    double computeAnalyticCharge(const std::vector<Vec3>& positions, bool isCathode) const;
+
+    /**
+     * Scale electrode charges to match analytic normalization.
+     * @param charges     Electrode charges (modified in place)
+     * @param Q_analytic  Target analytic charge sum
+     */
+    void scaleChargesAnalytic(std::vector<double>& charges, double Q_analytic) const;
 };
 
 /**

@@ -401,14 +401,52 @@ class ConstantVSystemBuilder:
 
     def _compute_electrode_area(self, electrode_indices: List[int]) -> float:
         """
-        Compute total electrode area using simple per-atom approximation.
+        Compute total electrode area from periodic box vectors.
 
-        This is a simplified version. In the original code, area is computed from
-        the unit cell dimensions. For now, we use a per-atom area estimate.
+        Corresponds to: Fixed_Voltage_routines.py::Electrode_Virtual.__init__() Lines 171-175
+
+        The original code computes:
+            boxVecs = MMsys.simmd.topology.getPeriodicBoxVectors()
+            crossBox = numpy.cross(boxVecs[0], boxVecs[1])
+            self.sheet_area = numpy.dot(crossBox, crossBox)**0.5
+
+        This gives the area of the x-y plane (assuming electrodes are in z).
         """
-        # Typical metal atom surface area ~ 0.1 nm² (rough estimate)
-        area_per_atom = 0.1  # nm²
-        return len(electrode_indices) * area_per_atom
+        # Get periodic box vectors from topology
+        box_vectors = self.topology.getPeriodicBoxVectors()
+
+        if box_vectors is None:
+            # Fallback: estimate from electrode atom positions
+            logger.warning(
+                "No periodic box vectors found. "
+                "Using rough area estimate from atom count."
+            )
+            area_per_atom = 0.1  # nm² (rough estimate)
+            return len(electrode_indices) * area_per_atom
+
+        # Convert to numpy arrays for cross product
+        # boxVecs[0] = a, boxVecs[1] = b
+        a = np.array([
+            box_vectors[0].x,
+            box_vectors[0].y,
+            box_vectors[0].z
+        ])
+        b = np.array([
+            box_vectors[1].x,
+            box_vectors[1].y,
+            box_vectors[1].z
+        ])
+
+        # Cross product gives normal vector with magnitude = area
+        # crossBox = numpy.cross(boxVecs[0], boxVecs[1])
+        cross_product = np.cross(a, b)
+
+        # Area = |cross product| = sqrt(dot(cross, cross))
+        # self.sheet_area = numpy.dot(crossBox, crossBox)**0.5
+        area_nm2 = np.sqrt(np.dot(cross_product, cross_product))
+
+        logger.debug(f"Computed electrode area from box vectors: {area_nm2:.4f} nm²")
+        return area_nm2
 
     # ═══════════════════════════════════════════════════════════════════════════
     # Integrator Creation (Native Core API)
