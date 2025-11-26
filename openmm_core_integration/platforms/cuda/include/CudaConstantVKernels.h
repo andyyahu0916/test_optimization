@@ -73,6 +73,9 @@ private:
     CudaContext& cu;
     bool hasInitialized;
 
+    // Helper method: Upload ElectrodeData to GPU (BUG FIX #2: Lazy Upload Trap)
+    void uploadElectrodeDataToGPU();
+
     // GPU arrays for electrode data
     CudaArray* cathodeIndicesGPU;
     CudaArray* cathodeAreasGPU;

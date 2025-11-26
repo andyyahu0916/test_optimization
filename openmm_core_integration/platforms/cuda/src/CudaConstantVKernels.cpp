@@ -16,6 +16,19 @@ using namespace OpenMM;
 using namespace std;
 
 // ═══════════════════════════════════════════════════════════════════════════
+// BUG FIX #3: CUDA Error Checking Macro
+// ═══════════════════════════════════════════════════════════════════════════
+
+#define CUDA_CHECK(call) \
+    do { \
+        cudaError_t err = call; \
+        if (err != cudaSuccess) { \
+            throw OpenMMException(string("CUDA error: ") + cudaGetErrorString(err) + \
+                                  string(" at ") + __FILE__ + string(":") + to_string(__LINE__)); \
+        } \
+    } while (0)
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Mirror Struct Definitions from .cu file (MUST MATCH EXACTLY)
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -388,32 +401,18 @@ void CudaCalcConstantVKernel::addNanotubeConductor(
     numNanotubes++;
 }
 
-double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces,
-                                        bool includeEnergy, int groups)
-{
-    if (!hasInitialized)
-        throw OpenMMException("CudaCalcConstantVKernel::execute() called before initialize()");
-
-    // For Force-based API, we don't execute the full integration kernel
-    // This would require implementing a separate SCF-only kernel
-    // For now, return 0.0 (the integration kernel handles SCF)
-    return 0.0;
-}
-
-void CudaCalcConstantVKernel::updateParameters(ContextImpl& context, const ConstantVForce& force)
-{
-    voltage = force.getVoltage() * 96.487;
-    Lgap = force.getLgap();
-    Lcell = force.getLcell();
-    totalArea = force.getTotalArea();
-    z_cathode = force.getZCathode();
-    z_anode = force.getZAnode();
-    nIterations = force.getNumIterations();
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // Upload conductor arrays to GPU (if not already done)
-    // ═══════════════════════════════════════════════════════════════════════
-
+/**
+ * BUG FIX #2: Helper method to upload ElectrodeData to GPU
+ *
+ * This method ensures that conductor data added via addBuckyballConductor()
+ * or addNanotubeConductor() is properly uploaded to GPU memory.
+ *
+ * Call this:
+ *   - During initialize() (for initial upload)
+ *   - In execute() (if conductors were added after initialize())
+ *   - In updateParameters() (when parameters change)
+ */
+void CudaCalcConstantVKernel::uploadElectrodeDataToGPU() {
     // Upload Buckyball array of structs
     if (numBuckyballs > 0 && buckyballDataArrayGPU == nullptr) {
         // Convert void* pointers to BuckyballData* and create vector
@@ -442,10 +441,7 @@ void CudaCalcConstantVKernel::updateParameters(ContextImpl& context, const Const
         nanotubeDataArrayGPU->upload(nanotubesVec);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
     // Update ElectrodeData struct on GPU (with conductor pointers)
-    // ═══════════════════════════════════════════════════════════════════════
-
     ElectrodeData hostElectrodeData;
     hostElectrodeData.numCathodes = numCathodeAtoms;
     hostElectrodeData.numAnodes = numAnodeAtoms;
@@ -469,6 +465,7 @@ void CudaCalcConstantVKernel::updateParameters(ContextImpl& context, const Const
     hostElectrodeData.nanotubes = (numNanotubes > 0) ?
         (NanotubeData*)nanotubeDataArrayGPU->getDevicePointer() : nullptr;
 
+    // System parameters
     hostElectrodeData.voltage_kjmol = voltage;
     hostElectrodeData.Lgap = Lgap;
     hostElectrodeData.Lcell = Lcell;
@@ -476,7 +473,40 @@ void CudaCalcConstantVKernel::updateParameters(ContextImpl& context, const Const
     hostElectrodeData.z_cathode = z_cathode;
     hostElectrodeData.z_anode = z_anode;
 
+    // Upload to GPU
     electrodeDataGPU->upload(&hostElectrodeData, 1);
+}
+
+double CudaCalcConstantVKernel::execute(ContextImpl& context, bool includeForces,
+                                        bool includeEnergy, int groups)
+{
+    if (!hasInitialized)
+        throw OpenMMException("CudaCalcConstantVKernel::execute() called before initialize()");
+
+    // BUG FIX #2: Check if conductors were added but not uploaded
+    if ((numBuckyballs > 0 && buckyballDataArrayGPU == nullptr) ||
+        (numNanotubes > 0 && nanotubeDataArrayGPU == nullptr)) {
+        uploadElectrodeDataToGPU();
+    }
+
+    // For Force-based API, we don't execute the full integration kernel
+    // This would require implementing a separate SCF-only kernel
+    // For now, return 0.0 (the integration kernel handles SCF)
+    return 0.0;
+}
+
+void CudaCalcConstantVKernel::updateParameters(ContextImpl& context, const ConstantVForce& force)
+{
+    voltage = force.getVoltage() * 96.487;
+    Lgap = force.getLgap();
+    Lcell = force.getLcell();
+    totalArea = force.getTotalArea();
+    z_cathode = force.getZCathode();
+    z_anode = force.getZAnode();
+    nIterations = force.getNumIterations();
+
+    // BUG FIX #2: Use helper method to upload electrode data
+    uploadElectrodeDataToGPU();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -759,12 +789,12 @@ void CudaIntegrateConstantVDrudeLangevinStepKernel::execute(
         numNormalParticles
     );
 
-    // Check for CUDA errors
-    cudaError_t err = cudaGetLastError();
-    if (err != cudaSuccess) {
-        throw OpenMMException("CUDA error in ConstantVDrudeLangevinStep: " +
-                            string(cudaGetErrorString(err)));
-    }
+    // BUG FIX #3: Comprehensive error checking
+    // Check for asynchronous errors (kernel launch failures)
+    CUDA_CHECK(cudaGetLastError());
+
+    // Check for synchronous errors (kernel execution failures)
+    CUDA_CHECK(cudaDeviceSynchronize());
 
     stepCount++;
 }
