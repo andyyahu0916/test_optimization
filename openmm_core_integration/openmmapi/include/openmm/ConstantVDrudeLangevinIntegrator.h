@@ -97,32 +97,52 @@ public:
     // ═══════════════════════════════════════════════════════════════════════
 
     /**
-     * Add cathode electrode atoms.
+     * Add a cathode electrode atom.
      *
-     * @param particleIndices  Vector of particle indices for cathode
-     * @param areas            Per-atom surface areas (nm²)
+     * @param particle  Particle index for cathode atom
+     * @param area      Surface area for this atom (nm²)
      */
-    void addCathodeAtoms(const std::vector<int>& particleIndices,
-                          const std::vector<double>& areas);
+    void addCathodeAtom(int particle, double area);
 
     /**
-     * Add anode electrode atoms.
-     *
-     * @param particleIndices  Vector of particle indices for anode
-     * @param areas            Per-atom surface areas (nm²)
+     * Get the number of cathode atoms.
      */
-    void addAnodeAtoms(const std::vector<int>& particleIndices,
-                        const std::vector<double>& areas);
+    int getNumCathodeAtoms() const {
+        return cathodeIndices.size();
+    }
 
     /**
-     * Add electrolyte atoms (for Green's Reciprocity image charge term).
+     * Add an anode electrode atom.
+     *
+     * @param particle  Particle index for anode atom
+     * @param area      Surface area for this atom (nm²)
+     */
+    void addAnodeAtom(int particle, double area);
+
+    /**
+     * Get the number of anode atoms.
+     */
+    int getNumAnodeAtoms() const {
+        return anodeIndices.size();
+    }
+
+    /**
+     * Add an electrolyte atom (for Green's Reciprocity image charge term).
      *
      * Electrolyte atoms contribute to the total electrode charge via:
      *   Q_image += (z_distance / Lcell) * (-q_electrolyte)
      *
-     * @param particleIndices  Vector of particle indices for electrolyte
+     * @param particle  Particle index for electrolyte atom
+     * @param charge    Fixed charge of this atom (elementary charge units)
      */
-    void addElectrolyteAtoms(const std::vector<int>& particleIndices);
+    void addElectrolyteAtom(int particle, double charge);
+
+    /**
+     * Get the number of electrolyte atoms.
+     */
+    int getNumElectrolyteAtoms() const {
+        return electrolyteIndices.size();
+    }
 
     /**
      * Add Buckyball conductor (spherical conductor near electrode).
@@ -171,12 +191,12 @@ public:
      * This is used in the analytic charge formula:
      *   Q_analytic = sign/(4π) * area * (V/Lgap + V/Lcell) * conversion
      */
-    void setTotalElectrodeArea(double area) { totalArea = area; }
+    void setTotalArea(double area) { totalArea = area; }
 
     /**
      * Get total electrode area.
      */
-    double getTotalElectrodeArea() const { return totalArea; }
+    double getTotalArea() const { return totalArea; }
 
     /**
      * Set cathode Z position (nm).
@@ -247,6 +267,18 @@ public:
      */
     int getNumSCFIterations() const { return scfIterations; }
 
+    /**
+     * Set SCF frequency (charge updates every N MD steps).
+     *
+     * Must be >= 1. Default is 1 (update every step).
+     */
+    void setSCFFrequency(int freq) { scfFrequency = freq; }
+
+    /**
+     * Get SCF frequency.
+     */
+    int getSCFFrequency() const { return scfFrequency; }
+
     // ═══════════════════════════════════════════════════════════════════════
     // Query Methods
     // ═══════════════════════════════════════════════════════════════════════
@@ -311,6 +343,7 @@ private:
 
     // SCF control
     int scfIterations;     // Number of SCF iterations per step
+    int scfFrequency;      // Update charges every N MD steps
 
     // Electrode atom data
     std::vector<int> cathodeIndices;
@@ -318,6 +351,7 @@ private:
     std::vector<int> anodeIndices;
     std::vector<double> anodeAreas;
     std::vector<int> electrolyteIndices;
+    std::vector<double> electrolyteCharges;
 
     // Conductor data (Buckyball/Nanotube)
     struct ConductorData {

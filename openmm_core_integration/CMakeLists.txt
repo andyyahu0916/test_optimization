@@ -82,10 +82,24 @@ include_directories(
 # ═══════════════════════════════════════════════════════════════════════════
 
 set(CORE_API_SOURCES
+    openmmapi/src/ConstantVForce.cpp
+    openmmapi/src/ConstantVForceImpl.cpp
+    openmmapi/src/ConstantVIntegrator.cpp
     openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp
+    openmmapi/src/ConstantVKernelFactory.cpp
+    openmmapi/src/registerConstantV.cpp
 )
 
 add_library(ConstantVAPI SHARED ${CORE_API_SOURCES})
+
+# Add compile definitions for conditional compilation
+if(BUILD_CUDA_LIB)
+    target_compile_definitions(ConstantVAPI PRIVATE OPENMM_BUILD_CUDA_LIB)
+endif()
+
+if(BUILD_REFERENCE_LIB)
+    target_compile_definitions(ConstantVAPI PRIVATE OPENMM_BUILD_REFERENCE_LIB)
+endif()
 
 target_link_libraries(ConstantVAPI
     ${OpenMM_LIBRARIES}
@@ -109,6 +123,7 @@ set_target_properties(ConstantVAPI PROPERTIES
 if(BUILD_CUDA_LIB)
     set(CUDA_SOURCES
         platforms/cuda/src/kernels/constantVDrudeLangevin.cu
+        platforms/cuda/src/CudaConstantVKernels.cpp
     )
 
     add_library(ConstantVCUDA SHARED ${CUDA_SOURCES})
@@ -144,6 +159,7 @@ endif()
 if(BUILD_REFERENCE_LIB)
     set(REFERENCE_SOURCES
         platforms/reference/src/ReferenceConstantVDrudeLangevinDynamics.cpp
+        platforms/reference/src/ReferenceConstantVKernels.cpp
     )
 
     add_library(ConstantVReference SHARED ${REFERENCE_SOURCES})
