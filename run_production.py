@@ -475,6 +475,100 @@ class ConstantVProductionSimulation:
         return atom_indices
 
     # ═══════════════════════════════════════════════════════════════════════
+    # Physics Summary and Validation (Optimization D)
+    # ═══════════════════════════════════════════════════════════════════════
+
+    def print_physics_summary(self) -> None:
+        """
+        Print physics summary and validation warnings.
+
+        This helps users verify their simulation parameters before running
+        long simulations, preventing "ran for 3 days with wrong parameters"
+        scenarios.
+        """
+        logger.info("=" * 80)
+        logger.info("PHYSICS SUMMARY & VALIDATION")
+        logger.info("=" * 80)
+
+        params = self.config['simulation_parameters']
+
+        # Get parameters
+        voltage = params['voltage_volts']
+        Lgap = params['Lgap_nm']
+        Lcell = params['Lcell_nm']
+        temperature = params['temperature_kelvin']
+
+        # Calculate total electrode area (nm²)
+        total_area = self.integrator.getTotalArea()
+
+        # Calculate theoretical capacitance (C = ε₀ * A / d)
+        # ε₀ = 8.854e-12 F/m = 8.854e-3 F/nm
+        # C (F) = 8.854e-3 (F/nm) * A (nm²) / d (nm)
+        epsilon_0 = 8.854e-3  # F/nm (vacuum permittivity)
+        capacitance_F = epsilon_0 * total_area / Lgap
+        capacitance_pF = capacitance_F * 1e12  # Convert to pF
+
+        # Calculate expected charge magnitude (Q = C * V)
+        # Q (C) = C (F) * V (V)
+        expected_charge_C = capacitance_F * voltage
+        expected_charge_e = expected_charge_C / 1.602e-19  # Convert to elementary charges
+
+        # Print summary
+        logger.info(f"Total Electrode Area:        {total_area:.2f} nm²")
+        logger.info(f"Electrode Spacing (Lgap):    {Lgap:.3f} nm")
+        logger.info(f"Periodic Cell Length (Lcell): {Lcell:.3f} nm")
+        logger.info(f"Applied Voltage:             {voltage:.2f} V")
+        logger.info(f"Temperature:                 {temperature:.1f} K")
+        logger.info(f"SCF Iterations:              {params['scf_iterations']}")
+        logger.info("")
+        logger.info(f"Theoretical Capacitance:     {capacitance_pF:.4e} pF")
+        logger.info(f"Expected Charge (per electrode): ±{expected_charge_e:.2e} e⁻")
+        logger.info(f"                            (±{expected_charge_C:.2e} C)")
+
+        # Validation warnings
+        logger.info("")
+        logger.info("VALIDATION CHECKS:")
+
+        warnings_found = False
+
+        # Check Lgap
+        if Lgap < 0.1:
+            logger.warning(f"  ⚠️  WARNING: Lgap = {Lgap:.3f} nm is very small (< 0.1 nm)")
+            logger.warning("      This may cause numerical instability or unphysical results.")
+            logger.warning("      Recommendation: Increase Lgap to at least 1.0 nm.")
+            warnings_found = True
+
+        # Check Voltage
+        if voltage > 10.0:
+            logger.warning(f"  ⚠️  WARNING: Voltage = {voltage:.2f} V is very large (> 10 V)")
+            logger.warning("      This may cause excessive charging and simulation instability.")
+            logger.warning("      Recommendation: Use voltage < 5 V for typical systems.")
+            warnings_found = True
+
+        # Check if Lgap < Lcell/10 (electrode too close relative to cell size)
+        if Lgap < Lcell / 10:
+            logger.warning(f"  ⚠️  WARNING: Lgap ({Lgap:.3f} nm) is very small compared to Lcell ({Lcell:.3f} nm)")
+            logger.warning("      Ratio Lgap/Lcell = {:.2%}".format(Lgap / Lcell))
+            logger.warning("      This may cause image charge artifacts.")
+            logger.warning("      Recommendation: Ensure Lgap > Lcell/5 for reliable results.")
+            warnings_found = True
+
+        # Check timestep relative to temperature (Drude oscillator stability)
+        timestep_ps = params['timestep_ps']
+        if self.is_polarizable:
+            # For Drude oscillators, timestep should be < 0.5 fs typically
+            if timestep_ps > 0.001:  # 1 fs
+                logger.warning(f"  ⚠️  WARNING: Timestep = {timestep_ps*1000:.2f} fs may be too large for Drude oscillators")
+                logger.warning("      Drude oscillators typically require timestep < 0.5 fs (0.0005 ps)")
+                logger.warning("      Recommendation: Reduce timestep to 0.0005 ps or less.")
+                warnings_found = True
+
+        if not warnings_found:
+            logger.info("  ✓ All validation checks passed")
+
+        logger.info("=" * 80)
+
+    # ═══════════════════════════════════════════════════════════════════════
     # Step 8: Create Simulation and Add Reporters
     # ═══════════════════════════════════════════════════════════════════════
 
@@ -590,6 +684,7 @@ class ConstantVProductionSimulation:
             self.add_exclusions()
             self.create_integrator()
             self.configure_integrator()
+            self.print_physics_summary()  # Optimization D: Validate before running
             self.create_simulation()
             self.add_reporters()
             self.run()

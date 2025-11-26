@@ -107,7 +107,16 @@ extern "C" void executeConstantVDrudeLangevinStep(
     float drudeTemperature,
     float drudeFriction,
     float maxDrudeDistance,
-    int scfIterations
+    int scfIterations,
+
+    // Host-side counts (Optimization A: eliminate PCIe roundtrip)
+    int numCathodes,
+    int numAnodes,
+    int numElectrolytes,
+    int numBuckyballs,
+    int numNanotubes,
+    int numDrudePairs,
+    int numNormalParticles
 );
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -721,7 +730,7 @@ void CudaIntegrateConstantVDrudeLangevinStepKernel::execute(
     ElectrodeData* d_electrodeData = (ElectrodeData*)electrodeDataGPU->getDevicePointer();
     DrudeParticleData* d_drudeData = (DrudeParticleData*)drudeDataGPU->getDevicePointer();
 
-    // Call CUDA kernel
+    // Call CUDA kernel (Optimization A: pass counts from host to eliminate PCIe roundtrip)
     executeConstantVDrudeLangevinStep(
         cu.getNumAtoms(),
         cu.getPaddedNumAtoms(),
@@ -739,7 +748,15 @@ void CudaIntegrateConstantVDrudeLangevinStepKernel::execute(
         (float)integrator.getDrudeTemperature(),
         (float)integrator.getDrudeFriction(),
         (float)maxDrudeDistance,
-        scfIterations
+        scfIterations,
+        // Host-side counts (eliminates cudaMemcpy)
+        numCathodeAtoms,
+        numAnodeAtoms,
+        numElectrolyteAtoms,
+        0,  // numBuckyballs (TODO: conductor support not implemented yet)
+        0,  // numNanotubes (TODO: conductor support not implemented yet)
+        numDrudePairs,
+        numNormalParticles
     );
 
     // Check for CUDA errors
