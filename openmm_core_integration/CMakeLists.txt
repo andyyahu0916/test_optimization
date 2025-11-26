@@ -164,6 +164,11 @@ if(BUILD_REFERENCE_LIB)
 
     add_library(ConstantVReference SHARED ${REFERENCE_SOURCES})
 
+    target_include_directories(ConstantVReference PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/platforms/reference/include>
+        $<INSTALL_INTERFACE:include/openmm/constantv/reference>
+    )
+
     target_link_libraries(ConstantVReference
         ConstantVAPI
         ${OpenMM_LIBRARIES}
@@ -249,6 +254,12 @@ endif()
 if(BUILD_REFERENCE_LIB)
     install(TARGETS ConstantVReference
         LIBRARY DESTINATION lib/plugins
+    )
+
+    install(FILES
+        platforms/reference/include/ReferenceConstantVDrudeLangevinDynamics.h
+        platforms/reference/include/ReferenceConstantVKernels.h
+        DESTINATION include/openmm/constantv/reference
     )
 endif()
 

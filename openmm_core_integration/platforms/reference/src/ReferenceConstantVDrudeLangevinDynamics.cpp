@@ -37,6 +37,31 @@ ReferenceConstantVDrudeLangevinDynamics::ReferenceConstantVDrudeLangevinDynamics
 {
 }
 
+void ReferenceConstantVDrudeLangevinDynamics::addCathodeAtom(int particle, double area) {
+    if (particle < 0)
+        throw OpenMMException("Cathode atom index must be non-negative");
+    if (area <= 0.0)
+        throw OpenMMException("Cathode atom area must be positive");
+    cathodeIndices.push_back(particle);
+    cathodeAreas.push_back(area);
+}
+
+void ReferenceConstantVDrudeLangevinDynamics::addAnodeAtom(int particle, double area) {
+    if (particle < 0)
+        throw OpenMMException("Anode atom index must be non-negative");
+    if (area <= 0.0)
+        throw OpenMMException("Anode atom area must be positive");
+    anodeIndices.push_back(particle);
+    anodeAreas.push_back(area);
+}
+
+void ReferenceConstantVDrudeLangevinDynamics::addElectrolyteAtom(int particle, double charge) {
+    if (particle < 0)
+        throw OpenMMException("Electrolyte atom index must be non-negative");
+    electrolyteIndices.push_back(particle);
+    electrolyteCharges.push_back(charge);
+}
+
 void ReferenceConstantVDrudeLangevinDynamics::updateElectrodeCharges(
     vector<Vec3>& positions,
     vector<Vec3>& forces,

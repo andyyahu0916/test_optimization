@@ -190,6 +190,22 @@ class SystemConfig(BaseModel):
         description="Residue size cutoff: residues with < natom_cutoff atoms are electrolyte",
         gt=0,
     )
+    sapt_ff_exclusions: bool = Field(
+        default=True,
+        description="Enable SAPT-FF specific exclusions (water interaction groups + TFSI handling)",
+    )
+    hybrid_water_model: bool = Field(
+        default=False,
+        description="Force-add hybrid water interaction groups even without SAPT-FF",
+    )
+    water_residue_name: str = Field(
+        default="HOH",
+        description="Residue name for water molecules when configuring hybrid interaction groups",
+    )
+    tfsi_residue_name: str = Field(
+        default="Tf2N",
+        description="Residue name for TFSI anions in SAPT-FF exclusion logic",
+    )
 
     @model_validator(mode='after')
     def validate_conductors_require_geometry(self) -> 'SystemConfig':

@@ -8,6 +8,7 @@
 #include "ReferenceConstantVKernels.h"
 #include "ReferenceConstantVDrudeLangevinDynamics.h"
 #include "openmm/OpenMMException.h"
+#include "openmm/NonbondedForce.h"
 #include "openmm/internal/ContextImpl.h"
 #include "openmm/Context.h"
 #include <cmath>
@@ -514,7 +515,8 @@ ReferenceIntegrateConstantVDrudeLangevinStepKernel::ReferenceIntegrateConstantVD
     string name, const Platform& platform) :
     KernelImpl(name, platform),
     dynamics(nullptr),
-    stepCount(0)
+    stepCount(0),
+    nonbondedForce(nullptr)
 {
 }
 
@@ -560,6 +562,9 @@ void ReferenceIntegrateConstantVDrudeLangevinStepKernel::initialize(
     dynamics->setVoltage(integrator.getVoltage());
     dynamics->setLgap(integrator.getLgap());
     dynamics->setLcell(integrator.getLcell());
+    dynamics->setTotalArea(integrator.getTotalArea());
+    dynamics->setZCathode(integrator.getZCathode());
+    dynamics->setZAnode(integrator.getZAnode());
     dynamics->setNumSCFIterations(integrator.getNumSCFIterations());
 }
 
@@ -572,13 +577,24 @@ void ReferenceIntegrateConstantVDrudeLangevinStepKernel::execute(
     context.getPositions(positions);
     context.getVelocities(velocities);
 
-    // Check if we need to update charges
+    initializeChargeCache(context);
+
+    vector<Vec3> forces(context.getSystem().getNumParticles(), Vec3(0, 0, 0));
+
+    // Check if we need to update charges (SCF loop)
     if (stepCount % integrator.getSCFFrequency() == 0) {
-        dynamics->updateElectrodeCharges(positions);
+        context.calcForcesAndEnergy(true, false, -1);
+        context.getForces(forces);
+
+        dynamics->updateElectrodeCharges(positions, forces, cachedCharges);
+        applyChargeUpdates(context);
+
+        // Recompute forces after charge update to keep dynamics consistent
+        context.calcForcesAndEnergy(true, false, -1);
+        context.getForces(forces);
     }
 
-    // Perform integration step
-    vector<Vec3> forces(context.getSystem().getNumParticles());
+    // Perform integration step with (possibly) refreshed forces
     dynamics->update(context, positions, velocities, forces, integrator.getStepSize());
 
     // Update context
@@ -586,4 +602,44 @@ void ReferenceIntegrateConstantVDrudeLangevinStepKernel::execute(
     context.setVelocities(velocities);
 
     stepCount++;
+}
+
+void ReferenceIntegrateConstantVDrudeLangevinStepKernel::initializeChargeCache(ContextImpl& context) {
+    if (nonbondedForce != nullptr)
+        return;
+
+    const System& system = context.getSystem();
+    for (int i = 0; i < system.getNumForces(); i++) {
+        const Force& force = system.getForce(i);
+        const NonbondedForce* candidate = dynamic_cast<const NonbondedForce*>(&force);
+        if (candidate != nullptr) {
+            nonbondedForce = const_cast<NonbondedForce*>(candidate);
+            break;
+        }
+    }
+
+    if (nonbondedForce == nullptr)
+        throw OpenMMException("ConstantVDrudeLangevinIntegrator requires a NonbondedForce in the System");
+
+    int numParticles = nonbondedForce->getNumParticles();
+    cachedCharges.resize(numParticles);
+    cachedSigma.resize(numParticles);
+    cachedEpsilon.resize(numParticles);
+    for (int i = 0; i < numParticles; i++) {
+        double charge, sigma, epsilon;
+        nonbondedForce->getParticleParameters(i, charge, sigma, epsilon);
+        cachedCharges[i] = charge;
+        cachedSigma[i] = sigma;
+        cachedEpsilon[i] = epsilon;
+    }
+}
+
+void ReferenceIntegrateConstantVDrudeLangevinStepKernel::applyChargeUpdates(ContextImpl& context) {
+    if (nonbondedForce == nullptr)
+        return;
+
+    for (int i = 0; i < (int) cachedCharges.size(); i++)
+        nonbondedForce->setParticleParameters(i, cachedCharges[i], cachedSigma[i], cachedEpsilon[i]);
+
+    nonbondedForce->updateParametersInContext(context);
 }

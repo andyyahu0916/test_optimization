@@ -31,9 +31,15 @@ import numpy as np
 import openmm
 from openmm import app, unit
 
+try:
+    import constantv
+except ImportError:  # pragma: no cover - load error handled at runtime
+    constantv = None
+
 # Import exclusion utilities
 sys.path.insert(0, str(Path(__file__).parent))
 from utils.exclusions import add_all_exclusions
+from openmm_constantv.reporters.electrode_charge_reporter import ElectrodeChargeReporter
 
 # Configure logging
 logging.basicConfig(
@@ -78,16 +84,19 @@ class ConstantVProductionSimulation:
         self.forcefield: app.ForceField = None
         self.system: openmm.System = None
         self.topology: app.Topology = None
-        self.integrator: openmm.ConstantVDrudeLangevinIntegrator = None
-        self.simulation: app.Simulation = None
+        self.integrator: openmm.Integrator | None = None
+        self.simulation: app.Simulation | None = None
+        self.constantv_force: "constantv.ConstantVForce" | None = None
 
         # Electrode/electrolyte atom indices
         self.cathode_indices: List[int] = []
         self.anode_indices: List[int] = []
         self.electrolyte_indices: List[int] = []
+        self.conductor_charge_indices: List[List[int]] = []
 
         # System properties
         self.is_polarizable: bool = False
+        self._particle_charges: List[float] = []
 
     # ═══════════════════════════════════════════════════════════════════════
     # Step 1: Load PDB and Force Field
@@ -189,6 +198,15 @@ class ConstantVProductionSimulation:
                 force.setNonbondedMethod(openmm.NonbondedForce.PME)
                 force.setEwaldErrorTolerance(1e-5)
                 logger.info("  ✓ Forced NonbondedMethod to PME (required for ConstantV)")
+                self._particle_charges = self._extract_particle_charges(force)
+
+    def _extract_particle_charges(self, nonbonded_force: openmm.NonbondedForce) -> List[float]:
+        """Return particle charges (in elementary charge units)."""
+        charges: List[float] = []
+        for idx in range(nonbonded_force.getNumParticles()):
+            charge, _, _ = nonbonded_force.getParticleParameters(idx)
+            charges.append(charge.value_in_unit(unit.elementary_charge))
+        return charges
 
     # ═══════════════════════════════════════════════════════════════════════
     # Step 4: Identify Electrodes and Electrolytes
@@ -299,166 +317,116 @@ class ConstantVProductionSimulation:
     # ═══════════════════════════════════════════════════════════════════════
 
     def create_integrator(self) -> None:
-        """
-        Create ConstantVDrudeLangevinIntegrator (Native C++ Core).
-
-        This is the NEW way of doing ConstantV simulations.
-        DO NOT add ConstantVForce to the system.
-
-        Corresponds to: Replacing the old Python SCF loops
-        """
-        logger.info("Step 6: Creating ConstantVDrudeLangevinIntegrator (Native Core)...")
+        """Create the OpenMM dynamics integrator (Drude or Langevin)."""
+        logger.info("Step 6: Creating OpenMM dynamics integrator...")
 
         params = self.config['simulation_parameters']
 
-        # Create integrator
-        self.integrator = openmm.ConstantVDrudeLangevinIntegrator(
-            params['temperature_kelvin'],          # temperature (K)
-            params['friction_coeff'],              # friction (1/ps)
-            params['temperature_drude_kelvin'],    # drudeTemperature (K)
-            params['drude_friction_coeff'],        # drudeFriction (1/ps)
-            params['timestep_ps'],                 # stepSize (ps)
-            params['voltage_volts'],               # voltage (V)
-            params['Lgap_nm'],                     # Lgap (nm)
-            params['Lcell_nm'],                    # Lcell (nm)
-            params['scf_iterations']               # scfIterations
-        )
-
-        logger.info(
-            f"  ✓ Integrator created: V={params['voltage_volts']}V, "
-            f"dt={params['timestep_ps']}ps, SCF={params['scf_iterations']}"
-        )
-
-        # Set additional parameters
-        self.integrator.setMaxDrudeDistance(params['max_drude_distance_nm'])
-        logger.info(f"  ✓ Max Drude distance: {params['max_drude_distance_nm']} nm")
-
-    def configure_integrator(self) -> None:
-        """
-        Configure integrator with electrode/electrolyte/conductor data.
-
-        This is where we inject the system-specific information into
-        the native C++ integrator.
-        """
-        logger.info("Step 7: Configuring Integrator...")
-
-        positions = self.modeller.getPositions()
-
-        # Compute electrode areas (simple per-atom approximation)
-        cathode_area_total = len(self.cathode_indices) * 0.1  # nm² (rough estimate)
-        anode_area_total = len(self.anode_indices) * 0.1
-        cathode_area_per_atom = cathode_area_total / len(self.cathode_indices)
-        anode_area_per_atom = anode_area_total / len(self.anode_indices)
-
-        # Add cathode atoms
-        for idx in self.cathode_indices:
-            self.integrator.addCathodeAtom(idx, cathode_area_per_atom)
-        logger.info(f"  ✓ Added {len(self.cathode_indices)} cathode atoms")
-
-        # Add anode atoms
-        for idx in self.anode_indices:
-            self.integrator.addAnodeAtom(idx, anode_area_per_atom)
-        logger.info(f"  ✓ Added {len(self.anode_indices)} anode atoms")
-
-        # Add electrolyte atoms
-        for idx in self.electrolyte_indices:
-            # Get charge from system (simplified - use particle mass as placeholder)
-            charge = 0.0  # Will be updated by Context
-            self.integrator.addElectrolyteAtom(idx, charge)
-        logger.info(f"  ✓ Added {len(self.electrolyte_indices)} electrolyte atoms")
-
-        # Set geometry parameters
-        total_area = cathode_area_total + anode_area_total
-        self.integrator.setTotalArea(total_area)
-
-        cathode_z_avg = np.mean([positions[idx].z for idx in self.cathode_indices])
-        anode_z_avg = np.mean([positions[idx].z for idx in self.anode_indices])
-        self.integrator.setZCathode(cathode_z_avg)
-        self.integrator.setZAnode(anode_z_avg)
-
-        logger.info(
-            f"  ✓ Geometry: Area={total_area:.2f}nm², "
-            f"Z_cathode={cathode_z_avg:.3f}nm, Z_anode={anode_z_avg:.3f}nm"
-        )
-
-        # Add Buckyball conductors (if any)
-        self._add_buckyballs()
-
-        # Add Nanotube conductors (if any)
-        self._add_nanotubes()
-
-    def _add_buckyballs(self) -> None:
-        """Add Buckyball conductors to integrator."""
-        buckyballs = self.config['conductors'].get('buckyballs', [])
-        if len(buckyballs) == 0:
-            return
-
-        logger.info(f"  Adding {len(buckyballs)} Buckyball conductor(s)...")
-
-        for i, bucky_config in enumerate(buckyballs):
-            # Get atom indices from chain indices
-            virtual_indices = self._get_chain_atoms(
-                bucky_config['virtual_chain_index'],
-                set(bucky_config.get('exclude_elements', []))
+        if self.is_polarizable:
+            self.integrator = openmm.DrudeLangevinIntegrator(
+                params['temperature_kelvin'],
+                params['friction_coeff'],
+                params['temperature_drude_kelvin'],
+                params['drude_friction_coeff'],
+                params['timestep_ps']
             )
-            real_indices = self._get_chain_atoms(
-                bucky_config['real_chain_index'],
-                set(bucky_config.get('exclude_elements', []))
-            )
-
-            # Add to integrator (C++ will compute geometry)
-            self.integrator.addBuckyballConductor(
-                virtual_indices,
-                real_indices,
-                bucky_config['electrode_type'],
-                bucky_config['voltage']
-            )
-
+            self.integrator.setMaxDrudeDistance(params['max_drude_distance_nm'])
             logger.info(
-                f"    ✓ Buckyball {i+1}: "
-                f"{len(virtual_indices)} virtual atoms, "
-                f"{len(real_indices)} real atoms, "
-                f"type={bucky_config['electrode_type']}, "
-                f"V={bucky_config['voltage']}V"
+                "  ✓ Using DrudeLangevinIntegrator (polarizable system)"
+            )
+        else:
+            self.integrator = openmm.LangevinMiddleIntegrator(
+                params['temperature_kelvin'],
+                params['friction_coeff'],
+                params['timestep_ps']
+            )
+            logger.info("  ✓ Using LangevinMiddleIntegrator (non-polarizable system)")
+
+    def configure_constantv_force(self) -> None:
+        """Attach and configure the ConstantVForce implementation."""
+        if constantv is None:
+            raise RuntimeError(
+                "constantv module is not available. Build/install the native ConstantV "
+                "plugin before running production."
             )
 
-    def _add_nanotubes(self) -> None:
-        """Add Nanotube conductors to integrator."""
+        logger.info("Step 7: Configuring ConstantVForce...")
+
+        params = self.config['simulation_parameters']
+        positions = self.modeller.getPositions()
+        total_area = self._compute_planar_area_nm2()
+        cathode_area_per_atom = total_area / len(self.cathode_indices)
+        anode_area_per_atom = total_area / len(self.anode_indices)
+
+        force = constantv.ConstantVForce()
+        force.setVoltage(params['voltage_volts'])
+        force.setLgap(params['Lgap_nm'])
+        force.setLcell(params['Lcell_nm'])
+        force.setTotalArea(total_area)
+        force.setZCathode(self._average_z(positions, self.cathode_indices))
+        force.setZAnode(self._average_z(positions, self.anode_indices))
+
+        for idx in self.cathode_indices:
+            force.addCathodeAtom(idx, cathode_area_per_atom)
+        for idx in self.anode_indices:
+            force.addAnodeAtom(idx, anode_area_per_atom)
+
+        for idx in self.electrolyte_indices:
+            force.addElectrolyteAtom(idx, self._particle_charges[idx])
+
+        self._add_conductors(force)
+
+        self.system.addForce(force)
+        self.constantv_force = force
+        logger.info("  ✓ ConstantVForce attached to system")
+
+    def _add_conductors(self, force) -> None:
+        """Register Buckyball and Nanotube conductors with ConstantVForce."""
+        buckyballs = self.config['conductors'].get('buckyballs', [])
         nanotubes = self.config['conductors'].get('nanotubes', [])
-        if len(nanotubes) == 0:
+
+        if not buckyballs and not nanotubes:
             return
 
-        logger.info(f"  Adding {len(nanotubes)} Nanotube conductor(s)...")
+        logger.info(
+            f"  Adding {len(buckyballs)} Buckyball(s) and {len(nanotubes)} Nanotube(s)"
+        )
 
-        for i, tube_config in enumerate(nanotubes):
-            # Get atom indices
+        for config in buckyballs:
             virtual_indices = self._get_chain_atoms(
-                tube_config['virtual_chain_index'],
-                set(tube_config.get('exclude_elements', []))
+                config['virtual_chain_index'],
+                set(config.get('exclude_elements', []))
             )
             real_indices = self._get_chain_atoms(
-                tube_config['real_chain_index'],
-                set(tube_config.get('exclude_elements', []))
+                config['real_chain_index'],
+                set(config.get('exclude_elements', []))
             )
-
-            # Axis vector
-            axis = openmm.Vec3(*tube_config['axis'])
-
-            # Add to integrator
-            self.integrator.addNanotubeConductor(
+            force.addBuckyballConductor(
                 virtual_indices,
                 real_indices,
-                tube_config['electrode_type'],
-                tube_config['voltage'],
+                config['electrode_type'],
+                config['voltage']
+            )
+            self.conductor_charge_indices.append(real_indices)
+
+        for config in nanotubes:
+            virtual_indices = self._get_chain_atoms(
+                config['virtual_chain_index'],
+                set(config.get('exclude_elements', []))
+            )
+            real_indices = self._get_chain_atoms(
+                config['real_chain_index'],
+                set(config.get('exclude_elements', []))
+            )
+            axis = openmm.Vec3(*config['axis'])
+            force.addNanotubeConductor(
+                virtual_indices,
+                real_indices,
+                config['electrode_type'],
+                config['voltage'],
                 axis
             )
-
-            logger.info(
-                f"    ✓ Nanotube {i+1}: "
-                f"{len(virtual_indices)} virtual atoms, "
-                f"{len(real_indices)} real atoms, "
-                f"axis={tube_config['axis']}"
-            )
+            self.conductor_charge_indices.append(real_indices)
 
     def _get_chain_atoms(self, chain_index: int, exclude_elements: Set[str]) -> List[int]:
         """Helper to get atom indices from chain index."""
@@ -473,6 +441,31 @@ class ConstantVProductionSimulation:
             raise ValueError(f"No atoms found for chain index {chain_index}")
 
         return atom_indices
+
+    def _compute_planar_area_nm2(self) -> float:
+        """Compute the planar area from periodic box vectors (nm^2)."""
+        box_vectors = self.topology.getPeriodicBoxVectors()
+        if box_vectors is None:
+            raise RuntimeError("Topology is missing periodic box vectors.")
+
+        a = np.array([box_vectors[0].x, box_vectors[0].y, box_vectors[0].z])
+        b = np.array([box_vectors[1].x, box_vectors[1].y, box_vectors[1].z])
+        cross = np.cross(a, b)
+        return float(np.sqrt(np.dot(cross, cross)))
+
+    def _average_z(self, positions, atom_indices: List[int]) -> float:
+        """Average z-position in nanometers for the provided indices."""
+        if not atom_indices:
+            raise ValueError("Atom index list cannot be empty when computing averages.")
+
+        z_values = []
+        for idx in atom_indices:
+            pos = positions[idx]
+            if hasattr(pos, 'value_in_unit'):
+                z_values.append(pos.value_in_unit(unit.nanometer)[2])
+            else:
+                z_values.append(pos.z)
+        return float(np.mean(z_values))
 
     # ═══════════════════════════════════════════════════════════════════════
     # Physics Summary and Validation (Optimization D)
@@ -498,8 +491,12 @@ class ConstantVProductionSimulation:
         Lcell = params['Lcell_nm']
         temperature = params['temperature_kelvin']
 
+        if self.constantv_force is None:
+            logger.warning("ConstantVForce is not configured; skipping physics summary.")
+            return
+
         # Calculate total electrode area (nm²)
-        total_area = self.integrator.getTotalArea()
+        total_area = self.constantv_force.getTotalArea()
 
         # Calculate theoretical capacitance (C = ε₀ * A / d)
         # ε₀ = 8.854e-12 F/m = 8.854e-3 F/nm
@@ -643,6 +640,18 @@ class ConstantVProductionSimulation:
             )
             logger.info(f"  ✓ Checkpoint Reporter: {output['checkpoint_file']} (freq={checkpoint_freq})")
 
+        # Electrode charge reporter
+        if output.get('output_charges'):
+            charge_reporter = ElectrodeChargeReporter(
+                output['output_charges'],
+                freq,
+                self.cathode_indices,
+                self.anode_indices,
+                self.conductor_charge_indices,
+            )
+            self.simulation.reporters.append(charge_reporter)
+            logger.info(f"  ✓ Electrode Charge Reporter: {output['output_charges']} (freq={freq})")
+
     # ═══════════════════════════════════════════════════════════════════════
     # Step 10: Run Simulation
     # ═══════════════════════════════════════════════════════════════════════
@@ -683,7 +692,7 @@ class ConstantVProductionSimulation:
             self.identify_electrolytes()
             self.add_exclusions()
             self.create_integrator()
-            self.configure_integrator()
+            self.configure_constantv_force()
             self.print_physics_summary()  # Optimization D: Validate before running
             self.create_simulation()
             self.add_reporters()

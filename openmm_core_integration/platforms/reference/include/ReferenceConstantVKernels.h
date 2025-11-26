@@ -15,6 +15,8 @@
 
 namespace OpenMM {
 
+class NonbondedForce;
+
 /**
  * Reference (CPU) implementation of CalcConstantVKernel.
  */
@@ -167,6 +169,13 @@ public:
 private:
     ReferenceConstantVDrudeLangevinDynamics* dynamics;
     int stepCount;
+    NonbondedForce* nonbondedForce;
+    std::vector<double> cachedCharges;
+    std::vector<double> cachedSigma;
+    std::vector<double> cachedEpsilon;
+
+    void initializeChargeCache(ContextImpl& context);
+    void applyChargeUpdates(ContextImpl& context);
 };
 
 } // namespace OpenMM
