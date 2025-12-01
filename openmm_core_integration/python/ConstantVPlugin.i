@@ -13,6 +13,14 @@
 
 %module constantv
 
+%include "std_vector.i"
+%include "std_string.i"
+
+namespace std {
+    %template(IntVector) vector<int>;
+    %template(DoubleVector) vector<double>;
+}
+
 %{
 #include "openmm/ConstantVForce.h"
 #include "openmm/ConstantVIntegrator.h"
@@ -20,28 +28,56 @@
 #include "openmm/Context.h"
 #include "openmm/System.h"
 #include "openmm/Vec3.h"
+#include "openmm/Force.h"
+#include "openmm/Integrator.h"
+#include "OpenMM.h"
 #include <vector>
 #include <string>
 %}
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Import OpenMM SWIG bindings
+ * Import OpenMM SWIG bindings for proper inheritance
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
-%import(module="openmm") "swig/OpenMMSwigHeaders.i"
+// Forward declare OpenMM base classes with minimal interface
+// This allows our classes to inherit from them without full reimplementation
+namespace OpenMM {
+    %nodefaultctor Force;
+    %nodefaultdtor Force;
+    class Force {
+    public:
+        int getForceGroup() const;
+        void setForceGroup(int group);
+    };
 
-/* ═══════════════════════════════════════════════════════════════════════════
- * STL Container Support
- * ═══════════════════════════════════════════════════════════════════════════
- */
+    %nodefaultctor Integrator;
+    %nodefaultdtor Integrator;
+    class Integrator {
+    public:
+        virtual void step(int steps) = 0;
+        double getStepSize() const;
+        void setStepSize(double size);
+    };
 
-%include "std_vector.i"
-%include "std_string.i"
-
-namespace std {
-    %template(IntVector) vector<int>;
-    %template(DoubleVector) vector<double>;
+    // DrudeLangevinIntegrator is required for our integrator inheritance
+    %nodefaultctor DrudeLangevinIntegrator;
+    %nodefaultdtor DrudeLangevinIntegrator;
+    class DrudeLangevinIntegrator : public Integrator {
+    public:
+        double getTemperature() const;
+        void setTemperature(double temp);
+        double getFriction() const;
+        void setFriction(double coeff);
+        double getDrudeTemperature() const;
+        void setDrudeTemperature(double temp);
+        double getDrudeFriction() const;
+        void setDrudeFriction(double coeff);
+        double getMaxDrudeDistance() const;
+        void setMaxDrudeDistance(double distance);
+        void setRandomNumberSeed(int seed);
+        int getRandomNumberSeed() const;
+    };
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -52,9 +88,6 @@ namespace std {
 %exception {
     try {
         $action
-    } catch (const OpenMM::OpenMMException& e) {
-        PyErr_SetString(PyExc_RuntimeError, e.what());
-        SWIG_fail;
     } catch (const std::exception& e) {
         PyErr_SetString(PyExc_RuntimeError, e.what());
         SWIG_fail;
@@ -160,6 +193,8 @@ public:
 /* ═══════════════════════════════════════════════════════════════════════════
  * ConstantVIntegrator - Verlet with SCF
  * ═══════════════════════════════════════════════════════════════════════════
+ * Uses standard Verlet integration with CUDA-accelerated SCF charge updates.
+ * This is the simplest integrator for testing CUDA SCF performance.
  */
 
 %feature("docstring") OpenMM::ConstantVIntegrator "
@@ -193,6 +228,14 @@ Example:
 %rename(ConstantVIntegrator) OpenMM::ConstantVIntegrator;
 
 namespace OpenMM {
+
+// Forward declare OpenMM::Integrator for inheritance
+class Integrator {
+public:
+    double getStepSize() const;
+    void setStepSize(double size);
+    virtual void step(int steps) = 0;
+};
 
 class ConstantVIntegrator : public Integrator {
 public:
@@ -323,14 +366,11 @@ public:
         const std::string& electrodeType,
         double voltage
     );
+    int getNumBuckyballConductors() const;
 
-    void addNanotubeConductor(
-        const std::vector<int>& virtualIndices,
-        const std::vector<int>& realIndices,
-        const std::string& electrodeType,
-        double voltage,
-        const Vec3& axis
-    );
+    // Note: addNanotubeConductor is available in C++ but not exposed to Python yet
+    // due to Vec3 type mapping complexity
+    int getNumNanotubeConductors() const;
 
     // System geometry
     void setTotalArea(double area);

@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/andy/test_optimization/openmm_core_integration/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

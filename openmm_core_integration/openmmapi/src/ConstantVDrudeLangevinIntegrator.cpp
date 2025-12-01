@@ -9,12 +9,16 @@
 #include "openmm/OpenMMException.h"
 #include "openmm/internal/ContextImpl.h"
 #include "openmm/kernels.h"
+#include "openmm/Kernel.h"
 #include <cmath>
 #include <algorithm>
 
 using namespace OpenMM;
 using std::vector;
 using std::string;
+
+// Forward declaration of kernel interface
+class IntegrateConstantVDrudeLangevinStepKernel;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Physical Constants (from professor's code)
@@ -204,24 +208,15 @@ void ConstantVDrudeLangevinIntegrator::step(int steps) {
     if (!electrodesInitialized)
         throw OpenMMException("Electrodes not initialized. Call Context creation first.");
 
-    // For each integration step:
-    // 1. Run SCF charge update (via custom kernel)
-    // 2. Call parent DrudeLangevinIntegrator::step()
-
-    for (int i = 0; i < steps; i++) {
-        // Step 1: SCF Charge Update
-        // This would call a custom kernel: IntegrateConstantVDrudeLangevinStepKernel
-        // The kernel performs:
-        //   - Compute forces (NonbondedForce)
-        //   - Update electrode charges (SCF loop)
-        //   - Apply Green's Reciprocity scaling
-
-        // TODO: Implement via custom kernel interface
-        // kernel.updateElectrodeCharges(scfIterations);
-
-        // Step 2: Integrate dynamics
-        DrudeLangevinIntegrator::step(1);
-    }
+    // IMPORTANT: We call the parent DrudeLangevinIntegrator which handles
+    // the actual Drude oscillator dynamics. The SCF charge update is performed
+    // by ConstantVForce (Force-based API) which is called during force calculation.
+    //
+    // For Integrator-only API (without ConstantVForce), we would need to
+    // call our custom kernel here. But this requires platform-specific
+    // kernel creation which is complex. For now, use ConstantVForce instead.
+    
+    DrudeLangevinIntegrator::step(steps);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

@@ -68,8 +68,10 @@ struct NanotubeData {
     double area_atom;
     double axis[3];  // Normalized
     double r_center[3];
+    double radius;   // Nanotube radius (nm)
+    double length;   // Nanotube length (nm) - needed for charge transfer
     int contactAtomIndex;
-    double dr_axis_contact;
+    double dr_center_contact;  // Radial distance from center to contact atom (nm)
     double voltage_kjmol;
     char electrodeType;
 };
@@ -135,7 +137,9 @@ __device__ double blockReduceSum(double val) {
     if (lane == 0) shared[wid] = val;
     __syncthreads();
 
-    val = (threadIdx.x < blockDim.x / 32) ? shared[lane] : 0.0;
+    // FIX P1-C3: Use ceiling division to handle non-32-multiple blockDim
+    int numWarps = (blockDim.x + 31) / 32;
+    val = (threadIdx.x < numWarps) ? shared[threadIdx.x] : 0.0;
 
     if (wid == 0) val = warpReduceSum(val);
 
@@ -152,7 +156,9 @@ __device__ int blockReduceSum(int val) {
     if (lane == 0) shared[wid] = val;
     __syncthreads();
 
-    val = (threadIdx.x < blockDim.x / 32) ? shared[lane] : 0;
+    // FIX P1-C3: Use ceiling division to handle non-32-multiple blockDim
+    int numWarps = (blockDim.x + 31) / 32;
+    val = (threadIdx.x < numWarps) ? shared[threadIdx.x] : 0;
 
     if (wid == 0) val = warpReduceSum(val);
 
@@ -223,16 +229,18 @@ __global__ void updateAnodeChargesKernel(
     double F_z = (double)force[atomIdx + paddedNumAtoms * 2] / (double)0x100000000;
     double Ez_external = (fabs(q_old) > 0.9 * SMALL_THRESHOLD) ? F_z / q_old : 0.0;
 
-    // Anode: negative voltage
+    // Anode: negative sign applies to ENTIRE expression (matching MM_classes.py:754)
+    // Original: q_i = -factor * area * (V/Lgap + Ez_external)
     double factor = 2.0 / FOUR_PI * CONVERSION_KJMOL_NM_TO_AU;
     double v_over_lgap = voltage_kjmol / Lgap;
-    double q_new = factor * area * (-v_over_lgap + Ez_external);
+    double q_new = -factor * area * (v_over_lgap + Ez_external);  // FIX: negative outside parentheses
 
     posq[atomIdx].w = (float)q_new;
 }
 
 /**
  * Kernel 3: Update buckyball conductor charges
+ * FIX C1: Added grid-stride loop to support >256 atoms
  */
 __global__ void updateBuckyballChargesKernel(
     const BuckyballData* __restrict__ buckyballs,
@@ -243,52 +251,67 @@ __global__ void updateBuckyballChargesKernel(
     int paddedNumAtoms
 ) {
     const BuckyballData& bucky = buckyballs[buckyballIndex];
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i >= bucky.numAtoms) return;
+    
+    // FIX C1: Grid-stride loop to handle >256 atoms
+    for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < bucky.numAtoms; i += blockDim.x * gridDim.x) {
+        int virtualIdx = bucky.virtualIndices[i];
+        int realIdx = bucky.realIndices[i];
 
-    int virtualIdx = bucky.virtualIndices[i];
-    int realIdx = bucky.realIndices[i];
+        // Read real atom position
+        double rx = (double)positions[realIdx].x;
+        double ry = (double)positions[realIdx].y;
+        double rz = (double)positions[realIdx].z;
 
-    // Read real atom position
-    double rx = (double)positions[realIdx].x;
-    double ry = (double)positions[realIdx].y;
-    double rz = (double)positions[realIdx].z;
+        // Compute normal vector (real atom - center)
+        double dx = rx - bucky.r_center[0];
+        double dy = ry - bucky.r_center[1];
+        double dz = rz - bucky.r_center[2];
+        double r_mag = sqrt(dx*dx + dy*dy + dz*dz);
+        double nx = dx / r_mag;
+        double ny = dy / r_mag;
+        double nz = dz / r_mag;
 
-    // Compute normal vector (real atom - center)
-    double dx = rx - bucky.r_center[0];
-    double dy = ry - bucky.r_center[1];
-    double dz = rz - bucky.r_center[2];
-    double r_mag = sqrt(dx*dx + dy*dy + dz*dz);
-    double nx = dx / r_mag;
-    double ny = dy / r_mag;
-    double nz = dz / r_mag;
+        // Read old charge and force
+        double q_old = (double)posq[virtualIdx].w;
+        double Fx = (double)force[virtualIdx] / (double)0x100000000;
+        double Fy = (double)force[virtualIdx + paddedNumAtoms] / (double)0x100000000;
+        double Fz = (double)force[virtualIdx + paddedNumAtoms * 2] / (double)0x100000000;
 
-    // Read old charge and force
-    double q_old = (double)posq[virtualIdx].w;
-    double Fx = (double)force[virtualIdx] / (double)0x100000000;
-    double Fy = (double)force[virtualIdx + paddedNumAtoms] / (double)0x100000000;
-    double Fz = (double)force[virtualIdx + paddedNumAtoms * 2] / (double)0x100000000;
+        // Normal component of external field
+        double E_n_external = (fabs(q_old) > 0.9 * SMALL_THRESHOLD)
+                              ? (Fx * nx + Fy * ny + Fz * nz) / q_old
+                              : 0.0;
 
-    // Normal component of external field
-    double E_n_external = (fabs(q_old) > 0.9 * SMALL_THRESHOLD)
-                          ? (Fx * nx + Fy * ny + Fz * nz) / q_old
-                          : 0.0;
+        // Update charge (professor's buckyball formula)
+        double factor = 2.0 / FOUR_PI * CONVERSION_KJMOL_NM_TO_AU;
+        double q_new = factor * bucky.area_atom * (bucky.voltage_kjmol / bucky.radius + E_n_external);
 
-    // Update charge (professor's buckyball formula)
-    double factor = 2.0 / FOUR_PI * CONVERSION_KJMOL_NM_TO_AU;
-    double q_new = factor * bucky.area_atom * (bucky.voltage_kjmol / bucky.radius + E_n_external);
-
-    posq[virtualIdx].w = (float)q_new;
+        posq[virtualIdx].w = (float)q_new;
+    }
 }
 
 /**
- * Kernel 3b: Update nanotube conductor charges
+ * Kernel 3b: Update nanotube conductor charges (COMPLETE TWO-STEP ALGORITHM)
  *
- * Corresponds to: MM_classes.py::Numerical_charge_Conductor() for Nanotube_Virtual
+ * Corresponds to: MM_classes.py::Numerical_charge_Conductor() for Nanotube_Virtual (lines 388-497)
  *
- * Similar to Buckyball, but:
- * - Normal vector is radial (perpendicular to axis)
- * - Uses cylindrical geometry for area calculation
+ * Implements the FULL two-step algorithm:
+ *   STEP 1 (lines 391-424): Surface polarization - image charges on virtual atoms
+ *   STEP 2 (lines 429-496): Charge transfer - equalize potential with electrode
+ *
+ * Physics:
+ * --------
+ * - Cylindrical geometry: axis direction, radial normal vectors
+ * - STEP 1: Each atom gets image charge to cancel normal E-field
+ * - STEP 2: Additional uniform charge to match electrode potential
+ *
+ * Implementation:
+ * ---------------
+ * - First pass: All threads compute STEP 1 (surface polarization) using grid-stride loop
+ * - Block reduction: Thread 0 computes STEP 2 (charge transfer dQ)
+ * - Second pass: All threads add uniform dq_atom = dQ/N to their charges
+ *
+ * FIX: Added grid-stride loop to support >256 atoms (same as Buckyball kernel)
  */
 __global__ void updateNanotubeChargesKernel(
     const NanotubeData* __restrict__ nanotubes,
@@ -296,56 +319,101 @@ __global__ void updateNanotubeChargesKernel(
     const long long* __restrict__ force,
     float4* __restrict__ posq,
     const float4* __restrict__ positions,
-    int paddedNumAtoms
+    int paddedNumAtoms,
+    double voltage_kjmol,
+    double Lgap
 ) {
     const NanotubeData& tube = nanotubes[nanotubeIndex];
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i >= tube.numAtoms) return;
 
-    int virtualIdx = tube.virtualIndices[i];
-    int realIdx = tube.realIndices[i];
+    __shared__ double dq_atom_shared;  // Charge transfer per atom (computed by thread 0)
 
-    // Read real atom position
-    double rx = (double)positions[realIdx].x;
-    double ry = (double)positions[realIdx].y;
-    double rz = (double)positions[realIdx].z;
+    // ═══════════════════════════════════════════════════════════════════════
+    // STEP 2: Charge Transfer to Equalize Potential (compute first, needed by all atoms)
+    // This is computed once by thread 0 before processing atoms
+    // ═══════════════════════════════════════════════════════════════════════
 
-    // Compute displacement from center
-    double dx = rx - tube.r_center[0];
-    double dy = ry - tube.r_center[1];
-    double dz = rz - tube.r_center[2];
+    if (threadIdx.x == 0) {
+        // Read force at contact electrode atom (original lines 436-452)
+        int contactIdx = tube.contactAtomIndex;
+        double q_contact = (double)posq[contactIdx].w;
+        double Fz_contact = (double)force[contactIdx + paddedNumAtoms * 2] / (double)0x100000000;
 
-    // Project out component along axis to get radial vector
-    // radial = (r - center) - axis * dot(r - center, axis)
-    double dot_axis = dx * tube.axis[0] + dy * tube.axis[1] + dz * tube.axis[2];
-    double radial_x = dx - tube.axis[0] * dot_axis;
-    double radial_y = dy - tube.axis[1] * dot_axis;
-    double radial_z = dz - tube.axis[2] * dot_axis;
+        // Normal field at contact atom (original line 450)
+        // For electrode atoms, normal is in z-direction (verified against golden standard)
+        double E_n_contact = 0.0;
+        if (fabs(q_contact) > 0.9 * SMALL_THRESHOLD) {
+            E_n_contact = Fz_contact / q_contact;
+        }
 
-    // Normalize to get normal vector
-    double r_mag = sqrt(radial_x*radial_x + radial_y*radial_y + radial_z*radial_z);
-    double nx = radial_x / r_mag;
-    double ny = radial_y / r_mag;
-    double nz = radial_z / r_mag;
+        // Compute field correction needed to equalize potential (original line 462)
+        double dE_conductor = -(E_n_contact + voltage_kjmol / (2.0 * Lgap)) * CONVERSION_KJMOL_NM_TO_AU;
 
-    // Read old charge and force
-    double q_old = (double)posq[virtualIdx].w;
-    double Fx = (double)force[virtualIdx] / (double)0x100000000;
-    double Fy = (double)force[virtualIdx + paddedNumAtoms] / (double)0x100000000;
-    double Fz = (double)force[virtualIdx + paddedNumAtoms * 2] / (double)0x100000000;
+        // Total charge transfer for cylindrical geometry (original line 477)
+        double sign = -1.0;
+        double dQ_conductor = sign * dE_conductor * tube.dr_center_contact * tube.length / 2.0;
 
-    // Normal component of external field (radial direction for nanotube)
-    double E_n_external = (fabs(q_old) > 0.9 * SMALL_THRESHOLD)
-                          ? (Fx * nx + Fy * ny + Fz * nz) / q_old
-                          : 0.0;
+        // Charge per atom (original line 487)
+        dq_atom_shared = dQ_conductor / (double)tube.numAtoms;
+    }
 
-    // Update charge
-    // For nanotube: q = 2/(4π) × area_atom × E_n_external × K_au
-    // Note: No V/radius term since nanotube is at same potential as electrode
+    __syncthreads();  // Ensure dq_atom_shared is ready for all threads
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // STEP 1 + Final: Surface Polarization + Charge Transfer (grid-stride loop)
+    // FIX: Use grid-stride loop to handle >256 atoms
+    // ═══════════════════════════════════════════════════════════════════════
+
     double factor = 2.0 / FOUR_PI * CONVERSION_KJMOL_NM_TO_AU;
-    double q_new = factor * tube.area_atom * E_n_external;
 
-    posq[virtualIdx].w = (float)q_new;
+    for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < tube.numAtoms; i += blockDim.x * gridDim.x) {
+        int virtualIdx = tube.virtualIndices[i];
+        int realIdx = tube.realIndices[i];
+
+        // Compute radial normal vector (perpendicular to axis)
+        double rx = (double)positions[realIdx].x;
+        double ry = (double)positions[realIdx].y;
+        double rz = (double)positions[realIdx].z;
+
+        double dx = rx - tube.r_center[0];
+        double dy = ry - tube.r_center[1];
+        double dz = rz - tube.r_center[2];
+
+        // Project out component along axis: radial = (r - center) - axis * dot(r - center, axis)
+        double dot_axis = dx * tube.axis[0] + dy * tube.axis[1] + dz * tube.axis[2];
+        double radial_x = dx - tube.axis[0] * dot_axis;
+        double radial_y = dy - tube.axis[1] * dot_axis;
+        double radial_z = dz - tube.axis[2] * dot_axis;
+
+        // Normalize to get normal vector
+        double r_mag = sqrt(radial_x*radial_x + radial_y*radial_y + radial_z*radial_z);
+        double nx = radial_x / r_mag;
+        double ny = radial_y / r_mag;
+        double nz = radial_z / r_mag;
+
+        // Read old charge and force
+        double q_old = (double)posq[virtualIdx].w;
+        double Fx = (double)force[virtualIdx] / (double)0x100000000;
+        double Fy = (double)force[virtualIdx + paddedNumAtoms] / (double)0x100000000;
+        double Fz = (double)force[virtualIdx + paddedNumAtoms * 2] / (double)0x100000000;
+
+        // Normal component of external field (original line 410)
+        double E_n_external = (fabs(q_old) > 0.9 * SMALL_THRESHOLD)
+                              ? (Fx * nx + Fy * ny + Fz * nz) / q_old
+                              : 0.0;
+
+        // Surface charge to cancel normal field inside conductor (original line 412)
+        double q_surface = factor * tube.area_atom * E_n_external;
+
+        // Total charge = surface polarization + uniform charge transfer (original line 493)
+        double q_total = q_surface + dq_atom_shared;
+
+        // Clamp to small threshold if needed
+        if (fabs(q_total) < SMALL_THRESHOLD) {
+            q_total = (q_total >= 0) ? SMALL_THRESHOLD : -SMALL_THRESHOLD;
+        }
+
+        posq[virtualIdx].w = (float)q_total;
+    }
 }
 
 /**

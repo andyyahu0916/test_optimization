@@ -1,0 +1,1 @@
+  -ldl "/home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/librt.a" -lcudadevrt -lcudart_static -lrt -lpthread 

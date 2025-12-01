@@ -587,214 +587,41 @@ class ConstantVSystemBuilder:
             )
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # Exclusion Handling (Electrodes + SAPT-FF parity)
+    # Exclusion Handling (Delegated to utils/exclusions.py)
     # ═══════════════════════════════════════════════════════════════════════════
 
     def _apply_exclusion_workflow(self) -> None:
-        """Apply electrode, conductor, and SAPT-FF exclusions automatically."""
+        """Apply electrode, conductor, and SAPT-FF exclusions using utils/exclusions.py.
+
+        NOTE: This delegates to utils/exclusions.py (SINGLE SOURCE OF TRUTH).
+        Do NOT duplicate exclusion logic here.
+        """
         if self.system is None:
             raise RuntimeError("System not initialized before exclusion workflow")
 
-        self._apply_electrode_exclusions()
+        # Import from utils package (single source of truth)
+        # NOTE: Requires PYTHONPATH to include project root:
+        #   export PYTHONPATH=/home/andy/test_optimization:$PYTHONPATH
+        from utils import add_all_exclusions
 
-        if self.config.sapt_ff_exclusions and self.config.hybrid_water_model:
-            logger.warning(
-                "Both sapt_ff_exclusions and hybrid_water_model enabled; SAPT-FF flow already"
-                " configures hybrid water interactions. Proceeding with SAPT-FF settings only."
-            )
+        # Prepare conductor configs for exclusions
+        conductor_configs = []
+        for config, virtual_indices, real_indices in self._iter_conductors():
+            conductor_configs.append({
+                'virtual_indices': virtual_indices,
+                'real_indices': real_indices
+            })
 
-        if self.config.sapt_ff_exclusions:
-            self._apply_sapt_ff_exclusions()
-        elif self.config.hybrid_water_model:
-            self._configure_water_interaction_groups(self.config.water_residue_name)
-
-    def _apply_electrode_exclusions(self) -> None:
-        """Replicate MM.generate_exclusions() electrode-specific logic."""
-        if self._nonbonded_force is None:
-            raise RuntimeError("NonbondedForce unavailable for exclusion generation")
-        if not self.cathode_indices or not self.anode_indices:
-            logger.warning("Electrode lists empty; skipping electrode exclusion generation")
-            return
-
-        custom_force = self._custom_nonbonded_force
-        nb_force = self._nonbonded_force
-
-        custom_pairs = set()
-        if custom_force is not None:
-            for idx in range(custom_force.getNumExclusions()):
-                p1, p2 = custom_force.getExclusionParticles(idx)
-                custom_pairs.add((p1, p2))
-                custom_pairs.add((p2, p1))
-
-        nb_pairs = set()
-        for idx in range(nb_force.getNumExceptions()):
-            p1, p2, _, _, _ = nb_force.getExceptionParameters(idx)
-            nb_pairs.add((p1, p2))
-            nb_pairs.add((p2, p1))
-
-        def add_pair(i: int, j: int) -> None:
-            if custom_force is not None and (i, j) not in custom_pairs:
-                custom_force.addExclusion(i, j)
-                custom_pairs.add((i, j))
-                custom_pairs.add((j, i))
-            if (i, j) not in nb_pairs:
-                nb_force.addException(i, j, 0.0, 1.0, 0.0, True)
-                nb_pairs.add((i, j))
-                nb_pairs.add((j, i))
-
-        def add_intra(indices: List[int]) -> int:
-            count = 0
-            for offset, idx_i in enumerate(indices):
-                for idx_j in indices[offset + 1:]:
-                    add_pair(idx_i, idx_j)
-                    count += 1
-            return count
-
-        def add_cross(group_a: List[int], group_b: List[int]) -> int:
-            count = 0
-            for idx_i in group_a:
-                for idx_j in group_b:
-                    add_pair(idx_i, idx_j)
-                    count += 1
-            return count
-
-        cathode_pairs = add_intra(self.cathode_indices)
-        anode_pairs = add_intra(self.anode_indices)
-
-        conductor_pairs = 0
-        conductor_cross_pairs = 0
-        for _, virtual_indices, real_indices in self._iter_conductors():
-            conductor_pairs += add_intra(real_indices)
-            conductor_cross_pairs += add_cross(real_indices, virtual_indices)
-
-        logger.info(
-            "Electrode exclusions: cathode=%d, anode=%d, conductor_real=%d, conductor_real×virtual=%d",
-            cathode_pairs,
-            anode_pairs,
-            conductor_pairs,
-            conductor_cross_pairs,
-        )
-
-    def _configure_water_interaction_groups(self, residue_name: str) -> None:
-        """Create CustomNonbonded interaction groups for hybrid water models."""
-        if self._custom_nonbonded_force is None:
-            logger.warning(
-                "CustomNonbondedForce missing; cannot configure hybrid water interactions"
-            )
-            return
-        if self.topology is None:
-            raise RuntimeError("Topology required for hybrid water configuration")
-        if self._water_groups_configured:
-            logger.debug("Hybrid water interaction groups already configured; skipping")
-            return
-
-        water_atoms: Set[int] = set()
-        non_water_atoms: Set[int] = set()
-        for residue in self.topology.residues():
-            target = water_atoms if residue.name == residue_name else non_water_atoms
-            for atom in residue.atoms():
-                target.add(atom.index)
-
-        if not water_atoms:
-            logger.info(
-                "No residues named '%s' found; hybrid water interaction groups skipped",
-                residue_name,
-            )
-            return
-
-        if not non_water_atoms:
-            logger.warning("System only contains water residues; skipping hybrid grouping")
-            return
-
-        self._custom_nonbonded_force.addInteractionGroup(water_atoms, non_water_atoms)
-        self._custom_nonbonded_force.addInteractionGroup(non_water_atoms, non_water_atoms)
-        self._water_groups_configured = True
-        logger.info(
-            "Configured hybrid water interaction groups (%d water atoms, %d non-water atoms)",
-            len(water_atoms),
-            len(non_water_atoms),
-        )
-
-    def _apply_sapt_ff_exclusions(self) -> None:
-        """Replicate SAPT_FF_exclusions behavior when enabled in config."""
-        if self.topology is None:
-            raise RuntimeError("Topology required before applying SAPT-FF exclusions")
-
-        self._configure_water_interaction_groups(self.config.water_residue_name)
-        self._apply_tfsi_exclusions(self.config.tfsi_residue_name)
-
-    def _apply_tfsi_exclusions(self, residue_name: str) -> None:
-        """Add intra-molecular exclusions and Drude screening for TFSI residues."""
-        if self._nonbonded_force is None:
-            raise RuntimeError("NonbondedForce unavailable for TFSI exclusions")
-        if self.topology is None:
-            raise RuntimeError("Topology required for TFSI exclusions")
-
-        tfsi_residues = [res for res in self.topology.residues() if res.name == residue_name]
-        if not tfsi_residues:
-            logger.debug("No residues named '%s' found; skipping TFSI exclusions", residue_name)
-            return
-
-        custom_force = self._custom_nonbonded_force
-        nb_force = self._nonbonded_force
-        drude_force = self._drude_force
-
-        custom_pairs = set()
-        if custom_force is not None:
-            for idx in range(custom_force.getNumExclusions()):
-                p1, p2 = custom_force.getExclusionParticles(idx)
-                custom_pairs.add((p1, p2))
-                custom_pairs.add((p2, p1))
-
-        drude_particle_map: Dict[int, int] = {}
-        drude_pair_keys = set()
-        if drude_force is not None:
-            for idx in range(drude_force.getNumParticles()):
-                params = drude_force.getParticleParameters(idx)
-                particle_index = params[0]
-                drude_particle_map[particle_index] = idx
-            for idx in range(drude_force.getNumScreenedPairs()):
-                d1, d2, _ = drude_force.getScreenedPairParameters(idx)
-                drude_pair_keys.add((d1, d2))
-                drude_pair_keys.add((d2, d1))
-
-        custom_added = 0
-        screened_pairs_added = 0
-
-        for residue in tfsi_residues:
-            atoms = list(residue.atoms())
-            for i in range(len(atoms)):
-                idx_i = atoms[i].index
-                for j in range(i + 1, len(atoms)):
-                    idx_j = atoms[j].index
-                    nb_force.addException(idx_i, idx_j, 0.0, 1.0, 0.0, True)
-
-                    key = (idx_i, idx_j)
-                    if custom_force is not None and key not in custom_pairs:
-                        custom_force.addExclusion(idx_i, idx_j)
-                        custom_pairs.add(key)
-                        custom_pairs.add((idx_j, idx_i))
-                        custom_added += 1
-
-                    if (
-                        drude_force is not None
-                        and idx_i in drude_particle_map
-                        and idx_j in drude_particle_map
-                    ):
-                        drude_i = drude_particle_map[idx_i]
-                        drude_j = drude_particle_map[idx_j]
-                        drude_key = (drude_i, drude_j)
-                        if drude_key not in drude_pair_keys:
-                            drude_force.addScreenedPair(drude_i, drude_j, 2.0)
-                            drude_pair_keys.add(drude_key)
-                            drude_pair_keys.add((drude_j, drude_i))
-                            screened_pairs_added += 1
-
-        logger.info(
-            "SAPT-FF TFSI exclusions applied: residues=%d, custom=%d, screened_pairs=%d",
-            len(tfsi_residues),
-            custom_added,
-            screened_pairs_added,
+        # Delegate to utils/exclusions.py
+        add_all_exclusions(
+            self.system,
+            self.topology,
+            self.cathode_indices,
+            self.anode_indices,
+            include_tfsi=self.config.sapt_ff_exclusions,
+            include_water=self.config.hybrid_water_model or self.config.sapt_ff_exclusions,
+            water_residue_name=self.config.water_residue_name,
+            conductor_configs=conductor_configs if len(conductor_configs) > 0 else None
         )
 
     def _compute_electrode_area(self, electrode_indices: List[int]) -> float:
@@ -967,10 +794,70 @@ class ConstantVSystemBuilder:
 
     def _assign_force_groups(self) -> None:
         """
-        Assign force groups.
+        Assign force groups, preserving ConstantVForce in group 31.
 
-        Note: ConstantVForce runs in its own force group; we simply stagger
-        built-in forces for easier debugging.
+        FIX C2: ConstantVForce must remain in CONSTANTV_FORCE_GROUP (31)
+        to prevent SCF timing issues. Other forces use groups 0-30.
         """
-        for i, force in enumerate(self.system.getForces()):
-            force.setForceGroup(i % 32)  # OpenMM supports 32 force groups
+        from ..constants import CONSTANTV_FORCE_GROUP
+        
+        other_force_idx = 0
+        for force in self.system.getForces():
+            # Check if this is ConstantVForce by class name (avoid import issues)
+            force_class_name = force.__class__.__name__
+            if 'ConstantV' in force_class_name:
+                # FIX C2: Preserve ConstantVForce in its dedicated group
+                force.setForceGroup(CONSTANTV_FORCE_GROUP)
+            else:
+                # Assign groups 0-30 to other forces
+                force.setForceGroup(other_force_idx % 31)
+                other_force_idx += 1
+
+    def seed_electrode_charges(self, context: "openmm.Context", threshold: float = 1e-6) -> None:
+        """
+        Initialize electrode charges to small non-zero values.
+
+        This improves SCF convergence by avoiding division by zero in the first
+        iteration when computing Ez_external = F_z / q_old.
+
+        Corresponds to: Original implementation's pre-simulation SCF warmup
+
+        Args:
+            context: OpenMM context (must be created with the system from this builder)
+            threshold: Small charge value to seed (default: 1e-6 elementary charge)
+
+        Example:
+            >>> builder = ConstantVSystemBuilder(config)
+            >>> system, topology, modeller = builder.build()
+            >>> context = openmm.Context(system, integrator)
+            >>> builder.seed_electrode_charges(context)  # Seed before simulation
+            >>> integrator.step(1000000)
+        """
+        if self._nonbonded_force is None:
+            raise RuntimeError("NonbondedForce not available for charge seeding")
+
+        logger.info(
+            "Seeding electrode charges to ±%.1e for better SCF convergence",
+            threshold
+        )
+
+        # Set cathode atoms to +threshold
+        for idx in self.cathode_indices:
+            charge, sigma, epsilon = self._nonbonded_force.getParticleParameters(idx)
+            self._nonbonded_force.setParticleParameters(idx, threshold, sigma, epsilon)
+
+        # Set anode atoms to -threshold
+        for idx in self.anode_indices:
+            charge, sigma, epsilon = self._nonbonded_force.getParticleParameters(idx)
+            self._nonbonded_force.setParticleParameters(idx, -threshold, sigma, epsilon)
+
+        # Update context with new charges
+        self._nonbonded_force.updateParametersInContext(context)
+
+        logger.info(
+            "Seeded %d cathode atoms (+%.1e) and %d anode atoms (-%.1e)",
+            len(self.cathode_indices),
+            threshold,
+            len(self.anode_indices),
+            threshold,
+        )

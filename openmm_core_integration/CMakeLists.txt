@@ -14,11 +14,29 @@ option(BUILD_REFERENCE_LIB "Build Reference platform library" ON)
 option(BUILD_PYTHON_WRAPPERS "Build Python SWIG bindings" ON)
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Find Dependencies
+# Find Dependencies (mamba/conda compatible)
 # ═══════════════════════════════════════════════════════════════════════════
 
-# OpenMM (required)
-find_package(OpenMM REQUIRED)
+# Try to find OpenMM in conda environment first
+if(DEFINED ENV{CONDA_PREFIX})
+    set(CONDA_PREFIX $ENV{CONDA_PREFIX})
+    message(STATUS "Detected mamba/conda environment: ${CONDA_PREFIX}")
+    
+    # Set OpenMM paths for conda
+    set(OpenMM_INCLUDE_DIR "${CONDA_PREFIX}/include" CACHE PATH "OpenMM include directory")
+    set(OpenMM_LIBRARY "${CONDA_PREFIX}/lib/libOpenMM.so" CACHE FILEPATH "OpenMM library")
+    set(OpenMM_LIBRARIES "${OpenMM_LIBRARY}" CACHE STRING "OpenMM libraries")
+    
+    # Set CUDA paths for conda
+    if(EXISTS "${CONDA_PREFIX}/bin/nvcc")
+        set(CMAKE_CUDA_COMPILER "${CONDA_PREFIX}/bin/nvcc" CACHE FILEPATH "CUDA compiler")
+        set(CUDAToolkit_ROOT "${CONDA_PREFIX}" CACHE PATH "CUDA toolkit root")
+    endif()
+else()
+    # OpenMM (required) - standard find_package
+    find_package(OpenMM REQUIRED)
+endif()
+
 include_directories(${OpenMM_INCLUDE_DIR})
 
 # CUDA (for CUDA platform)
@@ -84,7 +102,7 @@ include_directories(
 set(CORE_API_SOURCES
     openmmapi/src/ConstantVForce.cpp
     openmmapi/src/ConstantVForceImpl.cpp
-    openmmapi/src/ConstantVIntegrator.cpp
+    # openmmapi/src/ConstantVIntegrator.cpp  # TODO: Fix Verlet kernel integration
     openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp
     openmmapi/src/ConstantVKernelFactory.cpp
     openmmapi/src/registerConstantV.cpp
@@ -184,7 +202,7 @@ endif()
 # ═══════════════════════════════════════════════════════════════════════════
 
 if(BUILD_PYTHON_WRAPPERS)
-    set(CMAKE_SWIG_FLAGS -c++ -python)
+    set(CMAKE_SWIG_FLAGS -c++)
 
     # SWIG interface file
     set_property(SOURCE python/ConstantVPlugin.i PROPERTY CPLUSPLUS ON)
@@ -218,8 +236,9 @@ if(BUILD_PYTHON_WRAPPERS)
     )
 
     # Install Python module
+    # FIX H2/P4-C4: Use sysconfig.get_path('platlib') for correct venv/conda path
     execute_process(
-        COMMAND ${Python3_EXECUTABLE} -c "import site; print(site.getsitepackages()[0])"
+        COMMAND ${Python3_EXECUTABLE} -c "import sysconfig; print(sysconfig.get_path('platlib'))"
         OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )

@@ -84,9 +84,8 @@ class ConstantVProductionSimulation:
         self.forcefield: app.ForceField = None
         self.system: openmm.System = None
         self.topology: app.Topology = None
-        self.integrator: openmm.Integrator | None = None
+        self.integrator: "constantv.ConstantVDrudeLangevinIntegrator" | None = None
         self.simulation: app.Simulation | None = None
-        self.constantv_force: "constantv.ConstantVForce" | None = None
 
         # Electrode/electrolyte atom indices
         self.cathode_indices: List[int] = []
@@ -94,9 +93,17 @@ class ConstantVProductionSimulation:
         self.electrolyte_indices: List[int] = []
         self.conductor_charge_indices: List[List[int]] = []
 
+        # Conductor configurations (for exclusions)
+        self.conductor_exclusion_configs: List[Dict] = []
+
         # System properties
         self.is_polarizable: bool = False
         self._particle_charges: List[float] = []
+
+        # Geometry parameters (computed during integrator creation)
+        self._Lgap: float = 0.0
+        self._Lcell: float = 0.0
+        self._total_area: float = 0.0
 
     # ═══════════════════════════════════════════════════════════════════════
     # Step 1: Load PDB and Force Field
@@ -298,94 +305,158 @@ class ConstantVProductionSimulation:
 
         This MUST be called BEFORE creating the Context.
 
-        Corresponds to: electrode_sapt_exclusions.py
+        NEW: Now supports:
+        - Hybrid water model configuration
+        - Conductor (Buckyball/Nanotube) exclusions
+
+        Corresponds to: electrode_sapt_exclusions.py + MM_classes.py::generate_exclusions()
         """
         logger.info("Step 5: Adding Exclusions (CRITICAL for Stability)...")
+
+        # Prepare conductor exclusion configs if needed
+        self._prepare_conductor_exclusion_configs()
 
         add_all_exclusions(
             self.system,
             self.topology,
             self.cathode_indices,
             self.anode_indices,
-            include_tfsi=self.config['advanced']['add_tfsi_exclusions']
+            include_tfsi=self.config['advanced'].get('add_tfsi_exclusions', True),
+            include_water=self.config['advanced'].get('hybrid_water_model', False),
+            water_residue_name=self.config['advanced'].get('water_residue_name', 'HOH'),
+            conductor_configs=self.conductor_exclusion_configs if len(self.conductor_exclusion_configs) > 0 else None
         )
 
         logger.info("  ✓ Exclusions added successfully")
 
     # ═══════════════════════════════════════════════════════════════════════
-    # Step 6-7: Create and Configure Native Core Integrator
+    # Step 6-7: Create and Configure ConstantV Integrator (Integrator-Based Architecture)
     # ═══════════════════════════════════════════════════════════════════════
 
     def create_integrator(self) -> None:
-        """Create the OpenMM dynamics integrator (Drude or Langevin)."""
-        logger.info("Step 6: Creating OpenMM dynamics integrator...")
+        """Create the ConstantVDrudeLangevinIntegrator with electrode configuration.
 
-        params = self.config['simulation_parameters']
-
-        if self.is_polarizable:
-            self.integrator = openmm.DrudeLangevinIntegrator(
-                params['temperature_kelvin'],
-                params['friction_coeff'],
-                params['temperature_drude_kelvin'],
-                params['drude_friction_coeff'],
-                params['timestep_ps']
-            )
-            self.integrator.setMaxDrudeDistance(params['max_drude_distance_nm'])
-            logger.info(
-                "  ✓ Using DrudeLangevinIntegrator (polarizable system)"
-            )
-        else:
-            self.integrator = openmm.LangevinMiddleIntegrator(
-                params['temperature_kelvin'],
-                params['friction_coeff'],
-                params['timestep_ps']
-            )
-            logger.info("  ✓ Using LangevinMiddleIntegrator (non-polarizable system)")
-
-    def configure_constantv_force(self) -> None:
-        """Attach and configure the ConstantVForce implementation."""
+        CRITICAL CHANGE: This now uses the Integrator-based architecture instead of
+        Force-based architecture. The integrator handles SCF charge updates internally,
+        with configurable frequency to match the original implementation (200 steps).
+        """
         if constantv is None:
             raise RuntimeError(
                 "constantv module is not available. Build/install the native ConstantV "
-                "plugin before running production."
+                "integration before running production."
             )
 
-        logger.info("Step 7: Configuring ConstantVForce...")
+        logger.info("Step 6-7: Creating ConstantVDrudeLangevinIntegrator...")
 
         params = self.config['simulation_parameters']
+
+        # Compute geometry parameters needed for integrator initialization
         positions = self.modeller.getPositions()
         total_area = self._compute_planar_area_nm2()
-        cathode_area_per_atom = total_area / len(self.cathode_indices)
-        anode_area_per_atom = total_area / len(self.anode_indices)
+        z_cathode = self._average_z(positions, self.cathode_indices)
+        z_anode = self._average_z(positions, self.anode_indices)
 
-        force = constantv.ConstantVForce()
-        force.setVoltage(params['voltage_volts'])
-        force.setLgap(params['Lgap_nm'])
-        force.setLcell(params['Lcell_nm'])
-        force.setTotalArea(total_area)
-        force.setZCathode(self._average_z(positions, self.cathode_indices))
-        force.setZAnode(self._average_z(positions, self.anode_indices))
+        # Calculate Lgap and Lcell from box vectors
+        box_vectors = self.topology.getPeriodicBoxVectors()
+        if box_vectors is None:
+            raise RuntimeError("Periodic box vectors required for ConstantV")
 
+        cell_vector = np.array([box_vectors[2].x, box_vectors[2].y, box_vectors[2].z])
+        box_length_nm = float(np.linalg.norm(cell_vector))
+        Lcell = abs(z_anode - z_cathode)
+        Lgap = box_length_nm - Lcell
+
+        if not self.is_polarizable:
+            raise RuntimeError(
+                "ConstantVDrudeLangevinIntegrator requires a polarizable force field. "
+                "Please use a Drude force field (e.g., forcefield_drude.xml)."
+            )
+
+        # Create ConstantVDrudeLangevinIntegrator with all required parameters
+        # This replaces the separate DrudeLangevinIntegrator + ConstantVForce approach
+        self.integrator = constantv.ConstantVDrudeLangevinIntegrator(
+            params['temperature_kelvin'],
+            params['friction_coeff'],
+            params['temperature_drude_kelvin'],
+            params['drude_friction_coeff'],
+            params['timestep_ps'],
+            params['voltage_volts'],           # Voltage (V)
+            Lgap,                               # Vacuum gap (nm)
+            Lcell,                              # Electrode spacing (nm)
+            params['scf_iterations']            # SCF iterations per update
+        )
+
+        # Set Drude distance constraint
+        self.integrator.setMaxDrudeDistance(params['max_drude_distance_nm'])
+
+        # Set geometry parameters
+        self.integrator.setTotalArea(total_area)
+        self.integrator.setZCathode(z_cathode)
+        self.integrator.setZAnode(z_anode)
+
+        # CRITICAL: Set SCF frequency to match original implementation (200 steps)
+        # This prevents the 200x performance degradation from running SCF every step
+        self.integrator.setSCFFrequency(params['scf_frequency'])
+
+        logger.info("  ✓ Using ConstantVDrudeLangevinIntegrator (Integrator-based architecture)")
+        logger.info(f"    Voltage: {params['voltage_volts']:.2f} V")
+        logger.info(f"    Lgap: {Lgap:.3f} nm, Lcell: {Lcell:.3f} nm")
+        logger.info(f"    SCF iterations: {params['scf_iterations']}")
+        logger.info(f"    SCF frequency: every {params['scf_frequency']} steps")
+
+        # Store for later use in physics summary
+        self._Lgap = Lgap
+        self._Lcell = Lcell
+        self._total_area = total_area
+
+    def configure_electrodes_in_integrator(self) -> None:
+        """Configure electrode atoms, electrolyte atoms, and conductors in the integrator.
+
+        ARCHITECTURE CHANGE: With Integrator-based approach, we configure atoms
+        directly in the integrator instead of creating a separate Force object.
+        """
+        if self.integrator is None:
+            raise RuntimeError("Integrator must be created before configuring electrodes")
+
+        logger.info("Step 7b: Configuring electrodes and electrolytes in integrator...")
+
+        # Calculate area per atom for electrodes
+        cathode_area_per_atom = self._total_area / len(self.cathode_indices)
+        anode_area_per_atom = self._total_area / len(self.anode_indices)
+
+        # Add cathode atoms
         for idx in self.cathode_indices:
-            force.addCathodeAtom(idx, cathode_area_per_atom)
+            self.integrator.addCathodeAtom(idx, cathode_area_per_atom)
+
+        # Add anode atoms
         for idx in self.anode_indices:
-            force.addAnodeAtom(idx, anode_area_per_atom)
+            self.integrator.addAnodeAtom(idx, anode_area_per_atom)
 
+        # Add electrolyte atoms (for Green's Reciprocity correction)
         for idx in self.electrolyte_indices:
-            force.addElectrolyteAtom(idx, self._particle_charges[idx])
+            self.integrator.addElectrolyteAtom(idx, self._particle_charges[idx])
 
-        self._add_conductors(force)
+        logger.info(f"  ✓ Added {len(self.cathode_indices)} cathode atoms")
+        logger.info(f"  ✓ Added {len(self.anode_indices)} anode atoms")
+        logger.info(f"  ✓ Added {len(self.electrolyte_indices)} electrolyte atoms")
 
-        self.system.addForce(force)
-        self.constantv_force = force
-        logger.info("  ✓ ConstantVForce attached to system")
+        # Add conductors (Buckyballs and Nanotubes)
+        self._add_conductors_to_integrator()
 
-    def _add_conductors(self, force) -> None:
-        """Register Buckyball and Nanotube conductors with ConstantVForce."""
+        logger.info("  ✓ Electrode configuration complete")
+
+    def _add_conductors_to_integrator(self) -> None:
+        """Register Buckyball and Nanotube conductors with the integrator.
+
+        IMPORTANT: This method is called AFTER add_exclusions(), so it only
+        configures the integrator. Conductor exclusions must be added separately
+        in add_exclusions().
+        """
         buckyballs = self.config['conductors'].get('buckyballs', [])
         nanotubes = self.config['conductors'].get('nanotubes', [])
 
         if not buckyballs and not nanotubes:
+            logger.info("  No conductors configured")
             return
 
         logger.info(
@@ -401,13 +472,14 @@ class ConstantVProductionSimulation:
                 config['real_chain_index'],
                 set(config.get('exclude_elements', []))
             )
-            force.addBuckyballConductor(
+            self.integrator.addBuckyballConductor(
                 virtual_indices,
                 real_indices,
                 config['electrode_type'],
                 config['voltage']
             )
             self.conductor_charge_indices.append(real_indices)
+            logger.info(f"    ✓ Buckyball: {len(real_indices)} atoms, {config['electrode_type']}, {config['voltage']} V")
 
         for config in nanotubes:
             virtual_indices = self._get_chain_atoms(
@@ -419,7 +491,7 @@ class ConstantVProductionSimulation:
                 set(config.get('exclude_elements', []))
             )
             axis = openmm.Vec3(*config['axis'])
-            force.addNanotubeConductor(
+            self.integrator.addNanotubeConductor(
                 virtual_indices,
                 real_indices,
                 config['electrode_type'],
@@ -427,6 +499,46 @@ class ConstantVProductionSimulation:
                 axis
             )
             self.conductor_charge_indices.append(real_indices)
+            logger.info(f"    ✓ Nanotube: {len(real_indices)} atoms, {config['electrode_type']}, {config['voltage']} V")
+
+    def _prepare_conductor_exclusion_configs(self) -> None:
+        """Prepare conductor configurations for exclusion handling.
+
+        This must be called BEFORE add_exclusions() to ensure conductor
+        exclusions are added correctly.
+        """
+        buckyballs = self.config['conductors'].get('buckyballs', [])
+        nanotubes = self.config['conductors'].get('nanotubes', [])
+
+        self.conductor_exclusion_configs = []
+
+        for config in buckyballs:
+            virtual_indices = self._get_chain_atoms(
+                config['virtual_chain_index'],
+                set(config.get('exclude_elements', []))
+            )
+            real_indices = self._get_chain_atoms(
+                config['real_chain_index'],
+                set(config.get('exclude_elements', []))
+            )
+            self.conductor_exclusion_configs.append({
+                'virtual_indices': virtual_indices,
+                'real_indices': real_indices
+            })
+
+        for config in nanotubes:
+            virtual_indices = self._get_chain_atoms(
+                config['virtual_chain_index'],
+                set(config.get('exclude_elements', []))
+            )
+            real_indices = self._get_chain_atoms(
+                config['real_chain_index'],
+                set(config.get('exclude_elements', []))
+            )
+            self.conductor_exclusion_configs.append({
+                'virtual_indices': virtual_indices,
+                'real_indices': real_indices
+            })
 
     def _get_chain_atoms(self, chain_index: int, exclude_elements: Set[str]) -> List[int]:
         """Helper to get atom indices from chain index."""
@@ -485,18 +597,18 @@ class ConstantVProductionSimulation:
 
         params = self.config['simulation_parameters']
 
-        # Get parameters
+        # Get parameters (now computed from geometry, not from config)
         voltage = params['voltage_volts']
-        Lgap = params['Lgap_nm']
-        Lcell = params['Lcell_nm']
+        Lgap = self._Lgap
+        Lcell = self._Lcell
         temperature = params['temperature_kelvin']
 
-        if self.constantv_force is None:
-            logger.warning("ConstantVForce is not configured; skipping physics summary.")
+        if self.integrator is None:
+            logger.warning("Integrator is not configured; skipping physics summary.")
             return
 
-        # Calculate total electrode area (nm²)
-        total_area = self.constantv_force.getTotalArea()
+        # Get total electrode area (computed during integrator initialization)
+        total_area = self._total_area
 
         # Calculate theoretical capacitance (C = ε₀ * A / d)
         # ε₀ = 8.854e-12 F/m = 8.854e-3 F/nm
@@ -598,10 +710,53 @@ class ConstantVProductionSimulation:
         if properties:
             logger.info(f"    Properties: {properties}")
 
+        # Seed electrode charges for better SCF convergence (optional but recommended)
+        logger.info("  Seeding electrode charges...")
+        self._seed_electrode_charges()
+
         # Minimize energy
         logger.info("  Minimizing energy...")
         self.simulation.minimizeEnergy()
         logger.info("  ✓ Energy minimization complete")
+
+    def _seed_electrode_charges(self, threshold: float = 1e-6) -> None:
+        """
+        Initialize electrode charges to small non-zero values.
+
+        This avoids division by zero in the first SCF iteration when
+        computing Ez_external = F_z / q_old, improving convergence.
+
+        Args:
+            threshold: Small charge value (elementary charge units)
+        """
+        # Get NonbondedForce
+        nonbonded_force = None
+        for force in self.system.getForces():
+            if isinstance(force, openmm.NonbondedForce):
+                nonbonded_force = force
+                break
+
+        if nonbonded_force is None:
+            logger.warning("  ⚠️  NonbondedForce not found, skipping charge seeding")
+            return
+
+        # Seed cathode atoms (+threshold)
+        for idx in self.cathode_indices:
+            charge, sigma, epsilon = nonbonded_force.getParticleParameters(idx)
+            nonbonded_force.setParticleParameters(idx, threshold, sigma, epsilon)
+
+        # Seed anode atoms (-threshold)
+        for idx in self.anode_indices:
+            charge, sigma, epsilon = nonbonded_force.getParticleParameters(idx)
+            nonbonded_force.setParticleParameters(idx, -threshold, sigma, epsilon)
+
+        # Update context
+        nonbonded_force.updateParametersInContext(self.simulation.context)
+
+        logger.info(
+            f"  ✓ Seeded {len(self.cathode_indices)} cathode (+{threshold:.1e}) "
+            f"and {len(self.anode_indices)} anode (-{threshold:.1e}) atoms"
+        )
 
     def add_reporters(self) -> None:
         """Add trajectory and charge reporters."""
@@ -683,7 +838,10 @@ class ConstantVProductionSimulation:
     # ═══════════════════════════════════════════════════════════════════════
 
     def execute(self) -> None:
-        """Execute complete simulation workflow."""
+        """Execute complete simulation workflow.
+
+        ARCHITECTURE: Now uses Integrator-based approach instead of Force-based.
+        """
         try:
             self.load_system()
             self.add_drude_particles()
@@ -691,8 +849,11 @@ class ConstantVProductionSimulation:
             self.identify_electrodes()
             self.identify_electrolytes()
             self.add_exclusions()
+            # ARCHITECTURE CHANGE: create_integrator now creates ConstantVDrudeLangevinIntegrator
+            # with all ConstantV parameters built-in (instead of separate integrator + force)
             self.create_integrator()
-            self.configure_constantv_force()
+            # Configure electrodes, electrolytes, and conductors in the integrator
+            self.configure_electrodes_in_integrator()
             self.print_physics_summary()  # Optimization D: Validate before running
             self.create_simulation()
             self.add_reporters()

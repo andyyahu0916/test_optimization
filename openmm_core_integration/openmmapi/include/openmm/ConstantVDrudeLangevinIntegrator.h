@@ -181,6 +181,20 @@ public:
         const Vec3& axis
     );
 
+    /**
+     * Get the number of Buckyball conductors.
+     */
+    int getNumBuckyballConductors() const {
+        return buckyballs.size();
+    }
+
+    /**
+     * Get the number of Nanotube conductors.
+     */
+    int getNumNanotubeConductors() const {
+        return nanotubes.size();
+    }
+
     // ═══════════════════════════════════════════════════════════════════════
     // System Geometry Parameters
     // ═══════════════════════════════════════════════════════════════════════

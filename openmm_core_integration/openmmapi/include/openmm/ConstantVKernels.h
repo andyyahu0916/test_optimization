@@ -17,6 +17,10 @@
 
 namespace OpenMM {
 
+// Forward declarations
+class ConstantVForce;
+class ContextImpl;
+
 /**
  * CalcConstantVKernel is the abstract interface for platform-specific
  * implementations of the constant voltage SCF solver.
@@ -71,6 +75,8 @@ namespace OpenMM {
  */
 class CalcConstantVKernel : public KernelImpl {
 public:
+    CalcConstantVKernel(std::string name, const Platform& platform) : KernelImpl(name, platform) {}
+    
     static std::string Name() {
         return "CalcConstantV";
     }

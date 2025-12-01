@@ -3,6 +3,7 @@
  * -------------------------------------------------------------------------- */
 
 #include "CudaConstantVKernels.h"
+#include "openmm/ConstantVForce.h"
 #include "openmm/Context.h"
 #include "openmm/internal/ContextImpl.h"
 #include "openmm/DrudeForce.h"
@@ -54,8 +55,10 @@ struct NanotubeData {
     double area_atom;
     double axis[3];           // Normalized axis vector
     double r_center[3];
+    double radius;            // Nanotube radius (nm) - FIX P2-C1
+    double length;            // Nanotube length (nm) - FIX P2-C1
     int contactAtomIndex;
-    double dr_axis_contact;
+    double dr_center_contact; // Renamed from dr_axis_contact - FIX P2-C1
     double voltage_kjmol;
     char electrodeType;       // 'c' or 'a'
 };
@@ -388,8 +391,10 @@ void CudaCalcConstantVKernel::addNanotubeConductor(
     hostStruct->r_center[0] = center[0];
     hostStruct->r_center[1] = center[1];
     hostStruct->r_center[2] = center[2];
+    hostStruct->radius = radius;                  // FIX P2-C2: Now filled
+    hostStruct->length = length;                  // FIX P2-C2: Now filled
     hostStruct->contactAtomIndex = contactAtomIndex;
-    hostStruct->dr_axis_contact = contactDistance;
+    hostStruct->dr_center_contact = contactDistance; // Renamed - FIX P2-C1
     hostStruct->voltage_kjmol = voltage * 96.487;  // V to kJ/mol
     hostStruct->electrodeType = (electrodeType == "cathode") ? 'c' : 'a';
 
@@ -553,6 +558,8 @@ void CudaIntegrateConstantVDrudeLangevinStepKernel::initialize(
     numCathodeAtoms = integrator.getNumCathodeAtoms();
     numAnodeAtoms = integrator.getNumAnodeAtoms();
     numElectrolyteAtoms = integrator.getNumElectrolyteAtoms();
+    numBuckyballConductors = integrator.getNumBuckyballConductors();
+    numNanotubeConductors = integrator.getNumNanotubeConductors();
 
     voltage = integrator.getVoltage() * 96.487;  // V to kJ/mol
     Lgap = integrator.getLgap();
@@ -779,12 +786,12 @@ void CudaIntegrateConstantVDrudeLangevinStepKernel::execute(
         (float)integrator.getDrudeFriction(),
         (float)maxDrudeDistance,
         scfIterations,
-        // Host-side counts (eliminates cudaMemcpy)
+        // Host-side counts (eliminates cudaMemcpy - Optimization A)
         numCathodeAtoms,
         numAnodeAtoms,
         numElectrolyteAtoms,
-        0,  // numBuckyballs (TODO: conductor support not implemented yet)
-        0,  // numNanotubes (TODO: conductor support not implemented yet)
+        numBuckyballConductors,  // FIX: Now using actual conductor counts
+        numNanotubeConductors,   // FIX: Now using actual conductor counts
         numDrudePairs,
         numNormalParticles
     );

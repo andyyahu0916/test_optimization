@@ -1,0 +1,1 @@
+-I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -isystem "/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include"

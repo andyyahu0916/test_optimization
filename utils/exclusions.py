@@ -295,12 +295,188 @@ def generate_exclusions_TFSI(
         logger.info(f"TFSI: Added {screened_pair_count} Drude ScreenedPairs")
 
 
+def generate_exclusions_water(
+    system: openmm.System,
+    topology: app.Topology,
+    water_residue_name: str = 'HOH'
+) -> None:
+    """
+    Configure hybrid water model interaction groups.
+
+    Creates CustomNonbondedForce interaction groups for hybrid water models:
+    - Water-water interactions: Use NonbondedForce (SWM4-NDP/TIP4P parameters)
+    - Water-other interactions: Use CustomNonbondedForce (SAPT-FF parameters)
+    - Other-other interactions: Use CustomNonbondedForce
+
+    Physical Reasoning:
+        Water force fields (TIP4P, SWM4-NDP) are optimized for water-water interactions.
+        When mixing with SAPT-FF for ions/organic molecules, we need different
+        interaction potentials for water-solute vs. water-water.
+
+    Corresponds to: electrode_sapt_exclusions.py::generate_exclusions_water()
+
+    Args:
+        system: OpenMM System object
+        topology: OpenMM Topology object
+        water_residue_name: Residue name for water molecules (default: 'HOH')
+    """
+    # Find CustomNonbondedForce
+    custom_nonbonded_force: Optional[openmm.CustomNonbondedForce] = None
+    for force in system.getForces():
+        if isinstance(force, openmm.CustomNonbondedForce):
+            custom_nonbonded_force = force
+            break
+
+    if custom_nonbonded_force is None:
+        logger.warning("CustomNonbondedForce not found; cannot configure hybrid water model")
+        return
+
+    # Build water and non-water atom sets
+    water_atoms: Set[int] = set()
+    notwater_atoms: Set[int] = set()
+
+    for residue in topology.residues():
+        atom_indices = [atom.index for atom in residue.atoms()]
+        if residue.name == water_residue_name:
+            water_atoms.update(atom_indices)
+        else:
+            notwater_atoms.update(atom_indices)
+
+    if len(water_atoms) == 0:
+        logger.info(f"No water residues ('{water_residue_name}') found; skipping hybrid water model")
+        return
+
+    if len(notwater_atoms) == 0:
+        logger.warning("Only water atoms found; hybrid water model not applicable")
+        return
+
+    # Add interaction groups
+    # Group 1: water × notwater (water-other interactions via CustomNonbonded)
+    # Group 2: notwater × notwater (other-other interactions via CustomNonbonded)
+    # Note: water × water is handled by NonbondedForce (SWM4-NDP/TIP4P)
+    custom_nonbonded_force.addInteractionGroup(water_atoms, notwater_atoms)
+    custom_nonbonded_force.addInteractionGroup(notwater_atoms, notwater_atoms)
+
+    logger.info(
+        f"Hybrid water model configured: {len(water_atoms)} water atoms, "
+        f"{len(notwater_atoms)} non-water atoms"
+    )
+    logger.info("  Water-water: NonbondedForce (SWM4-NDP/TIP4P)")
+    logger.info("  Water-other: CustomNonbondedForce (SAPT-FF)")
+    logger.info("  Other-other: CustomNonbondedForce (SAPT-FF)")
+
+
+def exclusion_Conductor_NonbondedForce(
+    system: openmm.System,
+    topology: app.Topology,
+    conductor_virtual_indices: List[int],
+    conductor_real_indices: List[int]
+) -> None:
+    """
+    Add exclusions for conductor (Buckyball/Nanotube) atoms.
+
+    Conductors have two layers:
+    - Virtual layer: Used for electrostatics (Maxwell BC)
+    - Real layer: Used for VDW/steric interactions
+
+    Exclusion rules:
+    - Real × Real: EXCLUDE (no double-counting of VDW)
+    - Real × Virtual: EXCLUDE (prevent unphysical forces)
+    - Virtual × Virtual: DO NOT EXCLUDE (needed for electrostatics)
+
+    Corresponds to: MM_classes.py::generate_exclusions() lines 592-601
+
+    Args:
+        system: OpenMM System object
+        topology: OpenMM Topology object
+        conductor_virtual_indices: Virtual layer atom indices
+        conductor_real_indices: Real layer atom indices
+    """
+    # Find NonbondedForce and CustomNonbondedForce
+    nonbonded_force: Optional[openmm.NonbondedForce] = None
+    custom_nonbonded_force: Optional[openmm.CustomNonbondedForce] = None
+
+    for force in system.getForces():
+        if isinstance(force, openmm.NonbondedForce):
+            nonbonded_force = force
+        elif isinstance(force, openmm.CustomNonbondedForce):
+            custom_nonbonded_force = force
+
+    if nonbonded_force is None:
+        raise RuntimeError("NonbondedForce not found in system")
+
+    # Get existing exclusions
+    existing_exceptions = _get_existing_exceptions(nonbonded_force)
+    existing_exclusions = set()
+    if custom_nonbonded_force is not None:
+        existing_exclusions = _get_existing_exclusions(custom_nonbonded_force)
+
+    # Rule 1: Exclude Real × Real (all pairs within real layer)
+    real_real_count = 0
+    for i in range(len(conductor_real_indices)):
+        for j in range(i + 1, len(conductor_real_indices)):
+            idx_i = conductor_real_indices[i]
+            idx_j = conductor_real_indices[j]
+            pair_key = f"{idx_i}_{idx_j}"
+            pair_key_rev = f"{idx_j}_{idx_i}"
+
+            # NonbondedForce exception
+            try:
+                nonbonded_force.addException(idx_i, idx_j, 0.0, 1.0, 0.0, True)
+                real_real_count += 1
+            except Exception:
+                pass
+
+            # CustomNonbondedForce exclusion
+            if custom_nonbonded_force is not None:
+                if pair_key not in existing_exclusions and pair_key_rev not in existing_exclusions:
+                    try:
+                        custom_nonbonded_force.addExclusion(idx_i, idx_j)
+                        existing_exclusions.add(pair_key)
+                        existing_exclusions.add(pair_key_rev)
+                    except Exception:
+                        pass
+
+    # Rule 2: Exclude Real × Virtual (all pairs between layers)
+    real_virtual_count = 0
+    for idx_real in conductor_real_indices:
+        for idx_virtual in conductor_virtual_indices:
+            pair_key = f"{idx_real}_{idx_virtual}"
+            pair_key_rev = f"{idx_virtual}_{idx_real}"
+
+            # NonbondedForce exception
+            try:
+                nonbonded_force.addException(idx_real, idx_virtual, 0.0, 1.0, 0.0, True)
+                real_virtual_count += 1
+            except Exception:
+                pass
+
+            # CustomNonbondedForce exclusion
+            if custom_nonbonded_force is not None:
+                if pair_key not in existing_exclusions and pair_key_rev not in existing_exclusions:
+                    try:
+                        custom_nonbonded_force.addExclusion(idx_real, idx_virtual)
+                        existing_exclusions.add(pair_key)
+                        existing_exclusions.add(pair_key_rev)
+                    except Exception:
+                        pass
+
+    # Rule 3: DO NOT exclude Virtual × Virtual (needed for electrostatics)
+    logger.debug(
+        f"Conductor exclusions: Real×Real={real_real_count}, Real×Virtual={real_virtual_count}, "
+        f"Virtual×Virtual=0 (not excluded)"
+    )
+
+
 def add_all_exclusions(
     system: openmm.System,
     topology: app.Topology,
     cathode_indices: List[int],
     anode_indices: List[int],
-    include_tfsi: bool = True
+    include_tfsi: bool = True,
+    include_water: bool = False,
+    water_residue_name: str = 'HOH',
+    conductor_configs: Optional[List[Dict]] = None
 ) -> None:
     """
     Add all necessary exclusions to the system.
@@ -314,6 +490,8 @@ def add_all_exclusions(
     - NonbondedForce (standard Coulomb/LJ)
     - CustomNonbondedForce (SAPT-FF, custom interactions)
     - DrudeForce (for Drude oscillator ScreenedPairs)
+    - Hybrid water model (interaction groups)
+    - Conductor exclusions (Buckyball/Nanotube virtual/real layers)
 
     Args:
         system: OpenMM System object
@@ -321,6 +499,9 @@ def add_all_exclusions(
         cathode_indices: List of cathode atom indices
         anode_indices: List of anode atom indices
         include_tfsi: Whether to add TFSI exclusions (default: True)
+        include_water: Whether to configure hybrid water model (default: False)
+        water_residue_name: Residue name for water (default: 'HOH')
+        conductor_configs: List of conductor configurations with 'virtual_indices' and 'real_indices'
     """
     logger.info("=" * 60)
     logger.info("Adding Exclusions (CRITICAL for Stability)")
@@ -342,7 +523,21 @@ def add_all_exclusions(
         cathode_indices, anode_indices
     )
 
-    # Step 2: TFSI exclusions (if applicable)
+    # Step 2: Conductor exclusions (if conductors are present)
+    if conductor_configs is not None and len(conductor_configs) > 0:
+        logger.info(f"Adding exclusions for {len(conductor_configs)} conductor(s)")
+        for config in conductor_configs:
+            exclusion_Conductor_NonbondedForce(
+                system, topology,
+                config['virtual_indices'],
+                config['real_indices']
+            )
+
+    # Step 3: Hybrid water model (if applicable)
+    if include_water:
+        generate_exclusions_water(system, topology, water_residue_name)
+
+    # Step 4: TFSI exclusions (if applicable)
     if include_tfsi:
         generate_exclusions_TFSI(system, topology, drude_force)
 

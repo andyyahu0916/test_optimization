@@ -6,11 +6,19 @@
 set -e  # Exit on error
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Configuration
+# Configuration (mamba/conda compatible)
 # ═══════════════════════════════════════════════════════════════════════════
 
-# OpenMM installation path (adjust if needed)
-OPENMM_DIR="${OPENMM_DIR:-/usr/local/openmm}"
+# Auto-detect mamba/conda environment
+if [ -n "$CONDA_PREFIX" ]; then
+    echo "Detected mamba/conda environment: $CONDA_PREFIX"
+    OPENMM_DIR="${OPENMM_DIR:-$CONDA_PREFIX}"
+    CUDA_HOME="${CUDA_HOME:-$CONDA_PREFIX}"
+else
+    # Fallback for non-conda environments
+    OPENMM_DIR="${OPENMM_DIR:-/usr/local/openmm}"
+    CUDA_HOME="${CUDA_HOME:-/usr/local/cuda}"
+fi
 
 # Build type (Release or Debug)
 BUILD_TYPE="${BUILD_TYPE:-Release}"
@@ -20,7 +28,7 @@ JOBS="${JOBS:-$(nproc)}"
 
 # CUDA architectures (adjust for your GPU)
 # sm_70: V100, sm_75: T4, sm_80: A100, sm_86: RTX 30xx, sm_89: RTX 40xx, sm_90: H100
-CUDA_ARCHS="${CUDA_ARCHS:-70;75;80;86}"
+CUDA_ARCHS="${CUDA_ARCHS:-70;75;80;86;89;90}"
 
 # Build directory
 BUILD_DIR="build"
@@ -71,14 +79,20 @@ fi
 CMAKE_VERSION=$(cmake --version | head -n1 | awk '{print $3}')
 log_info "CMake version: $CMAKE_VERSION"
 
-# Check for CUDA
-if ! command -v nvcc &> /dev/null; then
-    log_warn "CUDA compiler (nvcc) not found. CUDA library will be disabled."
-    BUILD_CUDA=OFF
-else
+# Check for CUDA (use conda CUDA if available)
+if [ -n "$CONDA_PREFIX" ] && [ -f "$CONDA_PREFIX/bin/nvcc" ]; then
+    export PATH="$CONDA_PREFIX/bin:$PATH"
+    export CUDA_PATH="$CONDA_PREFIX"
+    NVCC_VERSION=$($CONDA_PREFIX/bin/nvcc --version | grep "release" | awk '{print $5}' | tr -d ',')
+    log_info "CUDA version (mamba): $NVCC_VERSION"
+    BUILD_CUDA=ON
+elif command -v nvcc &> /dev/null; then
     NVCC_VERSION=$(nvcc --version | grep "release" | awk '{print $5}' | tr -d ',')
     log_info "CUDA version: $NVCC_VERSION"
     BUILD_CUDA=ON
+else
+    log_warn "CUDA compiler (nvcc) not found. CUDA library will be disabled."
+    BUILD_CUDA=OFF
 fi
 
 # Check for Python
@@ -100,14 +114,23 @@ else
     BUILD_PYTHON=ON
 fi
 
-# Check for OpenMM
-if [ ! -d "$OPENMM_DIR" ]; then
+# Check for OpenMM (mamba/conda compatible)
+if [ -f "$OPENMM_DIR/lib/libOpenMM.so" ]; then
+    log_info "OpenMM directory: $OPENMM_DIR"
+elif [ -n "$CONDA_PREFIX" ]; then
+    # Try conda prefix
+    if [ -f "$CONDA_PREFIX/lib/libOpenMM.so" ]; then
+        OPENMM_DIR="$CONDA_PREFIX"
+        log_info "OpenMM directory (mamba): $OPENMM_DIR"
+    else
+        log_error "OpenMM not found in conda environment"
+        exit 1
+    fi
+else
     log_error "OpenMM not found at $OPENMM_DIR"
     log_error "Set OPENMM_DIR environment variable to your OpenMM installation path"
     exit 1
 fi
-
-log_info "OpenMM directory: $OPENMM_DIR"
 
 echo ""
 
@@ -135,8 +158,11 @@ cmake .. \
     -DOpenMM_DIR="$OPENMM_DIR" \
     -DCMAKE_CUDA_ARCHITECTURES="$CUDA_ARCHS" \
     -DBUILD_CUDA_LIB="$BUILD_CUDA" \
+    -DBUILD_REFERENCE_LIB=OFF \
     -DBUILD_PYTHON_WRAPPERS="$BUILD_PYTHON" \
     -DCMAKE_INSTALL_PREFIX="$OPENMM_DIR" \
+    -DCMAKE_PREFIX_PATH="$OPENMM_DIR" \
+    -DCUDA_TOOLKIT_ROOT_DIR="$CUDA_HOME" \
     || {
         log_error "CMake configuration failed!"
         exit 1
@@ -167,11 +193,19 @@ echo ""
 # ═══════════════════════════════════════════════════════════════════════════
 
 if [ "$1" == "install" ]; then
-    log_info "Installing..."
-    sudo make install || {
-        log_error "Installation failed!"
-        exit 1
-    }
+    log_info "Installing to $OPENMM_DIR..."
+    # Don't use sudo for conda environments
+    if [ -n "$CONDA_PREFIX" ] && [ "$OPENMM_DIR" == "$CONDA_PREFIX" ]; then
+        make install || {
+            log_error "Installation failed!"
+            exit 1
+        }
+    else
+        sudo make install || {
+            log_error "Installation failed!"
+            exit 1
+        }
+    fi
     log_success "Installation complete"
     echo ""
 fi

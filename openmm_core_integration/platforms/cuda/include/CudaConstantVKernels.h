@@ -8,6 +8,7 @@
  * -------------------------------------------------------------------------- */
 
 #include "openmm/ConstantVKernels.h"
+#include "openmm/ConstantVDrudeLangevinIntegrator.h"
 #include "openmm/cuda/CudaContext.h"
 #include "openmm/cuda/CudaArray.h"
 #include <vector>
@@ -148,6 +149,8 @@ private:
     int numCathodeAtoms;
     int numAnodeAtoms;
     int numElectrolyteAtoms;
+    int numBuckyballConductors;
+    int numNanotubeConductors;
     int numDrudePairs;
     int numNormalParticles;
     double voltage;

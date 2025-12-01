@@ -125,16 +125,18 @@ class NanotubeConfig(BaseModel):
     @field_validator("axis")
     @classmethod
     def validate_axis(cls, v: Tuple[float, float, float]) -> Tuple[float, float, float]:
-        """Ensure axis is a valid unit vector."""
+        """
+        Validate and auto-normalize axis vector.
+        
+        FIX P3-C1: Auto-normalize instead of raising error.
+        CUDA kernels assume unit vectors; this prevents incorrect charge calculations.
+        """
         norm = np.linalg.norm(v)
         if norm < 1e-10:
             raise ValueError(f"Nanotube axis cannot be zero vector, got {v}")
-        if abs(norm - 1.0) > 0.01:
-            raise ValueError(
-                f"Nanotube axis should be normalized (magnitude = 1.0), got magnitude {norm:.6f}. "
-                f"Please normalize axis to [{v[0]/norm:.6f}, {v[1]/norm:.6f}, {v[2]/norm:.6f}]"
-            )
-        return v
+        # FIX P3-C1: Auto-normalize to unit vector instead of raising error
+        normalized = (v[0] / norm, v[1] / norm, v[2] / norm)
+        return normalized
 
 
 # ═══════════════════════════════════════════════════════════

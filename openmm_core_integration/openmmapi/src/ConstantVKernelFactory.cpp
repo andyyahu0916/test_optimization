@@ -33,7 +33,7 @@ KernelImpl* ConstantVKernelFactory::createKernelImpl(std::string name,
 #ifdef OPENMM_BUILD_CUDA_LIB
         if (platform.getName() == "CUDA") {
             return new CudaCalcConstantVKernel(name, platform,
-                dynamic_cast<CudaContext&>(context.getPlatformData()));
+                *static_cast<CudaContext*>(context.getPlatformData()));
         }
 #endif
 
@@ -49,7 +49,7 @@ KernelImpl* ConstantVKernelFactory::createKernelImpl(std::string name,
 #ifdef OPENMM_BUILD_CUDA_LIB
         if (platform.getName() == "CUDA") {
             return new CudaIntegrateConstantVDrudeLangevinStepKernel(name, platform,
-                dynamic_cast<CudaContext&>(context.getPlatformData()));
+                *static_cast<CudaContext*>(context.getPlatformData()));
         }
 #endif
 

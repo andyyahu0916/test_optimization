@@ -139,8 +139,8 @@ void ReferenceConstantVDrudeLangevinDynamics::updateFlatElectrodeCharges(
             Ez_external = F_z / q_old;
         }
 
-        // Update charge
-        double factor = sign / FOUR_PI * CONVERSION_KJMOL_NM_TO_AU;
+        // Update charge (matching MM_classes.py:738 - q_i = 2/(4π) × area × (V/Lgap + Ez) × K)
+        double factor = 2.0 * sign / FOUR_PI * CONVERSION_KJMOL_NM_TO_AU;  // FIX: Added missing 2.0
         double v_over_lgap = voltage / Lgap;
         double q_new = factor * area * (v_over_lgap + Ez_external);
 

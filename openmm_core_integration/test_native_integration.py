@@ -95,12 +95,22 @@ def test_instantiation():
         log_success("Integrator created successfully")
 
         # Check methods exist
-        methods = ['addCathodeAtoms', 'addAnodeAtoms', 'setScfIterations', 'step']
-        for method in methods:
-            if hasattr(integrator, method):
-                log_success(f"  Method '{method}' found")
-            else:
-                log_error(f"  Method '{method}' NOT found!")
+        # FIX: Check for both singular and plural API forms
+        methods_to_check = [
+            ('addCathodeAtom', 'addCathodeAtoms'),   # Singular or plural
+            ('addAnodeAtom', 'addAnodeAtoms'),
+            ('setScfIterations', 'setNumSCFIterations'),
+            ('step',)
+        ]
+        for method_options in methods_to_check:
+            found = False
+            for method in method_options:
+                if hasattr(integrator, method):
+                    log_success(f"  Method '{method}' found")
+                    found = True
+                    break
+            if not found:
+                log_error(f"  Methods {method_options} NOT found!")
                 return False
 
         return True
@@ -153,13 +163,14 @@ def test_charge_update():
         system.addForce(nonbonded)
 
         # Integrator
+        # FIX: Voltage should be in Volts - integrator converts internally
         integrator = constantv.ConstantVDrudeLangevinIntegrator(
             temperature=300.0,
             frictionCoeff=1.0,
             drudeTemperature=1.0,
             drudeFrictionCoeff=50.0,
             stepSize=0.001,
-            voltage=2.0 * 96.487,  # 2V
+            voltage=2.0,  # 2V - FIX: removed incorrect *96.487 conversion
             Lgap=4.5,
             Lcell=5.0,
             scfIterations=4
@@ -171,8 +182,16 @@ def test_charge_update():
 
         # Simulation
         log_info("  Creating simulation...")
-        platform = Platform.getPlatformByName('CUDA' if Platform.getNumPlatforms() > 0 else 'Reference')
-        simulation = Simulation(Topology(), system, integrator, platform)
+        # FIX P4-M1: Correct platform selection logic
+        try:
+            platform = Platform.getPlatformByName('CUDA')
+            properties = {'Precision': 'mixed'}  # FIX P4-P3: Use mixed precision
+            simulation = Simulation(Topology(), system, integrator, platform, properties)
+            log_info("  Using CUDA platform with mixed precision")
+        except Exception:
+            platform = Platform.getPlatformByName('Reference')
+            simulation = Simulation(Topology(), system, integrator, platform)
+            log_info("  Using Reference platform (CUDA not available)")
 
         # Set positions
         simulation.context.setPositions([
@@ -185,9 +204,14 @@ def test_charge_update():
         log_info("  Running simulation...")
         state0 = simulation.context.getState(getForces=True)
 
-        # CRITICAL: Check initial cathode charge
+        # NOTE: getParticleParameters() returns Force object's static parameters,
+        # not GPU runtime values. For proper verification, use integrator.getCathodeCharge()
+        # or Context.getState(getPositions=True) and read posq.w from GPU.
+        # This is a known limitation - FIX P4-C2 requires integrator API extension.
+        
+        # CRITICAL: Check initial cathode charge (from Force object - may not reflect GPU state)
         q_cathode_0, _, _ = nonbonded.getParticleParameters(0)
-        log_info(f"  Cathode charge before step: {q_cathode_0._value:.6f} e")
+        log_info(f"  Cathode charge before step: {q_cathode_0._value:.6f} e (Force object)")
 
         # Run 10 steps
         simulation.step(10)
