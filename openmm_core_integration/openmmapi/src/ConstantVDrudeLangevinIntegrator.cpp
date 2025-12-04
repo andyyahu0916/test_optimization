@@ -17,8 +17,54 @@ using namespace OpenMM;
 using std::vector;
 using std::string;
 
-// Forward declaration of kernel interface
-class IntegrateConstantVDrudeLangevinStepKernel;
+// ═══════════════════════════════════════════════════════════════════════════
+// Kernel Interface Definition (must be defined before use)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Custom kernel interface for ConstantV integration.
+ *
+ * Platform-specific implementations (CUDA, Reference) must implement:
+ *   - initialize(): Initialize electrode data structures
+ *   - execute(): Run SCF + MD integration step
+ *
+ * This kernel combines charge update + dynamics integration in a single
+ * kernel launch to minimize memory transfers.
+ */
+class IntegrateConstantVDrudeLangevinStepKernel : public KernelImpl {
+public:
+    static std::string Name() {
+        return "IntegrateConstantVDrudeLangevinStep";
+    }
+
+    /**
+     * Initialize electrode data structures (called once during Context creation).
+     */
+    virtual void initialize(
+        const std::vector<int>& cathodeIndices,
+        const std::vector<double>& cathodeAreas,
+        const std::vector<int>& anodeIndices,
+        const std::vector<double>& anodeAreas,
+        const std::vector<int>& electrolyteIndices,
+        const std::vector<double>& electrolyteCharges,
+        double voltage,
+        double Lgap,
+        double Lcell,
+        double totalArea,
+        double z_cathode,
+        double z_anode,
+        int scfIterations
+    ) = 0;
+
+    /**
+     * Execute SCF charge update + MD integration step.
+     * This combines Poisson_solver_fixed_voltage() + simmd.step() from original implementation.
+     */
+    virtual void execute(
+        ContextImpl& context,
+        const ConstantVDrudeLangevinIntegrator& integrator
+    ) = 0;
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Physical Constants (from professor's code)
@@ -52,7 +98,8 @@ ConstantVDrudeLangevinIntegrator::ConstantVDrudeLangevinIntegrator(
     z_anode(0.0),
     scfIterations(scfIterations),
     scfFrequency(1),  // Default: update every step
-    electrodesInitialized(false)
+    electrodesInitialized(false),
+    stepCount(0)  // Initialize step counter
 {
     if (scfIterations < 1)
         throw OpenMMException("Number of SCF iterations must be at least 1");
@@ -62,6 +109,26 @@ ConstantVDrudeLangevinIntegrator::ConstantVDrudeLangevinIntegrator(
 }
 
 ConstantVDrudeLangevinIntegrator::~ConstantVDrudeLangevinIntegrator() {
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Kernel Names and Cleanup
+// ═══════════════════════════════════════════════════════════════════════════
+
+vector<string> ConstantVDrudeLangevinIntegrator::getKernelNames() {
+    vector<string> names;
+    // Get parent kernel names (DrudeLangevinIntegrator)
+    vector<string> parentNames = DrudeLangevinIntegrator::getKernelNames();
+    names.insert(names.end(), parentNames.begin(), parentNames.end());
+    
+    // Add our custom kernel
+    names.push_back("IntegrateConstantVDrudeLangevinStep");
+    return names;
+}
+
+void ConstantVDrudeLangevinIntegrator::cleanup() {
+    stepKernel = Kernel();  // Release kernel
+    DrudeLangevinIntegrator::cleanup();  // Call parent cleanup
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -76,6 +143,20 @@ void ConstantVDrudeLangevinIntegrator::addCathodeAtom(int particle, double area)
 void ConstantVDrudeLangevinIntegrator::addAnodeAtom(int particle, double area) {
     anodeIndices.push_back(particle);
     anodeAreas.push_back(area);
+}
+
+void ConstantVDrudeLangevinIntegrator::getCathodeAtomParameters(int index, int& particle, double& area) const {
+    if (index < 0 || index >= (int)cathodeIndices.size())
+        throw OpenMMException("Cathode atom index out of range");
+    particle = cathodeIndices[index];
+    area = cathodeAreas[index];
+}
+
+void ConstantVDrudeLangevinIntegrator::getAnodeAtomParameters(int index, int& particle, double& area) const {
+    if (index < 0 || index >= (int)anodeIndices.size())
+        throw OpenMMException("Anode atom index out of range");
+    particle = anodeIndices[index];
+    area = anodeAreas[index];
 }
 
 void ConstantVDrudeLangevinIntegrator::addElectrolyteAtom(int particle, double charge) {
@@ -160,6 +241,46 @@ void ConstantVDrudeLangevinIntegrator::addNanotubeConductor(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Conductor Parameter Getters (FIX P2-3)
+// ═══════════════════════════════════════════════════════════════════════════
+
+void ConstantVDrudeLangevinIntegrator::getBuckyballConductorParameters(
+    int index,
+    vector<int>& virtualIndices,
+    vector<int>& realIndices,
+    string& electrodeType,
+    double& voltage) const
+{
+    if (index < 0 || index >= (int)buckyballs.size())
+        throw OpenMMException("Buckyball conductor index out of range");
+
+    const ConductorData& conductor = buckyballs[index];
+    virtualIndices = conductor.virtualIndices;
+    realIndices = conductor.realIndices;
+    electrodeType = conductor.electrodeType;
+    voltage = conductor.voltage;
+}
+
+void ConstantVDrudeLangevinIntegrator::getNanotubeConductorParameters(
+    int index,
+    vector<int>& virtualIndices,
+    vector<int>& realIndices,
+    string& electrodeType,
+    double& voltage,
+    Vec3& axis) const
+{
+    if (index < 0 || index >= (int)nanotubes.size())
+        throw OpenMMException("Nanotube conductor index out of range");
+
+    const ConductorData& conductor = nanotubes[index];
+    virtualIndices = conductor.virtualIndices;
+    realIndices = conductor.realIndices;
+    electrodeType = conductor.electrodeType;
+    voltage = conductor.voltage;
+    axis = conductor.axis;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Query Methods
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -205,18 +326,30 @@ double ConstantVDrudeLangevinIntegrator::getTotalAnodeCharge() const {
 // ═══════════════════════════════════════════════════════════════════════════
 
 void ConstantVDrudeLangevinIntegrator::step(int steps) {
+    if (context == NULL)
+        throw OpenMMException("This Integrator is not bound to a context!");
+    
     if (!electrodesInitialized)
         throw OpenMMException("Electrodes not initialized. Call Context creation first.");
 
-    // IMPORTANT: We call the parent DrudeLangevinIntegrator which handles
-    // the actual Drude oscillator dynamics. The SCF charge update is performed
-    // by ConstantVForce (Force-based API) which is called during force calculation.
-    //
-    // For Integrator-only API (without ConstantVForce), we would need to
-    // call our custom kernel here. But this requires platform-specific
-    // kernel creation which is complex. For now, use ConstantVForce instead.
-    
-    DrudeLangevinIntegrator::step(steps);
+    // FIX: Use our custom kernel that combines SCF + MD
+    // This 100% aligns with original Python: Poisson_solver_fixed_voltage() + simmd.step()
+    // Get platform-specific kernel implementation
+    IntegrateConstantVDrudeLangevinStepKernel& kernelImpl = 
+        stepKernel.getAs<IntegrateConstantVDrudeLangevinStepKernel>();
+
+    for (int i = 0; i < steps; i++) {
+        // Check if we need to update charges this step
+        if ((stepCount % scfFrequency) == 0) {
+            // Execute SCF + MD in single kernel call
+            // This matches: Poisson_solver_fixed_voltage(Niterations) + simmd.step()
+            kernelImpl.execute(*context, *this);
+        } else {
+            // Skip SCF, just do MD step (use parent integrator)
+            DrudeLangevinIntegrator::step(1);
+        }
+        stepCount++;
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -234,63 +367,31 @@ void ConstantVDrudeLangevinIntegrator::initialize(ContextImpl& context) {
     if (totalArea <= 0.0)
         throw OpenMMException("Must set total electrode area before creating Context");
 
-    // Initialize platform-specific kernel
-    // This would create the custom CUDA/Reference kernel that handles SCF
-
-    // TODO: Register custom kernel with ContextImpl
-    // context.getPlatform().registerKernel(IntegrateConstantVDrudeLangevinStepKernel);
+    // FIX: Create platform-specific kernel
+    stepKernel = context.getPlatform().createKernel("IntegrateConstantVDrudeLangevinStep", context);
+    
+    // Initialize the kernel with electrode data
+    IntegrateConstantVDrudeLangevinStepKernel& kernelImpl = 
+        dynamic_cast<IntegrateConstantVDrudeLangevinStepKernel&>(stepKernel.getImpl());
+    
+    kernelImpl.initialize(
+        cathodeIndices,
+        cathodeAreas,
+        anodeIndices,
+        anodeAreas,
+        electrolyteIndices,
+        electrolyteCharges,
+        voltage * CONVERSION_EV_TO_KJMOL,  // Convert V to kJ/mol
+        Lgap,
+        Lcell,
+        totalArea,
+        z_cathode,
+        z_anode,
+        scfIterations
+    );
 
     electrodesInitialized = true;
+    stepCount = 0;  // Reset step counter
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Kernel Interface Definition (for platforms to implement)
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Custom kernel interface for ConstantV integration.
- *
- * Platform-specific implementations (CUDA, Reference) must implement:
- *   - initializeElectrodes(): Upload electrode data to GPU
- *   - updateElectrodeCharges(): Run SCF loop
- *   - integrate(): Perform Langevin integration step
- *
- * This kernel combines charge update + dynamics integration in a single
- * kernel launch to minimize memory transfers.
- */
-class IntegrateConstantVDrudeLangevinStepKernel : public KernelImpl {
-public:
-    static std::string Name() {
-        return "IntegrateConstantVDrudeLangevinStep";
-    }
-
-    /**
-     * Initialize electrode data structures (called once).
-     */
-    virtual void initializeElectrodes(
-        const std::vector<int>& cathodeIndices,
-        const std::vector<double>& cathodeAreas,
-        const std::vector<int>& anodeIndices,
-        const std::vector<double>& anodeAreas,
-        const std::vector<int>& electrolyteIndices,
-        double voltage,
-        double Lgap,
-        double Lcell,
-        double totalArea,
-        double z_cathode,
-        double z_anode
-    ) = 0;
-
-    /**
-     * Update electrode charges (SCF loop).
-     */
-    virtual void updateElectrodeCharges(int scfIterations) = 0;
-
-    /**
-     * Perform integration step with updated charges.
-     */
-    virtual void execute(
-        ContextImpl& context,
-        const ConstantVDrudeLangevinIntegrator& integrator
-    ) = 0;
-};
+// Kernel interface is now defined at the top of the file (before use)

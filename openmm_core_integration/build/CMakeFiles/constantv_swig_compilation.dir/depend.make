@@ -3,6 +3,4 @@
 
 CMakeFiles/constantv.dir/ConstantVPluginPYTHON.stamp: \
  /home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVDrudeLangevinIntegrator.h \
- /home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVForce.h \
- /home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVIntegrator.h \
  /home/andy/test_optimization/openmm_core_integration/python/ConstantVPlugin.i

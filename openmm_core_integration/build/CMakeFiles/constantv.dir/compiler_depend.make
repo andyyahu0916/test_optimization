@@ -488,9 +488,7 @@ CMakeFiles/constantv.dir/CMakeFiles/constantv.dir/ConstantVPluginPYTHON_wrap.cxx
   /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/unistd.h \
   /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/wchar.h \
   /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/wctype.h \
-  /home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVDrudeLangevinIntegrator.h \
-  /home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVForce.h \
-  /home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVIntegrator.h
+  /home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVDrudeLangevinIntegrator.h
 
 _constantvcpython-313-x86_64-linux-gnu.so: /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/crtbeginS.o \
   /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/crtendS.o \
@@ -513,7 +511,6 @@ _constantvcpython-313-x86_64-linux-gnu.so: /home/andy/miniforge3/envs/cuda/lib/g
   /home/andy/miniforge3/envs/cuda/lib/libpython3.13.so \
   /home/andy/miniforge3/envs/cuda/lib/libstdc++.so \
   /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so \
-  /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMDrudeCUDA.so \
   /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/lib/stubs/libcuda.so \
   /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/librt.a \
   CMakeFiles/constantv.dir/CMakeFiles/constantv.dir/ConstantVPluginPYTHON_wrap.cxx.o \
@@ -546,8 +543,6 @@ libConstantVAPI.so.1.0.0:
 /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/libgcc.a:
 
 /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/crtendS.o:
-
-/home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVIntegrator.h:
 
 /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/wctype.h:
 
@@ -1267,8 +1262,6 @@ CMakeFiles/constantv.dir/ConstantVPluginPYTHON_wrap.cxx:
 
 /home/andy/miniforge3/envs/cuda/include/openmm/NoseHooverChain.h:
 
-/home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMDrudeCUDA.so:
-
 /home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVDrudeLangevinIntegrator.h:
 
 /home/andy/miniforge3/envs/cuda/include/openmm/VariableVerletIntegrator.h:
@@ -1508,8 +1501,6 @@ libConstantVCUDA.so:
 /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/syslimits.h:
 
 /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/memoryfwd.h:
-
-/home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVForce.h:
 
 /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/new_allocator.h:
 

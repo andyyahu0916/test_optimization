@@ -1687,6 +1687,24 @@ private:
 class ReferenceIntegrateQTBStepKernel : public IntegrateQTBStepKernel {
 public:
     ReferenceIntegrateQTBStepKernel(std::string name, const Platform& platform, ReferencePlatform::PlatformData& data) : IntegrateQTBStepKernel(name, platform),
+        data(data), dynamics(NULL) {
+    }
+    ~ReferenceIntegrateQTBStepKernel();
+    void initialize(const System& system, const QTBIntegrator& integrator);
+    void execute(ContextImpl& context, const QTBIntegrator& integrator);
+    double computeKineticEnergy(ContextImpl& context, const QTBIntegrator& integrator);
+private:
+    ReferencePlatform::PlatformData& data;
+    ReferenceQTBDynamics* dynamics;
+    std::vector<double> masses;
+};
+
+/**
+ * This kernel is invoked by ConstantVDrudeLangevinIntegrator to take one time step.
+ */
+class ReferenceIntegrateConstantVDrudeLangevinStepKernel : public IntegrateConstantVDrudeLangevinStepKernel {
+public:
+    ReferenceIntegrateQTBStepKernel(std::string name, const Platform& platform, ReferencePlatform::PlatformData& data) : IntegrateQTBStepKernel(name, platform),
         data(data), dynamics(NULL), hasInitialized(false) {
     }
     ~ReferenceIntegrateQTBStepKernel();

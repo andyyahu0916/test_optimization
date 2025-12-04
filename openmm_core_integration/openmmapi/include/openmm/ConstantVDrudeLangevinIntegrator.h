@@ -112,6 +112,15 @@ public:
     }
 
     /**
+     * Get cathode atom parameters.
+     *
+     * @param index     Atom index in cathode list
+     * @param particle  [out] Particle index
+     * @param area      [out] Surface area (nm²)
+     */
+    void getCathodeAtomParameters(int index, int& particle, double& area) const;
+
+    /**
      * Add an anode electrode atom.
      *
      * @param particle  Particle index for anode atom
@@ -125,6 +134,15 @@ public:
     int getNumAnodeAtoms() const {
         return anodeIndices.size();
     }
+
+    /**
+     * Get anode atom parameters.
+     *
+     * @param index     Atom index in anode list
+     * @param particle  [out] Particle index
+     * @param area      [out] Surface area (nm²)
+     */
+    void getAnodeAtomParameters(int index, int& particle, double& area) const;
 
     /**
      * Add an electrolyte atom (for Green's Reciprocity image charge term).
@@ -194,6 +212,38 @@ public:
     int getNumNanotubeConductors() const {
         return nanotubes.size();
     }
+
+    /**
+     * Get Buckyball conductor parameters (FIX P2-3: needed for GPU upload).
+     *
+     * @param index            Conductor index
+     * @param virtualIndices   [out] Virtual layer atom indices
+     * @param realIndices      [out] Real layer atom indices
+     * @param electrodeType    [out] "cathode" or "anode"
+     * @param voltage          [out] Applied voltage (V)
+     */
+    void getBuckyballConductorParameters(int index,
+                                        std::vector<int>& virtualIndices,
+                                        std::vector<int>& realIndices,
+                                        std::string& electrodeType,
+                                        double& voltage) const;
+
+    /**
+     * Get Nanotube conductor parameters (FIX P2-3: needed for GPU upload).
+     *
+     * @param index            Conductor index
+     * @param virtualIndices   [out] Virtual layer atom indices
+     * @param realIndices      [out] Real layer atom indices
+     * @param electrodeType    [out] "cathode" or "anode"
+     * @param voltage          [out] Applied voltage (V)
+     * @param axis             [out] Unit vector along nanotube axis
+     */
+    void getNanotubeConductorParameters(int index,
+                                       std::vector<int>& virtualIndices,
+                                       std::vector<int>& realIndices,
+                                       std::string& electrodeType,
+                                       double& voltage,
+                                       Vec3& axis) const;
 
     // ═══════════════════════════════════════════════════════════════════════
     // System Geometry Parameters
@@ -337,6 +387,17 @@ public:
      */
     void step(int steps) override;
 
+    /**
+     * Get the names of all kernels used by this integrator.
+     */
+    std::vector<std::string> getKernelNames() override;
+
+    /**
+     * Clean up the integrator.
+     * Called by Context when it is destroyed or reinitialized.
+     */
+    void cleanup() override;
+
 protected:
     /**
      * Internal: Initialize electrode geometry (called from Context creation).
@@ -380,6 +441,10 @@ private:
 
     // Internal flags
     bool electrodesInitialized;
+    int stepCount;  // Track number of steps taken
+
+    // Platform-specific kernel (created in initialize())
+    Kernel stepKernel;  // Kernel for IntegrateConstantVDrudeLangevinStep
 };
 
 } // namespace OpenMM

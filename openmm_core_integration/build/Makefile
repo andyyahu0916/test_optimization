@@ -271,54 +271,6 @@ openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVAPI.dir/build.make CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.s
 .PHONY : openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.s
 
-openmmapi/src/ConstantVForce.o: openmmapi/src/ConstantVForce.cpp.o
-.PHONY : openmmapi/src/ConstantVForce.o
-
-# target to build an object file
-openmmapi/src/ConstantVForce.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVAPI.dir/build.make CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o
-.PHONY : openmmapi/src/ConstantVForce.cpp.o
-
-openmmapi/src/ConstantVForce.i: openmmapi/src/ConstantVForce.cpp.i
-.PHONY : openmmapi/src/ConstantVForce.i
-
-# target to preprocess a source file
-openmmapi/src/ConstantVForce.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVAPI.dir/build.make CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.i
-.PHONY : openmmapi/src/ConstantVForce.cpp.i
-
-openmmapi/src/ConstantVForce.s: openmmapi/src/ConstantVForce.cpp.s
-.PHONY : openmmapi/src/ConstantVForce.s
-
-# target to generate assembly for a file
-openmmapi/src/ConstantVForce.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVAPI.dir/build.make CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.s
-.PHONY : openmmapi/src/ConstantVForce.cpp.s
-
-openmmapi/src/ConstantVForceImpl.o: openmmapi/src/ConstantVForceImpl.cpp.o
-.PHONY : openmmapi/src/ConstantVForceImpl.o
-
-# target to build an object file
-openmmapi/src/ConstantVForceImpl.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVAPI.dir/build.make CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o
-.PHONY : openmmapi/src/ConstantVForceImpl.cpp.o
-
-openmmapi/src/ConstantVForceImpl.i: openmmapi/src/ConstantVForceImpl.cpp.i
-.PHONY : openmmapi/src/ConstantVForceImpl.i
-
-# target to preprocess a source file
-openmmapi/src/ConstantVForceImpl.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVAPI.dir/build.make CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.i
-.PHONY : openmmapi/src/ConstantVForceImpl.cpp.i
-
-openmmapi/src/ConstantVForceImpl.s: openmmapi/src/ConstantVForceImpl.cpp.s
-.PHONY : openmmapi/src/ConstantVForceImpl.s
-
-# target to generate assembly for a file
-openmmapi/src/ConstantVForceImpl.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVAPI.dir/build.make CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.s
-.PHONY : openmmapi/src/ConstantVForceImpl.cpp.s
-
 platforms/cuda/src/ConstantVKernelFactory.o: platforms/cuda/src/ConstantVKernelFactory.cpp.o
 .PHONY : platforms/cuda/src/ConstantVKernelFactory.o
 
@@ -343,53 +295,29 @@ platforms/cuda/src/ConstantVKernelFactory.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVCUDA.dir/build.make CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.s
 .PHONY : platforms/cuda/src/ConstantVKernelFactory.cpp.s
 
-platforms/cuda/src/CudaConstantVKernels.o: platforms/cuda/src/CudaConstantVKernels.cpp.o
+platforms/cuda/src/CudaConstantVKernels.o: platforms/cuda/src/CudaConstantVKernels.cu.o
 .PHONY : platforms/cuda/src/CudaConstantVKernels.o
 
 # target to build an object file
-platforms/cuda/src/CudaConstantVKernels.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVCUDA.dir/build.make CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o
-.PHONY : platforms/cuda/src/CudaConstantVKernels.cpp.o
+platforms/cuda/src/CudaConstantVKernels.cu.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVCUDA.dir/build.make CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o
+.PHONY : platforms/cuda/src/CudaConstantVKernels.cu.o
 
-platforms/cuda/src/CudaConstantVKernels.i: platforms/cuda/src/CudaConstantVKernels.cpp.i
+platforms/cuda/src/CudaConstantVKernels.i: platforms/cuda/src/CudaConstantVKernels.cu.i
 .PHONY : platforms/cuda/src/CudaConstantVKernels.i
 
 # target to preprocess a source file
-platforms/cuda/src/CudaConstantVKernels.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVCUDA.dir/build.make CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.i
-.PHONY : platforms/cuda/src/CudaConstantVKernels.cpp.i
+platforms/cuda/src/CudaConstantVKernels.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVCUDA.dir/build.make CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.i
+.PHONY : platforms/cuda/src/CudaConstantVKernels.cu.i
 
-platforms/cuda/src/CudaConstantVKernels.s: platforms/cuda/src/CudaConstantVKernels.cpp.s
+platforms/cuda/src/CudaConstantVKernels.s: platforms/cuda/src/CudaConstantVKernels.cu.s
 .PHONY : platforms/cuda/src/CudaConstantVKernels.s
 
 # target to generate assembly for a file
-platforms/cuda/src/CudaConstantVKernels.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVCUDA.dir/build.make CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.s
-.PHONY : platforms/cuda/src/CudaConstantVKernels.cpp.s
-
-platforms/cuda/src/kernels/constantVDrudeLangevin.o: platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o
-.PHONY : platforms/cuda/src/kernels/constantVDrudeLangevin.o
-
-# target to build an object file
-platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVCUDA.dir/build.make CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o
-.PHONY : platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o
-
-platforms/cuda/src/kernels/constantVDrudeLangevin.i: platforms/cuda/src/kernels/constantVDrudeLangevin.cu.i
-.PHONY : platforms/cuda/src/kernels/constantVDrudeLangevin.i
-
-# target to preprocess a source file
-platforms/cuda/src/kernels/constantVDrudeLangevin.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVCUDA.dir/build.make CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.i
-.PHONY : platforms/cuda/src/kernels/constantVDrudeLangevin.cu.i
-
-platforms/cuda/src/kernels/constantVDrudeLangevin.s: platforms/cuda/src/kernels/constantVDrudeLangevin.cu.s
-.PHONY : platforms/cuda/src/kernels/constantVDrudeLangevin.s
-
-# target to generate assembly for a file
-platforms/cuda/src/kernels/constantVDrudeLangevin.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVCUDA.dir/build.make CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.s
-.PHONY : platforms/cuda/src/kernels/constantVDrudeLangevin.cu.s
+platforms/cuda/src/CudaConstantVKernels.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ConstantVCUDA.dir/build.make CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.s
+.PHONY : platforms/cuda/src/CudaConstantVKernels.cu.s
 
 platforms/cuda/src/registerConstantV.o: platforms/cuda/src/registerConstantV.cpp.o
 .PHONY : platforms/cuda/src/registerConstantV.o
@@ -438,21 +366,12 @@ help:
 	@echo "... openmmapi/src/ConstantVDrudeLangevinIntegrator.o"
 	@echo "... openmmapi/src/ConstantVDrudeLangevinIntegrator.i"
 	@echo "... openmmapi/src/ConstantVDrudeLangevinIntegrator.s"
-	@echo "... openmmapi/src/ConstantVForce.o"
-	@echo "... openmmapi/src/ConstantVForce.i"
-	@echo "... openmmapi/src/ConstantVForce.s"
-	@echo "... openmmapi/src/ConstantVForceImpl.o"
-	@echo "... openmmapi/src/ConstantVForceImpl.i"
-	@echo "... openmmapi/src/ConstantVForceImpl.s"
 	@echo "... platforms/cuda/src/ConstantVKernelFactory.o"
 	@echo "... platforms/cuda/src/ConstantVKernelFactory.i"
 	@echo "... platforms/cuda/src/ConstantVKernelFactory.s"
 	@echo "... platforms/cuda/src/CudaConstantVKernels.o"
 	@echo "... platforms/cuda/src/CudaConstantVKernels.i"
 	@echo "... platforms/cuda/src/CudaConstantVKernels.s"
-	@echo "... platforms/cuda/src/kernels/constantVDrudeLangevin.o"
-	@echo "... platforms/cuda/src/kernels/constantVDrudeLangevin.i"
-	@echo "... platforms/cuda/src/kernels/constantVDrudeLangevin.s"
 	@echo "... platforms/cuda/src/registerConstantV.o"
 	@echo "... platforms/cuda/src/registerConstantV.i"
 	@echo "... platforms/cuda/src/registerConstantV.s"

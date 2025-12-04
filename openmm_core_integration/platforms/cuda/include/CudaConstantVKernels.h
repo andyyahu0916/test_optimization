@@ -124,6 +124,10 @@ public:
     void execute(ContextImpl& context, const ConstantVDrudeLangevinIntegrator& integrator);
 
 private:
+    // Helper method: Upload conductor data to GPU (FIX P2-3)
+    void uploadConductorDataToGPU(ContextImpl& context, const ConstantVDrudeLangevinIntegrator& integrator);
+
+private:
     CudaContext& cu;
     bool hasInitialized;
 
@@ -136,6 +140,13 @@ private:
 
     // ElectrodeData struct on GPU
     CudaArray* electrodeDataGPU;
+
+    // Conductor support - "Pointer-to-Pointer" pattern (FIX P2-3)
+    std::vector<CudaArray*> conductorArrays;         // All arrays for cleanup
+    std::vector<void*> buckyballStructsHost;         // BuckyballData with device pointers
+    std::vector<void*> nanotubeStructsHost;          // NanotubeData with device pointers
+    CudaArray* buckyballDataArrayGPU;                // Array of BuckyballData structs on GPU
+    CudaArray* nanotubeDataArrayGPU;                 // Array of NanotubeData structs on GPU
 
     // GPU arrays for Drude particle data
     CudaArray* pairParticlesGPU;      // int2 array

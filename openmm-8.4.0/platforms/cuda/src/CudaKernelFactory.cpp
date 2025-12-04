@@ -149,6 +149,8 @@ KernelImpl* CudaKernelFactory::createKernelImpl(std::string name, const Platform
         return new CommonIntegrateDPDStepKernel(name, platform, cu);
     if (name == IntegrateQTBStepKernel::Name())
         return new CommonIntegrateQTBStepKernel(name, platform, cu);
+    if (name == IntegrateConstantVDrudeLangevinStepKernel::Name())
+        return new CudaIntegrateConstantVDrudeLangevinStepKernel(name, platform, cu);
     if (name == ApplyAndersenThermostatKernel::Name())
         return new CommonApplyAndersenThermostatKernel(name, platform, cu);
     if (name == IntegrateNoseHooverStepKernel::Name())

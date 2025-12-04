@@ -21,6 +21,157 @@ namespace std {
     %template(DoubleVector) vector<double>;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Vec3 Typemap Support
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * FIX P3-SWIG: Add Vec3 typemap support for addNanotubeConductor.
+ * This allows Python to pass openmm.Vec3 objects to C++ methods expecting Vec3.
+ */
+
+// Fragment for converting Python sequence to Vec3
+%fragment("Py_SequenceToVec3", "header", fragment="Py_StripOpenMMUnits") {
+OpenMM::Vec3 Py_SequenceToVec3(PyObject* obj, int& status) {
+    PyObject* s, *o, *o1;
+    double x[3];
+    int i, length;
+    s = Py_StripOpenMMUnits(obj);
+    if (s == NULL) {
+        status = SWIG_ERROR;
+        return OpenMM::Vec3(0, 0, 0);
+    }
+    if (PySequence_Check(s)) {
+        length = PySequence_Size(s);
+        if (length != 3) {
+            Py_DECREF(s);
+            status = SWIG_ERROR;
+            return OpenMM::Vec3(0, 0, 0);
+        }
+        for (i = 0; i < 3; i++) {
+            o = PySequence_GetItem(s, i);
+            o1 = Py_StripOpenMMUnits(o);
+            if (o1 == NULL) {
+                Py_DECREF(s);
+                Py_DECREF(o);
+                status = SWIG_ERROR;
+                return OpenMM::Vec3(0, 0, 0);
+            }
+            x[i] = PyFloat_AsDouble(o1);
+            Py_DECREF(o);
+            Py_DECREF(o1);
+            if (PyErr_Occurred() != NULL) {
+                Py_DECREF(s);
+                status = SWIG_ERROR;
+                return OpenMM::Vec3(0, 0, 0);
+            }
+        }
+        Py_DECREF(s);
+        status = SWIG_OK;
+        return OpenMM::Vec3(x[0], x[1], x[2]);
+    }
+    Py_DECREF(s);
+    status = SWIG_ERROR;
+    return OpenMM::Vec3(0, 0, 0);
+}
+}
+
+// Fragment for stripping OpenMM units
+// FIX P3-SWIG: Use OpenMM's full implementation for unit stripping
+%fragment("Py_StripOpenMMUnits", "header") {
+PyObject* Py_StripOpenMMUnits(PyObject *input) {
+    static PyObject *__s_Quantity = NULL;
+    static PyObject *__s_md_unit_system_tuple = NULL;
+    static PyObject *__s_bar_tuple = NULL;
+
+    if (__s_Quantity == NULL) {
+        PyObject* module = NULL;
+        module = PyImport_ImportModule("openmm.unit");
+        if (!module) {
+            PyErr_SetString(PyExc_ImportError, "openmm.unit");
+            Py_CLEAR(module);
+            return NULL;
+        }
+
+        __s_Quantity = PyObject_GetAttrString(module, "Quantity");
+        if (!__s_Quantity) {
+            PyErr_SetString(PyExc_AttributeError, "'module' object has no attribute 'Quantity'");
+            Py_CLEAR(module);
+            Py_CLEAR(__s_Quantity);
+            return NULL;
+        }
+
+        PyObject* bar = NULL;
+        bar = PyObject_GetAttrString(module, "bar");
+        if (!bar) {
+            PyErr_SetString(PyExc_AttributeError, "'module' object has no attribute 'bar'");
+            Py_CLEAR(module);
+            Py_CLEAR(__s_Quantity);
+            Py_CLEAR(bar);
+            return NULL;
+        }
+
+        PyObject* md_unit_system = NULL;
+        md_unit_system = PyObject_GetAttrString(module, "md_unit_system");
+        if (!md_unit_system) {
+            PyErr_SetString(PyExc_AttributeError, "'module' object has no attribute 'md_unit_system'");
+            Py_CLEAR(module);
+            Py_CLEAR(__s_Quantity);
+            Py_CLEAR(bar);
+            Py_CLEAR(md_unit_system);
+            return NULL;
+        }
+        __s_md_unit_system_tuple = PyTuple_Pack(1, md_unit_system);
+        __s_bar_tuple = PyTuple_Pack(1, bar);
+        Py_DECREF(md_unit_system);
+        Py_DECREF(bar);
+        Py_DECREF(module);
+    }
+    PyObject *val;
+
+    if (PyObject_IsInstance(input, __s_Quantity)) {
+        PyObject* input_unit = NULL, *is_compatible = NULL, *compatible_with_bar = NULL;
+        input_unit = PyObject_GetAttrString(input, "unit");
+        is_compatible = PyObject_GetAttrString(input_unit, "is_compatible");
+        compatible_with_bar = PyObject_Call(is_compatible, __s_bar_tuple, NULL);
+        if (PyObject_IsTrue(compatible_with_bar)) {
+            PyObject* value_in_unit = PyObject_GetAttrString(input, "value_in_unit");
+            val = PyObject_Call(value_in_unit, __s_bar_tuple, NULL);
+            Py_DECREF(value_in_unit);
+        } else {
+            PyObject* value_in_unit_system = PyObject_GetAttrString(input, "value_in_unit_system");
+            val = PyObject_Call(value_in_unit_system, __s_md_unit_system_tuple, NULL);
+            Py_DECREF(value_in_unit_system);
+        }
+        Py_CLEAR(input_unit);
+        Py_CLEAR(is_compatible);
+        Py_CLEAR(compatible_with_bar);
+        if (PyErr_Occurred() != NULL) {
+            return NULL;
+        }
+    } else {
+        val = input;
+        Py_INCREF(val);
+    }
+    return val;
+}
+}
+
+// Typemap for const Vec3& (used in addNanotubeConductor)
+%typemap(in, fragment="Py_SequenceToVec3") const Vec3& (OpenMM::Vec3 myVec, int res=0) {
+    myVec = Py_SequenceToVec3($input, res);
+    if (!SWIG_IsOK(res)) {
+        PyErr_SetString(PyExc_ValueError, "in method $symname, argument $argnum could not be converted to type Vec3");
+        SWIG_fail;
+    }
+    $1 = &myVec;
+}
+
+%typemap(typecheck, precedence=SWIG_TYPECHECK_DOUBLE_ARRAY, fragment="Py_SequenceToVec3") const Vec3& {
+    int res = 0;
+    Py_SequenceToVec3($input, res);
+    $1 = SWIG_IsOK(res);
+}
+
 %{
 #include "openmm/ConstantVForce.h"
 #include "openmm/ConstantVIntegrator.h"
@@ -368,8 +519,14 @@ public:
     );
     int getNumBuckyballConductors() const;
 
-    // Note: addNanotubeConductor is available in C++ but not exposed to Python yet
-    // due to Vec3 type mapping complexity
+    // FIX P3-SWIG: Expose addNanotubeConductor with Vec3 typemap support
+    void addNanotubeConductor(
+        const std::vector<int>& virtualIndices,
+        const std::vector<int>& realIndices,
+        const std::string& electrodeType,
+        double voltage,
+        const Vec3& axis
+    );
     int getNumNanotubeConductors() const;
 
     // System geometry

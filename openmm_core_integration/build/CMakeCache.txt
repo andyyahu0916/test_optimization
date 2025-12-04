@@ -486,11 +486,14 @@ ConstantVIntegration_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 ConstantVIntegration_SOURCE_DIR:STATIC=/home/andy/test_optimization/openmm_core_integration
 
-//No help, variable specified on the command line.
-OPENMM_DIR:UNINITIALIZED=/home/andy/miniforge3/envs/cuda
+//Path to a library.
+OpenMM_CUDA_LIBRARY:FILEPATH=/home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so
 
 //No help, variable specified on the command line.
 OpenMM_DIR:UNINITIALIZED=/home/andy/miniforge3/envs/cuda
+
+//Path to a library.
+OpenMM_DRUDE_LIBRARY:FILEPATH=/home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so
 
 //OpenMM include directory
 OpenMM_INCLUDE_DIR:PATH=/home/andy/miniforge3/envs/cuda/include
@@ -841,8 +844,6 @@ _Python3_INCLUDE_DIR:INTERNAL=/home/andy/miniforge3/envs/cuda/include/python3.13
 //Python3 Properties
 _Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;13;9;64;<none>;cpython-313-x86_64-linux-gnu;abi3;/home/andy/miniforge3/envs/cuda/lib/python3.13;/home/andy/miniforge3/envs/cuda/lib/python3.13;/home/andy/miniforge3/envs/cuda/lib/python3.13/site-packages;/home/andy/miniforge3/envs/cuda/lib/python3.13/site-packages
 _Python3_INTERPRETER_SIGNATURE:INTERNAL=4c0cdecdc2273f2ee2a41105bb534ded
-//Interpreter reason failure
-_Python3_Interpreter_REASON_FAILURE:INTERNAL=
 //Path to a library.
 _Python3_LIBRARY_RELEASE:INTERNAL=/home/andy/miniforge3/envs/cuda/lib/libpython3.13.so
 //NumPy reason failure

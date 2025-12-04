@@ -72,39 +72,25 @@ include CMakeFiles/ConstantVCUDA.dir/flags.make
 CMakeFiles/ConstantVCUDA.dir/codegen:
 .PHONY : CMakeFiles/ConstantVCUDA.dir/codegen
 
-CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o: CMakeFiles/ConstantVCUDA.dir/flags.make
-CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o: CMakeFiles/ConstantVCUDA.dir/includes_CUDA.rsp
-CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o: /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/kernels/constantVDrudeLangevin.cu
-CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o: CMakeFiles/ConstantVCUDA.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CUDA object CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o"
-	/home/andy/miniforge3/envs/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o -MF CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o.d -x cu -rdc=true -c /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/kernels/constantVDrudeLangevin.cu -o CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o
+CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o: CMakeFiles/ConstantVCUDA.dir/flags.make
+CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o: CMakeFiles/ConstantVCUDA.dir/includes_CUDA.rsp
+CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o: /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cu
+CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o: CMakeFiles/ConstantVCUDA.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CUDA object CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o"
+	/home/andy/miniforge3/envs/cuda/bin/nvcc -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -MD -MT CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o -MF CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o.d -x cu -rdc=true -c /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cu -o CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o
 
-CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.i"
+CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CUDA source to CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.i"
 	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_PREPROCESSED_SOURCE
 
-CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CUDA source to assembly CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.s"
+CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CUDA source to assembly CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.s"
 	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_ASSEMBLY_SOURCE
-
-CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o: CMakeFiles/ConstantVCUDA.dir/flags.make
-CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o: /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp
-CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o: CMakeFiles/ConstantVCUDA.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o"
-	/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o -MF CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o.d -o CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o -c /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp
-
-CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.i"
-	/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp > CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.i
-
-CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.s"
-	/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp -o CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.s
 
 CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o: CMakeFiles/ConstantVCUDA.dir/flags.make
 CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o: /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/ConstantVKernelFactory.cpp
 CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o: CMakeFiles/ConstantVCUDA.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o"
 	/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o -MF CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o.d -o CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o -c /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/ConstantVKernelFactory.cpp
 
 CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.i: cmake_force
@@ -118,7 +104,7 @@ CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.s: cm
 CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.o: CMakeFiles/ConstantVCUDA.dir/flags.make
 CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.o: /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/registerConstantV.cpp
 CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.o: CMakeFiles/ConstantVCUDA.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.o"
 	/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.o -MF CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.o.d -o CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.o -c /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/registerConstantV.cpp
 
 CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.i: cmake_force
@@ -131,32 +117,29 @@ CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.s: cmake_f
 
 # Object files for target ConstantVCUDA
 ConstantVCUDA_OBJECTS = \
-"CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o" \
-"CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o" \
+"CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o" \
 "CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o" \
 "CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.o"
 
 # External object files for target ConstantVCUDA
 ConstantVCUDA_EXTERNAL_OBJECTS =
 
-CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o
-CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o
+CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.o
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: CMakeFiles/ConstantVCUDA.dir/build.make
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: CMakeFiles/ConstantVCUDA.dir/compiler_depend.ts
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: libConstantVAPI.so.1.0.0
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so
-CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: /home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so
-CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMDrudeCUDA.so
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: /home/andy/miniforge3/envs/cuda/lib/libcudart.so
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/lib/stubs/libcuda.so
+CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/librt.a
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: CMakeFiles/ConstantVCUDA.dir/deviceLinkLibs.rsp
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: CMakeFiles/ConstantVCUDA.dir/deviceObjects1.rsp
 CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o: CMakeFiles/ConstantVCUDA.dir/dlink.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CUDA device code CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CUDA device code CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ConstantVCUDA.dir/dlink.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -165,31 +148,28 @@ CMakeFiles/ConstantVCUDA.dir/build: CMakeFiles/ConstantVCUDA.dir/cmake_device_li
 
 # Object files for target ConstantVCUDA
 ConstantVCUDA_OBJECTS = \
-"CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o" \
-"CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o" \
+"CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o" \
 "CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o" \
 "CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.o"
 
 # External object files for target ConstantVCUDA
 ConstantVCUDA_EXTERNAL_OBJECTS =
 
-libConstantVCUDA.so: CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o
-libConstantVCUDA.so: CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o
+libConstantVCUDA.so: CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cu.o
 libConstantVCUDA.so: CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o
 libConstantVCUDA.so: CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/registerConstantV.cpp.o
 libConstantVCUDA.so: CMakeFiles/ConstantVCUDA.dir/build.make
 libConstantVCUDA.so: CMakeFiles/ConstantVCUDA.dir/compiler_depend.ts
 libConstantVCUDA.so: libConstantVAPI.so.1.0.0
 libConstantVCUDA.so: /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so
-libConstantVCUDA.so: /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so
 libConstantVCUDA.so: /home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so
-libConstantVCUDA.so: /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMDrudeCUDA.so
 libConstantVCUDA.so: /home/andy/miniforge3/envs/cuda/lib/libcudart.so
 libConstantVCUDA.so: /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/lib/stubs/libcuda.so
+libConstantVCUDA.so: /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so
 libConstantVCUDA.so: /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/librt.a
 libConstantVCUDA.so: CMakeFiles/ConstantVCUDA.dir/cmake_device_link.o
 libConstantVCUDA.so: CMakeFiles/ConstantVCUDA.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX shared library libConstantVCUDA.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX shared library libConstantVCUDA.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ConstantVCUDA.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

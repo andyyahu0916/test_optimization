@@ -101,12 +101,11 @@ _constantvcpython-313-x86_64-linux-gnu.so: /home/andy/miniforge3/envs/cuda/lib/l
 _constantvcpython-313-x86_64-linux-gnu.so: libConstantVCUDA.so
 _constantvcpython-313-x86_64-linux-gnu.so: libConstantVAPI.so.1.0.0
 _constantvcpython-313-x86_64-linux-gnu.so: /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so
-_constantvcpython-313-x86_64-linux-gnu.so: /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so
 _constantvcpython-313-x86_64-linux-gnu.so: /home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so
-_constantvcpython-313-x86_64-linux-gnu.so: /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMDrudeCUDA.so
 _constantvcpython-313-x86_64-linux-gnu.so: /home/andy/miniforge3/envs/cuda/lib/libcudart.so
 _constantvcpython-313-x86_64-linux-gnu.so: /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/lib/stubs/libcuda.so
 _constantvcpython-313-x86_64-linux-gnu.so: /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/librt.a
+_constantvcpython-313-x86_64-linux-gnu.so: /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so
 _constantvcpython-313-x86_64-linux-gnu.so: CMakeFiles/constantv.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX shared library _constantvcpython-313-x86_64-linux-gnu.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/constantv.dir/link.txt --verbose=$(VERBOSE)

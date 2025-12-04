@@ -158,13 +158,39 @@ def run_benchmark(
     # Generate system
     system, topology = generate_test_system(num_atoms)
 
-    # Create integrator (with ConstantV if available)
-    # For now, use standard Langevin
-    integrator = openmm.LangevinIntegrator(
-        300*unit.kelvin,
-        1/unit.picosecond,
-        0.002*unit.picoseconds
-    )
+    # FIX: Use ConstantVDrudeLangevinIntegrator instead of standard LangevinIntegrator
+    # This matches the original implementation which uses ConstantV functionality
+    try:
+        import constantv
+        integrator = constantv.ConstantVDrudeLangevinIntegrator(
+            300*unit.kelvin,           # temperature
+            1/unit.picosecond,         # frictionCoeff
+            300*unit.kelvin,           # drudeTemperature
+            1/unit.picosecond,         # drudeFrictionCoeff
+            0.002*unit.picoseconds,    # stepSize
+            0.0*unit.volt,            # voltage (0V for benchmark)
+            1.0*unit.nanometer,       # Lgap
+            5.0*unit.nanometer,       # Lcell
+            SCF_ITERATIONS            # scfIterations
+        )
+        # Add dummy electrodes for benchmark (will be ignored at 0V)
+        # Add first 10% as cathode, next 10% as anode
+        num_electrode = max(1, system.getNumParticles() // 10)
+        for i in range(num_electrode):
+            integrator.addCathodeAtom(i, 0.1*unit.nanometer**2)
+        for i in range(num_electrode, 2*num_electrode):
+            integrator.addAnodeAtom(i, 0.1*unit.nanometer**2)
+        # Add remaining as electrolyte
+        for i in range(2*num_electrode, system.getNumParticles()):
+            integrator.addElectrolyteAtom(i, 0.0)
+    except ImportError:
+        # Fallback to standard Langevin if ConstantV not available
+        print("[Bench] WARNING: ConstantV not available, using standard LangevinIntegrator")
+        integrator = openmm.LangevinIntegrator(
+            300*unit.kelvin,
+            1/unit.picosecond,
+            0.002*unit.picoseconds
+        )
 
     # Create platform
     platform = openmm.Platform.getPlatformByName(platform_name)
@@ -220,10 +246,20 @@ def run_benchmark(
     slope, intercept = np.polyfit(steps_array, energies, 1)
     energy_drift = abs(slope * 1000)  # kJ/mol per 1000 steps
 
-    # Memory bandwidth (estimate)
-    # For each step, we read/write all particle data: posq, velm, forces
-    # Size per atom: 4*4 bytes (float4) * 3 = 48 bytes
-    bytes_per_step = num_atoms * 48
+    # FIX: Memory bandwidth calculation - include all data transfers
+    # For each step, we read/write:
+    # 1. posq (float4): 4*4 = 16 bytes per atom (positions + charges)
+    # 2. velm (float4): 4*4 = 16 bytes per atom (velocities + masses)
+    # 3. force (long long*3): 3*8 = 24 bytes per atom (fixed-point forces)
+    # 4. posDelta (float4): 4*4 = 16 bytes per atom (position updates)
+    # 5. SCF iterations: additional reads/writes for charge updates
+    #    - Electrode charges: num_electrode * 8 bytes (double) per iteration
+    #    - Q_analytic: 2 * 8 bytes (cathode + anode) per iteration
+    #    - Scale factors: 2 * 8 bytes per iteration
+    bytes_per_atom_per_step = 16 + 16 + 24 + 16  # 72 bytes base
+    num_electrode = max(1, num_atoms // 10)  # Estimate electrode atoms
+    scf_overhead_per_step = (num_electrode * 8 + 2 * 8 + 2 * 8) * SCF_ITERATIONS  # SCF overhead
+    bytes_per_step = num_atoms * bytes_per_atom_per_step + scf_overhead_per_step
     total_bytes = bytes_per_step * NUM_STEPS
     memory_bandwidth_gb_s = (total_bytes / total_time_s) / 1e9
 

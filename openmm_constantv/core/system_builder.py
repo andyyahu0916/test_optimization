@@ -779,16 +779,30 @@ class ConstantVSystemBuilder:
         return config_dict
 
     def _identify_conductor_atoms(self, chain_index: int, exclude_elements: Tuple[str, ...]) -> List[int]:
-        """Identify conductor atoms by chain index."""
+        """
+        Identify conductor atoms by chain index.
+        
+        FIX P3-3: Handle multiple chains with same index (collect all atoms).
+        """
         atom_indices = []
+        matching_chains = []
+        
         for chain in self.topology.chains():
             if chain.index == chain_index:
+                matching_chains.append(chain)
                 for atom in chain.atoms():
                     if atom.element.symbol not in exclude_elements:
                         atom_indices.append(atom.index)
 
         if len(atom_indices) == 0:
             raise ValueError(f"No atoms found for chain index {chain_index}")
+        
+        # FIX P3-3: Warn if multiple chains have same index (unusual but possible)
+        if len(matching_chains) > 1:
+            logger.warning(
+                f"Found {len(matching_chains)} chains with index {chain_index}. "
+                f"Collected {len(atom_indices)} atoms from all matching chains."
+            )
 
         return atom_indices
 

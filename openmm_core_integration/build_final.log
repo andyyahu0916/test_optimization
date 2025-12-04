@@ -1,0 +1,602 @@
+Detected mamba/conda environment: /home/andy/miniforge3/envs/cuda
+[0;34m[INFO][0m Starting ConstantV Native Integration build...
+
+[0;34m[INFO][0m CMake version: 4.2.0
+[0;34m[INFO][0m CUDA version (mamba): 12.9
+[0;34m[INFO][0m Python version: 3.13.9
+[0;34m[INFO][0m SWIG version: 4.4.0
+[0;34m[INFO][0m OpenMM directory: /home/andy/miniforge3/envs/cuda
+
+[0;34m[INFO][0m Configuring CMake...
+
+-- The CXX compiler identification is GNU 14.3.0
+-- The CUDA compiler identification is NVIDIA 12.9.86 with host compiler GNU 14.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting CUDA compiler ABI info
+-- Detecting CUDA compiler ABI info - done
+-- Check for working CUDA compiler: /home/andy/miniforge3/envs/cuda/bin/nvcc - skipped
+-- Detecting CUDA compile features
+-- Detecting CUDA compile features - done
+-- Detected mamba/conda environment: /home/andy/miniforge3/envs/cuda
+-- Found CUDAToolkit: /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include (found version "12.9.86")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Found SWIG: /home/andy/miniforge3/envs/cuda/bin/swig4.0 (found suitable version "4.4.0", minimum required is "4.0")
+-- Found Python3: /home/andy/miniforge3/envs/cuda/bin/python3.13 (found version "3.13.9") found components: Interpreter Development Development.Module Development.Embed
+-- 
+-- ConstantV Native Integration Configuration Summary
+-- ==================================================
+-- Build type:           Release
+-- C++ Compiler:         /home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++
+-- CUDA Compiler:        /home/andy/miniforge3/envs/cuda/bin/nvcc
+-- CUDA Architectures:   70;75;80;86;89;90
+-- OpenMM Include:       /home/andy/miniforge3/envs/cuda/include
+-- OpenMM Libraries:     /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so
+-- Python Executable:    /home/andy/miniforge3/envs/cuda/bin/python3.13
+-- Python Site-Packages: /home/andy/miniforge3/envs/cuda/lib/python3.13/site-packages
+-- 
+-- Build Options:
+--   CUDA Library:       ON
+--   Reference Library:  OFF
+--   Python Wrappers:    ON
+-- 
+-- Configuring done (93.3s)
+-- Generating done (0.0s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CUDA_TOOLKIT_ROOT_DIR
+    OpenMM_DIR
+
+
+-- Build files have been written to: /home/andy/test_optimization/openmm_core_integration/build
+
+[0;32m[SUCCESS][0m CMake configuration complete
+
+[0;34m[INFO][0m Building with 22 parallel jobs...
+
+/home/andy/miniforge3/envs/cuda/bin/cmake -S/home/andy/test_optimization/openmm_core_integration -B/home/andy/test_optimization/openmm_core_integration/build --check-build-system CMakeFiles/Makefile.cmake 0
+/home/andy/miniforge3/envs/cuda/bin/cmake -E cmake_progress_start /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles /home/andy/test_optimization/openmm_core_integration/build//CMakeFiles/progress.marks
+make  -f CMakeFiles/Makefile2 all
+make[1]: Entering directory '/home/andy/test_optimization/openmm_core_integration/build'
+make  -f CMakeFiles/ConstantVAPI.dir/build.make CMakeFiles/ConstantVAPI.dir/depend
+make  -f CMakeFiles/constantv_swig_compilation.dir/build.make CMakeFiles/constantv_swig_compilation.dir/depend
+make[2]: Entering directory '/home/andy/test_optimization/openmm_core_integration/build'
+cd /home/andy/test_optimization/openmm_core_integration/build && /home/andy/miniforge3/envs/cuda/bin/cmake -E cmake_depends "Unix Makefiles" /home/andy/test_optimization/openmm_core_integration /home/andy/test_optimization/openmm_core_integration /home/andy/test_optimization/openmm_core_integration/build /home/andy/test_optimization/openmm_core_integration/build /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/ConstantVAPI.dir/DependInfo.cmake "--color=" ConstantVAPI
+make[2]: Entering directory '/home/andy/test_optimization/openmm_core_integration/build'
+cd /home/andy/test_optimization/openmm_core_integration/build && /home/andy/miniforge3/envs/cuda/bin/cmake -E cmake_depends "Unix Makefiles" /home/andy/test_optimization/openmm_core_integration /home/andy/test_optimization/openmm_core_integration /home/andy/test_optimization/openmm_core_integration/build /home/andy/test_optimization/openmm_core_integration/build /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv_swig_compilation.dir/DependInfo.cmake "--color=" constantv_swig_compilation
+Dependee "/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv_swig_compilation.dir/DependInfo.cmake" is newer than depender "/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv_swig_compilation.dir/depend.internal".
+Dependee "/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/CMakeDirectoryInformation.cmake" is newer than depender "/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv_swig_compilation.dir/depend.internal".
+Scanning dependencies of target constantv_swig_compilation
+make[2]: Leaving directory '/home/andy/test_optimization/openmm_core_integration/build'
+make  -f CMakeFiles/ConstantVAPI.dir/build.make CMakeFiles/ConstantVAPI.dir/build
+make[2]: Entering directory '/home/andy/test_optimization/openmm_core_integration/build'
+make[2]: Leaving directory '/home/andy/test_optimization/openmm_core_integration/build'
+[ 15%] Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o
+[  7%] Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o
+make  -f CMakeFiles/constantv_swig_compilation.dir/build.make CMakeFiles/constantv_swig_compilation.dir/build
+/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ -DConstantVAPI_EXPORTS -DOPENMM_BUILD_CUDA_LIB -I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/andy/miniforge3/envs/cuda/include  -I/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -march=native -std=gnu++17 -fPIC -Wall -Wextra -Wno-unused-parameter -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVForce.cpp
+make[2]: Entering directory '/home/andy/test_optimization/openmm_core_integration/build'
+[ 23%] Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVKernelFactory.cpp.o
+[ 30%] Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/registerConstantV.cpp.o
+/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ -DConstantVAPI_EXPORTS -DOPENMM_BUILD_CUDA_LIB -I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/andy/miniforge3/envs/cuda/include  -I/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -march=native -std=gnu++17 -fPIC -Wall -Wextra -Wno-unused-parameter -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVForceImpl.cpp
+/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ -DConstantVAPI_EXPORTS -DOPENMM_BUILD_CUDA_LIB -I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/andy/miniforge3/envs/cuda/include  -I/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -march=native -std=gnu++17 -fPIC -Wall -Wextra -Wno-unused-parameter -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVKernelFactory.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVKernelFactory.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVKernelFactory.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVKernelFactory.cpp
+/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ -DConstantVAPI_EXPORTS -DOPENMM_BUILD_CUDA_LIB -I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/andy/miniforge3/envs/cuda/include  -I/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -march=native -std=gnu++17 -fPIC -Wall -Wextra -Wno-unused-parameter -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/registerConstantV.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/registerConstantV.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/registerConstantV.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/registerConstantV.cpp
+[ 46%] Swig compile python/ConstantVPlugin.i for python
+[ 46%] Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o
+/home/andy/miniforge3/envs/cuda/bin/cmake -E make_directory /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv.dir /home/andy/test_optimization/openmm_core_integration/build /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv.dir
+/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ -DConstantVAPI_EXPORTS -DOPENMM_BUILD_CUDA_LIB -I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/andy/miniforge3/envs/cuda/include  -I/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -march=native -std=gnu++17 -fPIC -Wall -Wextra -Wno-unused-parameter -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp
+/home/andy/miniforge3/envs/cuda/bin/cmake -E touch /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv.dir/ConstantVPluginPYTHON.stamp
+/home/andy/miniforge3/envs/cuda/bin/cmake -E env SWIG_LIB=/home/andy/miniforge3/envs/cuda/share/swig/4.4.0 /home/andy/miniforge3/envs/cuda/bin/swig4.0 -python -c++ -outdir /home/andy/test_optimization/openmm_core_integration/build -c++ -module constantv -interface _constantv -I/home/andy/miniforge3/envs/cuda/include -I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -o /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv.dir/ConstantVPluginPYTHON_wrap.cxx /home/andy/test_optimization/openmm_core_integration/python/ConstantVPlugin.i
+/home/andy/test_optimization/openmm_core_integration/python/ConstantVPlugin.i:384: Warning 302: Redefinition of identifier 'Integrator' as OpenMM::Integrator ignored,
+/home/andy/test_optimization/openmm_core_integration/python/ConstantVPlugin.i:207: Warning 302: previous definition of 'Integrator' as OpenMM::Integrator.
+make[2]: Leaving directory '/home/andy/test_optimization/openmm_core_integration/build'
+[ 46%] Built target constantv_swig_compilation
+[ 53%] Linking CXX shared library libConstantVAPI.so
+/home/andy/miniforge3/envs/cuda/bin/cmake -E cmake_link_script CMakeFiles/ConstantVAPI.dir/link.txt --verbose=1
+/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ -fPIC -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/andy/miniforge3/envs/cuda/include  -I/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -march=native -shared -Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/andy/miniforge3/envs/cuda/lib -Wl,-rpath-link,/home/andy/miniforge3/envs/cuda/lib -L/home/andy/miniforge3/envs/cuda/lib  -L/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/lib -L/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/lib/stubs -Wl,--dependency-file=CMakeFiles/ConstantVAPI.dir/link.d -Wl,-soname,libConstantVAPI.so.1 -o libConstantVAPI.so.1.0.0 CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVKernelFactory.cpp.o CMakeFiles/ConstantVAPI.dir/openmmapi/src/registerConstantV.cpp.o  /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so
+/home/andy/miniforge3/envs/cuda/bin/cmake -E cmake_symlink_library libConstantVAPI.so.1.0.0 libConstantVAPI.so.1 libConstantVAPI.so
+make[2]: Leaving directory '/home/andy/test_optimization/openmm_core_integration/build'
+[ 53%] Built target ConstantVAPI
+make  -f CMakeFiles/ConstantVCUDA.dir/build.make CMakeFiles/ConstantVCUDA.dir/depend
+make[2]: Entering directory '/home/andy/test_optimization/openmm_core_integration/build'
+cd /home/andy/test_optimization/openmm_core_integration/build && /home/andy/miniforge3/envs/cuda/bin/cmake -E cmake_depends "Unix Makefiles" /home/andy/test_optimization/openmm_core_integration /home/andy/test_optimization/openmm_core_integration /home/andy/test_optimization/openmm_core_integration/build /home/andy/test_optimization/openmm_core_integration/build /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/ConstantVCUDA.dir/DependInfo.cmake "--color=" ConstantVCUDA
+make[2]: Leaving directory '/home/andy/test_optimization/openmm_core_integration/build'
+make  -f CMakeFiles/ConstantVCUDA.dir/build.make CMakeFiles/ConstantVCUDA.dir/build
+make[2]: Entering directory '/home/andy/test_optimization/openmm_core_integration/build'
+[ 61%] Building CUDA object CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o
+[ 69%] Building CUDA object CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o
+/home/andy/miniforge3/envs/cuda/bin/nvcc -forward-unknown-to-host-compiler -DConstantVCUDA_EXPORTS --options-file CMakeFiles/ConstantVCUDA.dir/includes_CUDA.rsp -O3 -DNDEBUG --use_fast_math -std=c++17 "--generate-code=arch=compute_70,code=[compute_70,sm_70]" "--generate-code=arch=compute_75,code=[compute_75,sm_75]" "--generate-code=arch=compute_80,code=[compute_80,sm_80]" "--generate-code=arch=compute_86,code=[compute_86,sm_86]" "--generate-code=arch=compute_89,code=[compute_89,sm_89]" "--generate-code=arch=compute_90,code=[compute_90,sm_90]" -Xcompiler=-fPIC -Wall -Wextra -Wno-unused-parameter --expt-relaxed-constexpr --use_fast_math -Xptxas=-v --generate-line-info -MD -MT CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o -MF CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o.d -x cu -rdc=true -c /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/kernels/constantVDrudeLangevin.cu -o CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/kernels/constantVDrudeLangevin.cu.o
+/home/andy/miniforge3/envs/cuda/bin/nvcc -forward-unknown-to-host-compiler -DConstantVCUDA_EXPORTS --options-file CMakeFiles/ConstantVCUDA.dir/includes_CUDA.rsp -O3 -DNDEBUG --use_fast_math -std=c++17 "--generate-code=arch=compute_70,code=[compute_70,sm_70]" "--generate-code=arch=compute_75,code=[compute_75,sm_75]" "--generate-code=arch=compute_80,code=[compute_80,sm_80]" "--generate-code=arch=compute_86,code=[compute_86,sm_86]" "--generate-code=arch=compute_89,code=[compute_89,sm_89]" "--generate-code=arch=compute_90,code=[compute_90,sm_90]" -Xcompiler=-fPIC -Wall -Wextra -Wno-unused-parameter --expt-relaxed-constexpr --use_fast_math -Xptxas=-v --generate-line-info -MD -MT CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o -MF CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o.d -x cu -rdc=true -c /home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp -o CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o
+nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
+nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/kernels/constantVDrudeLangevin.cu(1421): warning #20091-D: a __constant__ variable "BOLTZ" cannot be directly read in a host function
+      double noisescale = sqrt(2 * BOLTZ * temperature * friction) *
+                                   ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/kernels/constantVDrudeLangevin.cu(1426): warning #20091-D: a __constant__ variable "BOLTZ" cannot be directly read in a host function
+      double noisescaleDrude = sqrt(2 * BOLTZ * drudeTemperature * drudeFriction) *
+                                        ^
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/kernels/constantVDrudeLangevin.cu(1429): warning #20091-D: a __constant__ variable "BOLTZ" cannot be directly read in a host function
+      double hardwallscaleDrude = sqrt(BOLTZ * drudeTemperature);
+                                       ^
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/kernels/constantVDrudeLangevin.cu(1666): warning #20091-D: a __constant__ variable "BOLTZ" cannot be directly read in a host function
+      double noisescale = sqrt(2 * BOLTZ * temperature * friction) *
+                                   ^
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/kernels/constantVDrudeLangevin.cu(1671): warning #20091-D: a __constant__ variable "BOLTZ" cannot be directly read in a host function
+      double noisescaleDrude = sqrt(2 * BOLTZ * drudeTemperature * drudeFriction) *
+                                        ^
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/kernels/constantVDrudeLangevin.cu(1674): warning #20091-D: a __constant__ variable "BOLTZ" cannot be directly read in a host function
+      double hardwallscaleDrude = sqrt(BOLTZ * drudeTemperature);
+                                       ^
+
+ptxas info    : 0 bytes gmem, 40 bytes cmem[3]
+ptxas info    : Compiling entry function '_Z30applyHardWallConstraintsKernelP6float4S0_PK4int2ifff' for 'sm_70'
+ptxas info    : Function properties for _Z30applyHardWallConstraintsKernelP6float4S0_PK4int2ifff
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 45 registers, used 0 barriers, 392 bytes cmem[0]
+ptxas info    : Compile time = 20.308 ms
+ptxas info    : Compiling entry function '_Z33integrateDrudeLangevinPart2KernelP6float4PKS_S0_if' for 'sm_70'
+ptxas info    : Function properties for _Z33integrateDrudeLangevinPart2KernelP6float4PKS_S0_if
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 22 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 1.231 ms
+ptxas info    : Compiling entry function '_Z33integrateDrudeLangevinPart1KernelP6float4PKxS0_PKiPK4int2iiifffffffPKS_j' for 'sm_70'
+ptxas info    : Function properties for _Z33integrateDrudeLangevinPart1KernelP6float4PKxS0_PKiPK4int2iiifffffffPKS_j
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, used 0 barriers, 444 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 6.434 ms
+ptxas info    : Compiling entry function 'scaleChargesAnalyticKernel' for 'sm_70'
+ptxas info    : Function properties for scaleChargesAnalyticKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 46 registers, used 1 barriers, 572 bytes smem, 388 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 30.677 ms
+ptxas info    : Compiling entry function 'computeAnalyticChargeKernel' for 'sm_70'
+ptxas info    : Function properties for computeAnalyticChargeKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 52 registers, used 1 barriers, 280 bytes smem, 388 bytes cmem[0]
+ptxas info    : Compile time = 31.765 ms
+ptxas info    : Compiling entry function 'updateNanotubeChargesStep2Kernel' for 'sm_70'
+ptxas info    : Function properties for updateNanotubeChargesStep2Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 16 bytes smem, 408 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 5.368 ms
+ptxas info    : Compiling entry function 'updateNanotubeChargesStep1Kernel' for 'sm_70'
+ptxas info    : Function properties for updateNanotubeChargesStep1Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 54 registers, used 0 barriers, 396 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 5.924 ms
+ptxas info    : Compiling entry function 'updateBuckyballChargesStep2Kernel' for 'sm_70'
+ptxas info    : Function properties for updateBuckyballChargesStep2Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 16 bytes smem, 408 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 4.946 ms
+ptxas info    : Compiling entry function 'updateBuckyballChargesStep1Kernel' for 'sm_70'
+ptxas info    : Function properties for updateBuckyballChargesStep1Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 54 registers, used 0 barriers, 396 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 6.840 ms
+ptxas info    : Compiling entry function 'updateAnodeChargesKernel' for 'sm_70'
+ptxas info    : Function properties for updateAnodeChargesKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 412 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 3.218 ms
+ptxas info    : Compiling entry function 'updateCathodeChargesKernel' for 'sm_70'
+ptxas info    : Function properties for updateCathodeChargesKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 412 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 2.529 ms
+ptxas info    : Function properties for _Z14blockReduceSumi
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 3.094 ms
+ptxas info    : Function properties for _Z14blockReduceSumd
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 4.324 ms
+ptxas info    : Function properties for _Z13warpReduceSumi
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 2.591 ms
+ptxas info    : Function properties for _Z13warpReduceSumd
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 2.624 ms
+ptxas info    : 0 bytes gmem, 40 bytes cmem[3]
+ptxas info    : Compiling entry function '_Z30applyHardWallConstraintsKernelP6float4S0_PK4int2ifff' for 'sm_75'
+ptxas info    : Function properties for _Z30applyHardWallConstraintsKernelP6float4S0_PK4int2ifff
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 48 registers, used 0 barriers, 392 bytes cmem[0]
+ptxas info    : Compile time = 6.168 ms
+ptxas info    : Compiling entry function '_Z33integrateDrudeLangevinPart2KernelP6float4PKS_S0_if' for 'sm_75'
+ptxas info    : Function properties for _Z33integrateDrudeLangevinPart2KernelP6float4PKS_S0_if
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 18 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 2.002 ms
+ptxas info    : Compiling entry function '_Z33integrateDrudeLangevinPart1KernelP6float4PKxS0_PKiPK4int2iiifffffffPKS_j' for 'sm_75'
+ptxas info    : Function properties for _Z33integrateDrudeLangevinPart1KernelP6float4PKxS0_PKiPK4int2iiifffffffPKS_j
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 49 registers, used 0 barriers, 444 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 6.128 ms
+ptxas info    : Compiling entry function 'scaleChargesAnalyticKernel' for 'sm_75'
+ptxas info    : Function properties for scaleChargesAnalyticKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 44 registers, used 1 barriers, 572 bytes smem, 388 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 30.796 ms
+ptxas info    : Compiling entry function 'computeAnalyticChargeKernel' for 'sm_75'
+ptxas info    : Function properties for computeAnalyticChargeKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 51 registers, used 1 barriers, 280 bytes smem, 388 bytes cmem[0]
+ptxas info    : Compile time = 33.906 ms
+ptxas info    : Compiling entry function 'updateNanotubeChargesStep2Kernel' for 'sm_75'
+ptxas info    : Function properties for updateNanotubeChargesStep2Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 16 bytes smem, 408 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 7.114 ms
+ptxas info    : Compiling entry function 'updateNanotubeChargesStep1Kernel' for 'sm_75'
+ptxas info    : Function properties for updateNanotubeChargesStep1Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 54 registers, used 0 barriers, 396 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 6.792 ms
+ptxas info    : Compiling entry function 'updateBuckyballChargesStep2Kernel' for 'sm_75'
+ptxas info    : Function properties for updateBuckyballChargesStep2Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 16 bytes smem, 408 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 7.125 ms
+ptxas info    : Compiling entry function 'updateBuckyballChargesStep1Kernel' for 'sm_75'
+ptxas info    : Function properties for updateBuckyballChargesStep1Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 54 registers, used 0 barriers, 396 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 6.479 ms
+ptxas info    : Compiling entry function 'updateAnodeChargesKernel' for 'sm_75'
+ptxas info    : Function properties for updateAnodeChargesKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 412 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 3.467 ms
+ptxas info    : Compiling entry function 'updateCathodeChargesKernel' for 'sm_75'
+ptxas info    : Function properties for updateCathodeChargesKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 412 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 4.227 ms
+ptxas info    : Function properties for _Z14blockReduceSumi
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 3.899 ms
+ptxas info    : Function properties for _Z14blockReduceSumd
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 5.767 ms
+ptxas info    : Function properties for _Z13warpReduceSumi
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 1.683 ms
+ptxas info    : Function properties for _Z13warpReduceSumd
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 2.319 ms
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp(891): error: a host function call cannot be configured
+              computeAnalyticChargeKernel<<<1, 256>>>(
+              ^
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp(930): error: a host function call cannot be configured
+              updateCathodeChargesKernel<<<numBlocks, blockSize>>>(
+              ^
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp(948): error: a host function call cannot be configured
+              updateAnodeChargesKernel<<<numBlocks, blockSize>>>(
+              ^
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp(968): error: a host function call cannot be configured
+                  updateBuckyballChargesStep1Kernel<<<numBlocks, blockSize>>>(
+                  ^
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp(983): error: a host function call cannot be configured
+                  updateNanotubeChargesStep1Kernel<<<numBlocks, blockSize>>>(
+                  ^
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp(1009): error: a host function call cannot be configured
+                  updateBuckyballChargesStep2Kernel<<<numBlocks, blockSize>>>(
+                  ^
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp(1025): error: a host function call cannot be configured
+                  updateNanotubeChargesStep2Kernel<<<numBlocks, blockSize>>>(
+                  ^
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp(1041): error: a host function call cannot be configured
+              computeAnalyticChargeKernel<<<1, 256>>>(
+              ^
+
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp(1055): error: a host function call cannot be configured
+          scaleChargesAnalyticKernel<<<1, 256>>>(
+          ^
+
+9 errors detected in the compilation of "/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/CudaConstantVKernels.cpp".
+make[2]: *** [CMakeFiles/ConstantVCUDA.dir/build.make:95: CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/CudaConstantVKernels.cpp.o] Error 2
+make[2]: *** Waiting for unfinished jobs....
+ptxas info    : 0 bytes gmem, 40 bytes cmem[3]
+ptxas info    : Compiling entry function '_Z30applyHardWallConstraintsKernelP6float4S0_PK4int2ifff' for 'sm_80'
+ptxas info    : Function properties for _Z30applyHardWallConstraintsKernelP6float4S0_PK4int2ifff
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 46 registers, used 0 barriers, 392 bytes cmem[0]
+ptxas info    : Compile time = 6.286 ms
+ptxas info    : Compiling entry function '_Z33integrateDrudeLangevinPart2KernelP6float4PKS_S0_if' for 'sm_80'
+ptxas info    : Function properties for _Z33integrateDrudeLangevinPart2KernelP6float4PKS_S0_if
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 22 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 1.473 ms
+ptxas info    : Compiling entry function '_Z33integrateDrudeLangevinPart1KernelP6float4PKxS0_PKiPK4int2iiifffffffPKS_j' for 'sm_80'
+ptxas info    : Function properties for _Z33integrateDrudeLangevinPart1KernelP6float4PKxS0_PKiPK4int2iiifffffffPKS_j
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, used 0 barriers, 444 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 6.652 ms
+ptxas info    : Compiling entry function 'scaleChargesAnalyticKernel' for 'sm_80'
+ptxas info    : Function properties for scaleChargesAnalyticKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 44 registers, used 1 barriers, 572 bytes smem, 388 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 35.836 ms
+ptxas info    : Compiling entry function 'computeAnalyticChargeKernel' for 'sm_80'
+ptxas info    : Function properties for computeAnalyticChargeKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 52 registers, used 1 barriers, 280 bytes smem, 388 bytes cmem[0]
+ptxas info    : Compile time = 35.068 ms
+ptxas info    : Compiling entry function 'updateNanotubeChargesStep2Kernel' for 'sm_80'
+ptxas info    : Function properties for updateNanotubeChargesStep2Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 16 bytes smem, 408 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 6.320 ms
+ptxas info    : Compiling entry function 'updateNanotubeChargesStep1Kernel' for 'sm_80'
+ptxas info    : Function properties for updateNanotubeChargesStep1Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 54 registers, used 0 barriers, 396 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 7.331 ms
+ptxas info    : Compiling entry function 'updateBuckyballChargesStep2Kernel' for 'sm_80'
+ptxas info    : Function properties for updateBuckyballChargesStep2Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 16 bytes smem, 408 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 5.608 ms
+ptxas info    : Compiling entry function 'updateBuckyballChargesStep1Kernel' for 'sm_80'
+ptxas info    : Function properties for updateBuckyballChargesStep1Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 54 registers, used 0 barriers, 396 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 6.465 ms
+ptxas info    : Compiling entry function 'updateAnodeChargesKernel' for 'sm_80'
+ptxas info    : Function properties for updateAnodeChargesKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 412 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 3.801 ms
+ptxas info    : Compiling entry function 'updateCathodeChargesKernel' for 'sm_80'
+ptxas info    : Function properties for updateCathodeChargesKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 412 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 3.087 ms
+ptxas info    : Function properties for _Z14blockReduceSumi
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 3.992 ms
+ptxas info    : Function properties for _Z14blockReduceSumd
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 5.462 ms
+ptxas info    : Function properties for _Z13warpReduceSumi
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 2.279 ms
+ptxas info    : Function properties for _Z13warpReduceSumd
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 2.689 ms
+ptxas info    : 0 bytes gmem, 40 bytes cmem[3]
+ptxas info    : Compiling entry function '_Z30applyHardWallConstraintsKernelP6float4S0_PK4int2ifff' for 'sm_86'
+ptxas info    : Function properties for _Z30applyHardWallConstraintsKernelP6float4S0_PK4int2ifff
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 46 registers, used 0 barriers, 392 bytes cmem[0]
+ptxas info    : Compile time = 4.811 ms
+ptxas info    : Compiling entry function '_Z33integrateDrudeLangevinPart2KernelP6float4PKS_S0_if' for 'sm_86'
+ptxas info    : Function properties for _Z33integrateDrudeLangevinPart2KernelP6float4PKS_S0_if
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 22 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 1.909 ms
+ptxas info    : Compiling entry function '_Z33integrateDrudeLangevinPart1KernelP6float4PKxS0_PKiPK4int2iiifffffffPKS_j' for 'sm_86'
+ptxas info    : Function properties for _Z33integrateDrudeLangevinPart1KernelP6float4PKxS0_PKiPK4int2iiifffffffPKS_j
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 0 barriers, 444 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 5.332 ms
+ptxas info    : Compiling entry function 'scaleChargesAnalyticKernel' for 'sm_86'
+ptxas info    : Function properties for scaleChargesAnalyticKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 44 registers, used 1 barriers, 572 bytes smem, 388 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 37.054 ms
+ptxas info    : Compiling entry function 'computeAnalyticChargeKernel' for 'sm_86'
+ptxas info    : Function properties for computeAnalyticChargeKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 53 registers, used 1 barriers, 280 bytes smem, 388 bytes cmem[0]
+ptxas info    : Compile time = 39.650 ms
+ptxas info    : Compiling entry function 'updateNanotubeChargesStep2Kernel' for 'sm_86'
+ptxas info    : Function properties for updateNanotubeChargesStep2Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 42 registers, used 1 barriers, 16 bytes smem, 408 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 6.339 ms
+ptxas info    : Compiling entry function 'updateNanotubeChargesStep1Kernel' for 'sm_86'
+ptxas info    : Function properties for updateNanotubeChargesStep1Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 53 registers, used 0 barriers, 396 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 7.431 ms
+ptxas info    : Compiling entry function 'updateBuckyballChargesStep2Kernel' for 'sm_86'
+ptxas info    : Function properties for updateBuckyballChargesStep2Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 42 registers, used 1 barriers, 16 bytes smem, 408 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 5.788 ms
+ptxas info    : Compiling entry function 'updateBuckyballChargesStep1Kernel' for 'sm_86'
+ptxas info    : Function properties for updateBuckyballChargesStep1Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 56 registers, used 0 barriers, 396 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 6.252 ms
+ptxas info    : Compiling entry function 'updateAnodeChargesKernel' for 'sm_86'
+ptxas info    : Function properties for updateAnodeChargesKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 412 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 3.406 ms
+ptxas info    : Compiling entry function 'updateCathodeChargesKernel' for 'sm_86'
+ptxas info    : Function properties for updateCathodeChargesKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 412 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 2.890 ms
+ptxas info    : Function properties for _Z14blockReduceSumi
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 3.583 ms
+ptxas info    : Function properties for _Z14blockReduceSumd
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 6.947 ms
+ptxas info    : Function properties for _Z13warpReduceSumi
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 2.062 ms
+ptxas info    : Function properties for _Z13warpReduceSumd
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 2.312 ms
+ptxas info    : 0 bytes gmem, 40 bytes cmem[3]
+ptxas info    : Compiling entry function '_Z30applyHardWallConstraintsKernelP6float4S0_PK4int2ifff' for 'sm_89'
+ptxas info    : Function properties for _Z30applyHardWallConstraintsKernelP6float4S0_PK4int2ifff
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 46 registers, used 0 barriers, 392 bytes cmem[0]
+ptxas info    : Compile time = 5.196 ms
+ptxas info    : Compiling entry function '_Z33integrateDrudeLangevinPart2KernelP6float4PKS_S0_if' for 'sm_89'
+ptxas info    : Function properties for _Z33integrateDrudeLangevinPart2KernelP6float4PKS_S0_if
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 22 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 1.299 ms
+ptxas info    : Compiling entry function '_Z33integrateDrudeLangevinPart1KernelP6float4PKxS0_PKiPK4int2iiifffffffPKS_j' for 'sm_89'
+ptxas info    : Function properties for _Z33integrateDrudeLangevinPart1KernelP6float4PKxS0_PKiPK4int2iiifffffffPKS_j
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 0 barriers, 444 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 6.419 ms
+ptxas info    : Compiling entry function 'scaleChargesAnalyticKernel' for 'sm_89'
+ptxas info    : Function properties for scaleChargesAnalyticKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 44 registers, used 1 barriers, 572 bytes smem, 388 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 39.664 ms
+ptxas info    : Compiling entry function 'computeAnalyticChargeKernel' for 'sm_89'
+ptxas info    : Function properties for computeAnalyticChargeKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 53 registers, used 1 barriers, 280 bytes smem, 388 bytes cmem[0]
+ptxas info    : Compile time = 40.542 ms
+ptxas info    : Compiling entry function 'updateNanotubeChargesStep2Kernel' for 'sm_89'
+ptxas info    : Function properties for updateNanotubeChargesStep2Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 42 registers, used 1 barriers, 16 bytes smem, 408 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 6.561 ms
+ptxas info    : Compiling entry function 'updateNanotubeChargesStep1Kernel' for 'sm_89'
+ptxas info    : Function properties for updateNanotubeChargesStep1Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 53 registers, used 0 barriers, 396 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 7.422 ms
+ptxas info    : Compiling entry function 'updateBuckyballChargesStep2Kernel' for 'sm_89'
+ptxas info    : Function properties for updateBuckyballChargesStep2Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 42 registers, used 1 barriers, 16 bytes smem, 408 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 6.007 ms
+ptxas info    : Compiling entry function 'updateBuckyballChargesStep1Kernel' for 'sm_89'
+ptxas info    : Function properties for updateBuckyballChargesStep1Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 56 registers, used 0 barriers, 396 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 7.738 ms
+ptxas info    : Compiling entry function 'updateAnodeChargesKernel' for 'sm_89'
+ptxas info    : Function properties for updateAnodeChargesKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 412 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 3.261 ms
+ptxas info    : Compiling entry function 'updateCathodeChargesKernel' for 'sm_89'
+ptxas info    : Function properties for updateCathodeChargesKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 412 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 3.612 ms
+ptxas info    : Function properties for _Z14blockReduceSumi
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 3.712 ms
+ptxas info    : Function properties for _Z14blockReduceSumd
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 5.991 ms
+ptxas info    : Function properties for _Z13warpReduceSumi
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 1.772 ms
+ptxas info    : Function properties for _Z13warpReduceSumd
+    8 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Compile time = 2.314 ms
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z30applyHardWallConstraintsKernelP6float4S0_PK4int2ifff' for 'sm_90'
+ptxas info    : Function properties for _Z30applyHardWallConstraintsKernelP6float4S0_PK4int2ifff
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 46 registers, used 0 barriers
+ptxas info    : Compile time = 14.748 ms
+ptxas info    : Compiling entry function '_Z33integrateDrudeLangevinPart2KernelP6float4PKS_S0_if' for 'sm_90'
+ptxas info    : Function properties for _Z33integrateDrudeLangevinPart2KernelP6float4PKS_S0_if
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 22 registers, used 0 barriers
+ptxas info    : Compile time = 2.949 ms
+ptxas info    : Compiling entry function '_Z33integrateDrudeLangevinPart1KernelP6float4PKxS0_PKiPK4int2iiifffffffPKS_j' for 'sm_90'
+ptxas info    : Function properties for _Z33integrateDrudeLangevinPart1KernelP6float4PKxS0_PKiPK4int2iiifffffffPKS_j
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 0 barriers
+ptxas info    : Compile time = 8.492 ms
+ptxas info    : Compiling entry function 'scaleChargesAnalyticKernel' for 'sm_90'
+ptxas info    : Function properties for scaleChargesAnalyticKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 38 registers, used 1 barriers, 572 bytes smem
+ptxas info    : Compile time = 35.111 ms
+ptxas info    : Compiling entry function 'computeAnalyticChargeKernel' for 'sm_90'
+ptxas info    : Function properties for computeAnalyticChargeKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 54 registers, used 1 barriers, 280 bytes smem
+ptxas info    : Compile time = 29.799 ms
+ptxas info    : Compiling entry function 'updateNanotubeChargesStep2Kernel' for 'sm_90'
+ptxas info    : Function properties for updateNanotubeChargesStep2Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 38 registers, used 1 barriers, 16 bytes smem
+ptxas info    : Compile time = 9.075 ms
+ptxas info    : Compiling entry function 'updateNanotubeChargesStep1Kernel' for 'sm_90'
+ptxas info    : Function properties for updateNanotubeChargesStep1Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 54 registers, used 0 barriers
+ptxas info    : Compile time = 8.588 ms
+ptxas info    : Compiling entry function 'updateBuckyballChargesStep2Kernel' for 'sm_90'
+ptxas info    : Function properties for updateBuckyballChargesStep2Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 38 registers, used 1 barriers, 16 bytes smem
+ptxas info    : Compile time = 7.989 ms
+ptxas info    : Compiling entry function 'updateBuckyballChargesStep1Kernel' for 'sm_90'
+ptxas info    : Function properties for updateBuckyballChargesStep1Kernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 54 registers, used 0 barriers
+ptxas info    : Compile time = 8.555 ms
+ptxas info    : Compiling entry function 'updateAnodeChargesKernel' for 'sm_90'
+ptxas info    : Function properties for updateAnodeChargesKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers
+ptxas info    : Compile time = 5.756 ms
+ptxas info    : Compiling entry function 'updateCathodeChargesKernel' for 'sm_90'
+ptxas info    : Function properties for updateCathodeChargesKernel
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers
+ptxas info    : Compile time = 4.547 ms
+ptxas info    : Function properties for _Z14blockReduceSumi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compile time = 2.831 ms
+ptxas info    : Function properties for _Z14blockReduceSumd
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compile time = 3.909 ms
+ptxas info    : Function properties for _Z13warpReduceSumi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compile time = 0.937 ms
+ptxas info    : Function properties for _Z13warpReduceSumd
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compile time = 1.359 ms
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/kernels/constantVDrudeLangevin.cu: In function 'void executeConstantVDrudeLangevinStep(int, int, float4*, float4*, long long int*, float4*, float4*, unsigned int, ElectrodeData*, DrudeParticleData*, float, float, float, float, float, float, int, int, int, int, int, int, int, int)':
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/kernels/constantVDrudeLangevin.cu:1507:98: warning: passing argument 4 to 'restrict'-qualified parameter aliases with argument 5 [-Wrestrict]
+ 1507 |                 updateBuckyballChargesStep1Kernel<<<numBlocks, blockSize>>>(
+      |                                                                 ~~~~~~~~~~~~                     ^                                                                               
+/home/andy/test_optimization/openmm_core_integration/platforms/cuda/src/kernels/constantVDrudeLangevin.cu:1527:97: warning: passing argument 4 to 'restrict'-qualified parameter aliases with argument 5 [-Wrestrict]
+ 1527 |                 updateNanotubeChargesStep1Kernel<<<numBlocks, blockSize>>>(
+      |                                                                 ~~~~~~~~~~~                     ^                                                                             
+make[2]: Leaving directory '/home/andy/test_optimization/openmm_core_integration/build'
+make[1]: *** [CMakeFiles/Makefile2:127: CMakeFiles/ConstantVCUDA.dir/all] Error 2
+make[1]: Leaving directory '/home/andy/test_optimization/openmm_core_integration/build'
+make: *** [Makefile:146: all] Error 2
+[0;31m[ERROR][0m Build failed!

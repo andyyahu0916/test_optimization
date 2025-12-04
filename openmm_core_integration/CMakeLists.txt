@@ -144,6 +144,9 @@ if(BUILD_CUDA_LIB)
         platforms/cuda/src/CudaConstantVKernels.cpp
     )
 
+    # Mark C++ file as CUDA source (needed for kernel calls with <<<>>> syntax)
+    set_source_files_properties(platforms/cuda/src/CudaConstantVKernels.cpp PROPERTIES LANGUAGE CUDA)
+
     add_library(ConstantVCUDA SHARED ${CUDA_SOURCES})
 
     target_link_libraries(ConstantVCUDA

@@ -490,8 +490,6 @@ CMakeFiles/constantv.dir/CMakeFiles/constantv.dir/ConstantVPluginPYTHON_wrap.cxx
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/wchar.h
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/include/wctype.h
  /home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVDrudeLangevinIntegrator.h
- /home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVForce.h
- /home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVIntegrator.h
 
 _constantvcpython-313-x86_64-linux-gnu.so
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/crtbeginS.o
@@ -515,7 +513,6 @@ _constantvcpython-313-x86_64-linux-gnu.so
  /home/andy/miniforge3/envs/cuda/lib/libpython3.13.so
  /home/andy/miniforge3/envs/cuda/lib/libstdc++.so
  /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so
- /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMDrudeCUDA.so
  /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/lib/stubs/libcuda.so
  /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/librt.a
  /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv.dir/CMakeFiles/constantv.dir/ConstantVPluginPYTHON_wrap.cxx.o

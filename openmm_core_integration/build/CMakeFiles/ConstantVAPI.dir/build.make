@@ -72,38 +72,10 @@ include CMakeFiles/ConstantVAPI.dir/flags.make
 CMakeFiles/ConstantVAPI.dir/codegen:
 .PHONY : CMakeFiles/ConstantVAPI.dir/codegen
 
-CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o: CMakeFiles/ConstantVAPI.dir/flags.make
-CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o: /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVForce.cpp
-CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o: CMakeFiles/ConstantVAPI.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o"
-	/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVForce.cpp
-
-CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.i"
-	/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVForce.cpp > CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.i
-
-CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.s"
-	/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVForce.cpp -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.s
-
-CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o: CMakeFiles/ConstantVAPI.dir/flags.make
-CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o: /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVForceImpl.cpp
-CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o: CMakeFiles/ConstantVAPI.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o"
-	/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVForceImpl.cpp
-
-CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.i"
-	/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVForceImpl.cpp > CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.i
-
-CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.s"
-	/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVForceImpl.cpp -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.s
-
 CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o: CMakeFiles/ConstantVAPI.dir/flags.make
 CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o: /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp
 CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o: CMakeFiles/ConstantVAPI.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o"
 	/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp
 
 CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.i: cmake_force
@@ -116,21 +88,18 @@ CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.s
 
 # Object files for target ConstantVAPI
 ConstantVAPI_OBJECTS = \
-"CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o" \
-"CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o" \
 "CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o"
 
 # External object files for target ConstantVAPI
 ConstantVAPI_EXTERNAL_OBJECTS =
 
-libConstantVAPI.so.1.0.0: CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o
-libConstantVAPI.so.1.0.0: CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o
 libConstantVAPI.so.1.0.0: CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o
 libConstantVAPI.so.1.0.0: CMakeFiles/ConstantVAPI.dir/build.make
 libConstantVAPI.so.1.0.0: CMakeFiles/ConstantVAPI.dir/compiler_depend.ts
 libConstantVAPI.so.1.0.0: /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so
+libConstantVAPI.so.1.0.0: /home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so
 libConstantVAPI.so.1.0.0: CMakeFiles/ConstantVAPI.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX shared library libConstantVAPI.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX shared library libConstantVAPI.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ConstantVAPI.dir/link.txt --verbose=$(VERBOSE)
 	$(CMAKE_COMMAND) -E cmake_symlink_library libConstantVAPI.so.1.0.0 libConstantVAPI.so.1 libConstantVAPI.so
 

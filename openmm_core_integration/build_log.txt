@@ -1,0 +1,144 @@
+Detected mamba/conda environment: /home/andy/miniforge3/envs/cuda
+[0;34m[INFO][0m Starting ConstantV Native Integration build...
+
+[0;34m[INFO][0m CMake version: 4.2.0
+[0;34m[INFO][0m CUDA version (mamba): 12.9
+[0;34m[INFO][0m Python version: 3.13.9
+[0;34m[INFO][0m SWIG version: 4.4.0
+[0;34m[INFO][0m OpenMM directory: /home/andy/miniforge3/envs/cuda
+
+[0;34m[INFO][0m Configuring CMake...
+
+-- The CXX compiler identification is GNU 14.3.0
+-- The CUDA compiler identification is NVIDIA 12.9.86 with host compiler GNU 14.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting CUDA compiler ABI info
+-- Detecting CUDA compiler ABI info - done
+-- Check for working CUDA compiler: /home/andy/miniforge3/envs/cuda/bin/nvcc - skipped
+-- Detecting CUDA compile features
+-- Detecting CUDA compile features - done
+-- Detected mamba/conda environment: /home/andy/miniforge3/envs/cuda
+-- Found CUDAToolkit: /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include (found version "12.9.86")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Found SWIG: /home/andy/miniforge3/envs/cuda/bin/swig4.0 (found suitable version "4.4.0", minimum required is "4.0")
+-- Found Python3: /home/andy/miniforge3/envs/cuda/bin/python3.13 (found version "3.13.9") found components: Interpreter Development Development.Module Development.Embed
+-- 
+-- ConstantV Native Integration Configuration Summary
+-- ==================================================
+-- Build type:           Release
+-- C++ Compiler:         /home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++
+-- CUDA Compiler:        /home/andy/miniforge3/envs/cuda/bin/nvcc
+-- CUDA Architectures:   70;75;80;86;89;90
+-- OpenMM Include:       /home/andy/miniforge3/envs/cuda/include
+-- OpenMM Libraries:     /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so
+-- Python Executable:    /home/andy/miniforge3/envs/cuda/bin/python3.13
+-- Python Site-Packages: /home/andy/miniforge3/envs/cuda/lib/python3.13/site-packages
+-- 
+-- Build Options:
+--   CUDA Library:       ON
+--   Reference Library:  OFF
+--   Python Wrappers:    ON
+-- 
+-- Configuring done (52.5s)
+-- Generating done (0.0s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CUDA_TOOLKIT_ROOT_DIR
+    OpenMM_DIR
+
+
+-- Build files have been written to: /home/andy/test_optimization/openmm_core_integration/build
+
+[0;32m[SUCCESS][0m CMake configuration complete
+
+[0;34m[INFO][0m Building with 22 parallel jobs...
+
+/home/andy/miniforge3/envs/cuda/bin/cmake -S/home/andy/test_optimization/openmm_core_integration -B/home/andy/test_optimization/openmm_core_integration/build --check-build-system CMakeFiles/Makefile.cmake 0
+/home/andy/miniforge3/envs/cuda/bin/cmake -E cmake_progress_start /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles /home/andy/test_optimization/openmm_core_integration/build//CMakeFiles/progress.marks
+make  -f CMakeFiles/Makefile2 all
+make[1]: Entering directory '/home/andy/test_optimization/openmm_core_integration/build'
+make  -f CMakeFiles/ConstantVAPI.dir/build.make CMakeFiles/ConstantVAPI.dir/depend
+make  -f CMakeFiles/constantv_swig_compilation.dir/build.make CMakeFiles/constantv_swig_compilation.dir/depend
+make[2]: Entering directory '/home/andy/test_optimization/openmm_core_integration/build'
+cd /home/andy/test_optimization/openmm_core_integration/build && /home/andy/miniforge3/envs/cuda/bin/cmake -E cmake_depends "Unix Makefiles" /home/andy/test_optimization/openmm_core_integration /home/andy/test_optimization/openmm_core_integration /home/andy/test_optimization/openmm_core_integration/build /home/andy/test_optimization/openmm_core_integration/build /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/ConstantVAPI.dir/DependInfo.cmake "--color=" ConstantVAPI
+make[2]: Entering directory '/home/andy/test_optimization/openmm_core_integration/build'
+cd /home/andy/test_optimization/openmm_core_integration/build && /home/andy/miniforge3/envs/cuda/bin/cmake -E cmake_depends "Unix Makefiles" /home/andy/test_optimization/openmm_core_integration /home/andy/test_optimization/openmm_core_integration /home/andy/test_optimization/openmm_core_integration/build /home/andy/test_optimization/openmm_core_integration/build /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv_swig_compilation.dir/DependInfo.cmake "--color=" constantv_swig_compilation
+Dependee "/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv_swig_compilation.dir/DependInfo.cmake" is newer than depender "/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv_swig_compilation.dir/depend.internal".
+Dependee "/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/CMakeDirectoryInformation.cmake" is newer than depender "/home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv_swig_compilation.dir/depend.internal".
+Scanning dependencies of target constantv_swig_compilation
+make[2]: Leaving directory '/home/andy/test_optimization/openmm_core_integration/build'
+make  -f CMakeFiles/ConstantVAPI.dir/build.make CMakeFiles/ConstantVAPI.dir/build
+make[2]: Leaving directory '/home/andy/test_optimization/openmm_core_integration/build'
+make  -f CMakeFiles/constantv_swig_compilation.dir/build.make CMakeFiles/constantv_swig_compilation.dir/build
+make[2]: Entering directory '/home/andy/test_optimization/openmm_core_integration/build'
+make[2]: Entering directory '/home/andy/test_optimization/openmm_core_integration/build'
+[ 38%] Swig compile python/ConstantVPlugin.i for python
+[ 38%] Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVKernelFactory.cpp.o
+[ 38%] Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o
+[ 38%] Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o
+[ 38%] Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o
+[ 46%] Building CXX object CMakeFiles/ConstantVAPI.dir/openmmapi/src/registerConstantV.cpp.o
+/home/andy/miniforge3/envs/cuda/bin/cmake -E make_directory /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv.dir /home/andy/test_optimization/openmm_core_integration/build /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv.dir
+/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ -DConstantVAPI_EXPORTS -DOPENMM_BUILD_CUDA_LIB -I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/andy/miniforge3/envs/cuda/include  -I/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -march=native -std=gnu++17 -fPIC -Wall -Wextra -Wno-unused-parameter -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForce.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVForce.cpp
+/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ -DConstantVAPI_EXPORTS -DOPENMM_BUILD_CUDA_LIB -I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/andy/miniforge3/envs/cuda/include  -I/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -march=native -std=gnu++17 -fPIC -Wall -Wextra -Wno-unused-parameter -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVForceImpl.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVForceImpl.cpp
+/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ -DConstantVAPI_EXPORTS -DOPENMM_BUILD_CUDA_LIB -I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/andy/miniforge3/envs/cuda/include  -I/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -march=native -std=gnu++17 -fPIC -Wall -Wextra -Wno-unused-parameter -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp
+/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ -DConstantVAPI_EXPORTS -DOPENMM_BUILD_CUDA_LIB -I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/andy/miniforge3/envs/cuda/include  -I/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -march=native -std=gnu++17 -fPIC -Wall -Wextra -Wno-unused-parameter -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVKernelFactory.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVKernelFactory.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVKernelFactory.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVKernelFactory.cpp
+/home/andy/miniforge3/envs/cuda/bin/x86_64-conda-linux-gnu-c++ -DConstantVAPI_EXPORTS -DOPENMM_BUILD_CUDA_LIB -I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -fvisibility-inlines-hidden -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/andy/miniforge3/envs/cuda/include  -I/home/andy/miniforge3/envs/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -march=native -std=gnu++17 -fPIC -Wall -Wextra -Wno-unused-parameter -MD -MT CMakeFiles/ConstantVAPI.dir/openmmapi/src/registerConstantV.cpp.o -MF CMakeFiles/ConstantVAPI.dir/openmmapi/src/registerConstantV.cpp.o.d -o CMakeFiles/ConstantVAPI.dir/openmmapi/src/registerConstantV.cpp.o -c /home/andy/test_optimization/openmm_core_integration/openmmapi/src/registerConstantV.cpp
+/home/andy/miniforge3/envs/cuda/bin/cmake -E touch /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv.dir/ConstantVPluginPYTHON.stamp
+/home/andy/miniforge3/envs/cuda/bin/cmake -E env SWIG_LIB=/home/andy/miniforge3/envs/cuda/share/swig/4.4.0 /home/andy/miniforge3/envs/cuda/bin/swig4.0 -python -c++ -outdir /home/andy/test_optimization/openmm_core_integration/build -c++ -module constantv -interface _constantv -I/home/andy/miniforge3/envs/cuda/include -I/home/andy/miniforge3/envs/cuda/include/python3.13 -I/home/andy/test_optimization/openmm_core_integration/openmmapi/include -I/home/andy/test_optimization/openmm_core_integration/platforms/cuda/include -I/home/andy/test_optimization/openmm_core_integration/platforms/reference/include -o /home/andy/test_optimization/openmm_core_integration/build/CMakeFiles/constantv.dir/ConstantVPluginPYTHON_wrap.cxx /home/andy/test_optimization/openmm_core_integration/python/ConstantVPlugin.i
+/home/andy/test_optimization/openmm_core_integration/python/ConstantVPlugin.i:384: Warning 302: Redefinition of identifier 'Integrator' as OpenMM::Integrator ignored,
+/home/andy/test_optimization/openmm_core_integration/python/ConstantVPlugin.i:207: Warning 302: previous definition of 'Integrator' as OpenMM::Integrator.
+make[2]: Leaving directory '/home/andy/test_optimization/openmm_core_integration/build'
+[ 46%] Built target constantv_swig_compilation
+/home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp: In member function 'virtual void OpenMM::ConstantVDrudeLangevinIntegrator::step(int)':
+/home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp:274:30: error: 'class OpenMM::KernelImpl' has no member named 'getPointer'
+  274 |     if (stepKernel.getImpl().getPointer() == nullptr)
+      |                              ^~~~~~~~~~
+/home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp:279:9: error: cannot 'dynamic_cast' '((OpenMM::ConstantVDrudeLangevinIntegrator*)this)->OpenMM::ConstantVDrudeLangevinIntegrator::stepKernel.OpenMM::Kernel::getImpl()' (of type 'class OpenMM::KernelImpl') to type 'class IntegrateConstantVDrudeLangevinStepKernel&' (target is not pointer or reference to complete type)
+  279 |         dynamic_cast<IntegrateConstantVDrudeLangevinStepKernel&>(stepKernel.getImpl());
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp:284:28: error: 'getOwner' was not declared in this scope
+  284 |     const Context* owner = getOwner();
+      |                            ^~~~~~~~
+/home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp:286:34: error: 'const OpenMM::ContextImpl& OpenMM::Context::getImpl() const' is private within this context
+  286 |         context = &owner->getImpl();
+      |                    ~~~~~~~~~~~~~~^~
+In file included from /home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp:8:
+/home/andy/miniforge3/envs/cuda/include/openmm/Context.h:292:24: note: declared private here
+  292 |     const ContextImpl& getImpl() const;
+      |                        ^~~~~~~
+/home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp:286:19: error: invalid conversion from 'const OpenMM::ContextImpl*' to 'OpenMM::ContextImpl*' [-fpermissive]
+  286 |         context = &owner->getImpl();
+      |                   ^~~~~~~~~~~~~~~~~
+      |                   |
+      |                   const OpenMM::ContextImpl*
+/home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp:296:13: error: invalid use of incomplete type 'class IntegrateConstantVDrudeLangevinStepKernel'
+  296 |             kernelImpl.execute(*context, *this);
+      |             ^~~~~~~~~~
+/home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp:21:7: note: forward declaration of 'class IntegrateConstantVDrudeLangevinStepKernel'
+   21 | class IntegrateConstantVDrudeLangevinStepKernel;
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp: In member function 'virtual void OpenMM::ConstantVDrudeLangevinIntegrator::initialize(OpenMM::ContextImpl&)':
+/home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp:325:9: error: cannot 'dynamic_cast' '((OpenMM::ConstantVDrudeLangevinIntegrator*)this)->OpenMM::ConstantVDrudeLangevinIntegrator::stepKernel.OpenMM::Kernel::getImpl()' (of type 'class OpenMM::KernelImpl') to type 'class IntegrateConstantVDrudeLangevinStepKernel&' (target is not pointer or reference to complete type)
+  325 |         dynamic_cast<IntegrateConstantVDrudeLangevinStepKernel&>(stepKernel.getImpl());
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp:327:5: error: invalid use of incomplete type 'class IntegrateConstantVDrudeLangevinStepKernel'
+  327 |     kernelImpl.initialize(
+      |     ^~~~~~~~~~
+/home/andy/test_optimization/openmm_core_integration/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp:21:7: note: forward declaration of 'class IntegrateConstantVDrudeLangevinStepKernel'
+   21 | class IntegrateConstantVDrudeLangevinStepKernel;
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+make[2]: *** [CMakeFiles/ConstantVAPI.dir/build.make:107: CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[2]: Leaving directory '/home/andy/test_optimization/openmm_core_integration/build'
+make[1]: *** [CMakeFiles/Makefile2:95: CMakeFiles/ConstantVAPI.dir/all] Error 2
+make[1]: Leaving directory '/home/andy/test_optimization/openmm_core_integration/build'
+make: *** [Makefile:146: all] Error 2
+[0;31m[ERROR][0m Build failed!

@@ -177,13 +177,20 @@ CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o
  /home/andy/miniforge3/envs/cuda/include/openmm/Platform.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/internal/windowsExportDrude.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/Vec3.h \
+ /home/andy/test_optimization/openmm_core_integration/openmmapi/include/openmm/ConstantVKernels.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/KernelImpl.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/Platform.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/System.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/DrudeForce.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/Context.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/Integrator.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/System.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/internal/OSRngSeed.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/internal/windowsExport.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/Force.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/internal/windowsExportDrude.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/internal/ContextImpl.h \
- /home/andy/miniforge3/envs/cuda/include/openmm/Platform.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/internal/DrudeHelpers.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/kernels.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/AndersenThermostat.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/Force.h \
@@ -217,7 +224,6 @@ CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o
  /home/andy/miniforge3/envs/cuda/include/openmm/GBSAOBCForce.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/HarmonicAngleForce.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/HarmonicBondForce.h \
- /home/andy/miniforge3/envs/cuda/include/openmm/KernelImpl.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/MonteCarloBarostat.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/OrientationRestraintForce.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/PeriodicTorsionForce.h \
@@ -226,14 +232,12 @@ CMakeFiles/ConstantVAPI.dir/openmmapi/src/ConstantVDrudeLangevinIntegrator.cpp.o
  /home/andy/miniforge3/envs/cuda/include/openmm/RGForce.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/RMSDForce.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/NonbondedForce.h \
- /home/andy/miniforge3/envs/cuda/include/openmm/System.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/VariableLangevinIntegrator.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/VariableVerletIntegrator.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/VerletIntegrator.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/NoseHooverIntegrator.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/State.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/NoseHooverChain.h \
- /home/andy/miniforge3/envs/cuda/include/openmm/Force.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/NoseHooverChain.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/ATMForce.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/internal/AssertionUtilities.h \

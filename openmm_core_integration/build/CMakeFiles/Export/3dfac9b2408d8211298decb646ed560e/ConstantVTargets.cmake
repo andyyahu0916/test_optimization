@@ -60,7 +60,7 @@ add_library(ConstantV::ConstantVAPI SHARED IMPORTED)
 
 set_target_properties(ConstantV::ConstantVAPI PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
-  INTERFACE_LINK_LIBRARIES "/home/andy/miniforge3/envs/cuda/lib/libOpenMM.so"
+  INTERFACE_LINK_LIBRARIES "/home/andy/miniforge3/envs/cuda/lib/libOpenMM.so;/home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so"
 )
 
 # Load information for each installed configuration.

@@ -107,6 +107,7 @@ CudaPlatform::CudaPlatform() {
     registerKernelFactory(IntegrateCustomStepKernel::Name(), factory);
     registerKernelFactory(IntegrateDPDStepKernel::Name(), factory);
     registerKernelFactory(IntegrateQTBStepKernel::Name(), factory);
+    registerKernelFactory(IntegrateConstantVDrudeLangevinStepKernel::Name(), factory);
     registerKernelFactory(ApplyAndersenThermostatKernel::Name(), factory);
     registerKernelFactory(ApplyMonteCarloBarostatKernel::Name(), factory);
     registerKernelFactory(RemoveCMMotionKernel::Name(), factory);

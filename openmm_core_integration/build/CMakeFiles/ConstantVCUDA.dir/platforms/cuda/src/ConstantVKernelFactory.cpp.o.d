@@ -168,12 +168,23 @@ CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o: \
  /home/andy/miniforge3/envs/cuda/include/openmm/Vec3.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/internal/windowsExport.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/Vec3.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/DrudeForce.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/Context.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/Integrator.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/State.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/serialization/SerializationNode.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/serialization/SerializationProxy.h \
+ /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/typeinfo \
  /home/andy/miniforge3/envs/cuda/include/openmm/OpenMMException.h \
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/exception \
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/exception_ptr.h \
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/cxxabi_init_exception.h \
- /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/typeinfo \
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/nested_exception.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/System.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/internal/OSRngSeed.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/internal/windowsExport.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/Force.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/internal/windowsExportDrude.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/internal/ContextImpl.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/Kernel.h \
  /home/andy/test_optimization/openmm_core_integration/platforms/cuda/include/CudaConstantVKernels.h \
@@ -181,9 +192,6 @@ CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o: \
  /home/andy/miniforge3/envs/cuda/include/openmm/DrudeLangevinIntegrator.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/DrudeIntegrator.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/Integrator.h \
- /home/andy/miniforge3/envs/cuda/include/openmm/State.h \
- /home/andy/miniforge3/envs/cuda/include/openmm/serialization/SerializationNode.h \
- /home/andy/miniforge3/envs/cuda/include/openmm/serialization/SerializationProxy.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/internal/windowsExportDrude.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaContext.h \
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/utility \
@@ -324,7 +332,6 @@ CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o: \
  /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaNonbondedUtilities.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaPlatform.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/internal/ThreadPool.h \
- /home/andy/miniforge3/envs/cuda/include/openmm/internal/windowsExport.h \
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/functional \
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/bits/std_function.h \
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/unordered_map \
@@ -336,4 +343,5 @@ CMakeFiles/ConstantVCUDA.dir/platforms/cuda/src/ConstantVKernelFactory.cpp.o: \
  /home/andy/miniforge3/envs/cuda/lib/gcc/x86_64-conda-linux-gnu/14.3.0/include/c++/compare \
  /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaQueue.h \
  /home/andy/miniforge3/envs/cuda/include/openmm/common/ComputeContext.h \
- /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaArray.h
+ /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaArray.h \
+ /home/andy/miniforge3/envs/cuda/include/openmm/cuda/CudaPlatform.h

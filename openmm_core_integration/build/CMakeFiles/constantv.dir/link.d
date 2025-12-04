@@ -7,13 +7,12 @@ _constantvcpython-313-x86_64-linux-gnu.so: \
   libConstantVCUDA.so \
   libConstantVAPI.so.1.0.0 \
   /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so \
-  /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so \
   /home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so \
-  /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMDrudeCUDA.so \
   /home/andy/miniforge3/envs/cuda/lib/libcudart.so \
   /home/andy/miniforge3/envs/cuda/targets/x86_64-linux/lib/stubs/libcuda.so \
   /home/andy/miniforge3/envs/cuda/bin/../x86_64-conda-linux-gnu/sysroot/lib/../lib/libdl.a \
   /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/librt.a \
+  /home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so \
   /home/andy/miniforge3/envs/cuda/lib/libstdc++.so \
   /home/andy/miniforge3/envs/cuda/bin/../x86_64-conda-linux-gnu/sysroot/lib/../lib/libm.so \
   /home/andy/miniforge3/envs/cuda/bin/../x86_64-conda-linux-gnu/sysroot/lib/../lib/libm.so \
@@ -55,11 +54,7 @@ libConstantVAPI.so.1.0.0:
 
 /home/andy/miniforge3/envs/cuda/lib/libOpenMM.so:
 
-/home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so:
-
 /home/andy/miniforge3/envs/cuda/lib/libOpenMMDrude.so:
-
-/home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMDrudeCUDA.so:
 
 /home/andy/miniforge3/envs/cuda/lib/libcudart.so:
 
@@ -68,6 +63,8 @@ libConstantVAPI.so.1.0.0:
 /home/andy/miniforge3/envs/cuda/bin/../x86_64-conda-linux-gnu/sysroot/lib/../lib/libdl.a:
 
 /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/librt.a:
+
+/home/andy/miniforge3/envs/cuda/lib/plugins/libOpenMMCUDA.so:
 
 /home/andy/miniforge3/envs/cuda/lib/libstdc++.so:
 
