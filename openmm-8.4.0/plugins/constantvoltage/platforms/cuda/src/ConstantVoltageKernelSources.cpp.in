@@ -1,0 +1,15 @@
+/* -------------------------------------------------------------------------- *
+ *                                   OpenMM                                   *
+ * -------------------------------------------------------------------------- *
+ * This is part of the OpenMM molecular simulation toolkit.                   *
+ * https://openmm.org                                                         *
+ *                                                                            *
+ * Copyright (c) 2024 Stanford University and the Authors.                    *
+ * Authors: Andy (Constant Voltage Integration)                               *
+ * -------------------------------------------------------------------------- */
+
+#include "ConstantVoltageKernelSources.h"
+
+using namespace OpenMM;
+using namespace std;
+

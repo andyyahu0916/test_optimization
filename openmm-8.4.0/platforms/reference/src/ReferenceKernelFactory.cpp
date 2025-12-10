@@ -112,8 +112,6 @@ KernelImpl* ReferenceKernelFactory::createKernelImpl(std::string name, const Pla
         return new ReferenceIntegrateDPDStepKernel(name, platform, data);
     if (name == IntegrateQTBStepKernel::Name())
         return new ReferenceIntegrateQTBStepKernel(name, platform, data);
-    if (name == IntegrateConstantVDrudeLangevinStepKernel::Name())
-        return new ReferenceIntegrateConstantVDrudeLangevinStepKernel(name, platform, data);
     if (name == ApplyAndersenThermostatKernel::Name())
         return new ReferenceApplyAndersenThermostatKernel(name, platform);
     if (name == ApplyMonteCarloBarostatKernel::Name())

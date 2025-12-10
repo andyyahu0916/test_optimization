@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -msse2 -pthread -DLEPTON_USE_JIT -Wl,--no-as-needed -lrt -Wl,--dependency-file=CMakeFiles/TestCpuCheckpoints.dir/link.d CMakeFiles/TestCpuCheckpoints.dir/TestCpuCheckpoints.cpp.o -o ../../../TestCpuCheckpoints  -Wl,-rpath,/home/andy/test_optimization/openmm-8.4.0/build_test ../../../libOpenMMCPU.so ../../../libOpenMM.so /usr/lib/x86_64-linux-gnu/libdl.a

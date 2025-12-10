@@ -108,8 +108,8 @@ def test_instantiation():
         ]
         
         for method in methods_to_check:
-            if hasattr(integrator, method):
-                log_success(f"  Method '{method}' found")
+                if hasattr(integrator, method):
+                    log_success(f"  Method '{method}' found")
             else:
                 log_error(f"  Method '{method}' NOT found!")
                 return False
@@ -268,7 +268,7 @@ def test_charge_update():
             total_charge = q_cathode_10_static._value + q_anode_10_static._value + 1.0
         
         log_info(f"  Total charge: {total_charge:.9f} e")
-        
+
         # Note: With Green's Reciprocity, total charge should be conserved
         # The exact value depends on the initial conditions, but it should be constant
         if abs(total_charge - 1.0) < 1e-5:  # Should be close to 1.0 (from the ion, if electrodes start at 0)

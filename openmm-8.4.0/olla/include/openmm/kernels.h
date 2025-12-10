@@ -1589,40 +1589,6 @@ public:
      * @param integrator the QTBIntegrator this kernel is being used for
      */
     virtual double computeKineticEnergy(ContextImpl& context, const QTBIntegrator& integrator) = 0;
-};
-
-/**
- * This kernel is invoked by ConstantVDrudeLangevinIntegrator to take one time step.
- * It combines SCF charge updates with Drude Langevin dynamics integration.
- */
-class IntegrateConstantVDrudeLangevinStepKernel : public KernelImpl {
-public:
-    static std::string Name() {
-        return "IntegrateConstantVDrudeLangevinStep";
-    }
-    IntegrateConstantVDrudeLangevinStepKernel(std::string name, const Platform& platform) : KernelImpl(name, platform) {
-    }
-    /**
-     * Initialize the kernel.
-     * 
-     * @param system     the System this kernel will be applied to
-     * @param integrator the QTBIntegrator this kernel will be used for
-     */
-    virtual void initialize(const System& system, const QTBIntegrator& integrator) = 0;
-    /**
-     * Execute the kernel.
-     * 
-     * @param context    the context in which to execute this kernel
-     * @param integrator the QTBIntegrator this kernel is being used for
-     */
-    virtual void execute(ContextImpl& context, const QTBIntegrator& integrator) = 0;
-    /**
-     * Compute the kinetic energy.
-     * 
-     * @param context    the context in which to execute this kernel
-     * @param integrator the QTBIntegrator this kernel is being used for
-     */
-    virtual double computeKineticEnergy(ContextImpl& context, const QTBIntegrator& integrator) = 0;
     /**
      * Get the adapted friction coefficients for a particle.
      * 

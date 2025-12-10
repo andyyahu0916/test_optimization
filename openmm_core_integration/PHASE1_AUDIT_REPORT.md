@@ -83,7 +83,7 @@ double geom_anode   = -factor * area * (V / Lgap + V / Lcell);
 - **因子差異**: 幾何項使用 `1/(4π)`，但電荷更新使用 `2/(4π)`
   - 幾何項 (`computeAnalyticChargeKernel`): `1.0 / FOUR_PI`
   - 電荷更新 (`updateCathodeChargesKernel`): `2.0 / FOUR_PI`
-  
+
 **分析**: 這是**正確的**！根據 DERIVATION.md:
 - 幾何項 (L111): `Q = ε₀AV/(4π) × (1/L_gap + 1/L_cell)` → 使用 `1/(4π)`
 - SCF 更新 (L179): `q_i = 2ε₀a_i/(4π) × (V/L_gap + E_z)` → 使用 `2/(4π)`

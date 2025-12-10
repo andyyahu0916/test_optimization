@@ -391,7 +391,7 @@ void addNanotubeConductor(
 - SWIG 介面中**註釋說明** `addNanotubeConductor` 尚未暴露給 Python
 - 但 `system_builder.py:573` 中使用了 `force.addNanotubeConductor(...)`
 
-**分析**: 
+**分析**:
 - 如果 SWIG 沒有暴露，Python 調用會失敗
 - 需要檢查實際的 SWIG 綁定是否包含此方法
 

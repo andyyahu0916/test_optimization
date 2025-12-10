@@ -105,16 +105,16 @@ if(BUILD_PYTHON_WRAPPERS)
         SOURCES python/ConstantVPlugin.i
     )
     
-    # FIX H2/P4-C4: Use sysconfig.get_path('platlib') for correct venv/conda path
-    execute_process(
-        COMMAND ${Python3_EXECUTABLE} -c "import sysconfig; print(sysconfig.get_path('platlib'))"
-        OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    
-    install(TARGETS constantv
-        LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES}
-    )
+# FIX H2/P4-C4: Use sysconfig.get_path('platlib') for correct venv/conda path
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} -c "import sysconfig; print(sysconfig.get_path('platlib'))"
+    OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+install(TARGETS constantv
+    LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES}
+)
 endif()
 ```
 
@@ -368,16 +368,16 @@ def test_charge_update():
     integrator.addAnodeAtoms([1], [0.4])   # ❌ 方法不存在
     
     # ...
-    # NOTE: getParticleParameters() returns Force object's static parameters,
-    # not GPU runtime values. For proper verification, use integrator.getCathodeCharge()
-    # or Context.getState(getPositions=True) and read posq.w from GPU.
-    # This is a known limitation - FIX P4-C2 requires integrator API extension.
-    
-    q_cathode_0, _, _ = nonbonded.getParticleParameters(0)
+# NOTE: getParticleParameters() returns Force object's static parameters,
+# not GPU runtime values. For proper verification, use integrator.getCathodeCharge()
+# or Context.getState(getPositions=True) and read posq.w from GPU.
+# This is a known limitation - FIX P4-C2 requires integrator API extension.
+
+q_cathode_0, _, _ = nonbonded.getParticleParameters(0)
     # ...
-    simulation.step(10)
+simulation.step(10)
     # ...
-    q_cathode_10, _, _ = nonbonded.getParticleParameters(0)
+q_cathode_10, _, _ = nonbonded.getParticleParameters(0)
 ```
 
 **問題**:
