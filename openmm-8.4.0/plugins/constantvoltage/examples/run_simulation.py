@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
 ============================================================================
-Fixed-Voltage MD Simulation - Corrected Version with Exclusions
+Fixed-Voltage MD Simulation - Corrected Version
 ============================================================================
-This script faithfully replicates run_openMM.py including electrode exclusions.
+Matches original run_openMM.py exactly:
+- Chain 0/1: Virtual electrode layers (grpc) - used for SCF charge updates
+- Chain 2/3: Real electrode layers (grph) - used for VDW, only exclusions added
 ============================================================================
 """
 
@@ -18,7 +20,7 @@ from openmm.app import *
 from openmm import *
 from openmm.unit import *
 
-# Physical Constants
+# Physical Constants (matching original)
 conversion_KjmolNm_Au = 0.00719475
 small_threshold = 1e-6
 VOLTAGE_TO_KJMOL = 96.485
@@ -34,8 +36,15 @@ if os.path.exists(outPath):
 os.mkdir(outPath)
 
 Voltage = 0.0
-cathode_chains = (0, 2)
-anode_chains = (1, 3)
+
+# IMPORTANT: Original electrode structure
+# cathode_index = (0, 2) means:
+#   - Chain 0: Virtual layer (grpc) - participates in SCF
+#   - Chain 2: Real layer (grph) - only used for exclusions
+cathode_virtual_chain = 0
+cathode_real_chain = 2
+anode_virtual_chain = 1
+anode_real_chain = 3
 exclude_elements = ('H',)
 
 ffdir = '/home/andy/test_optimization/OpenMM-ConstantV(original)/ffdir/'
@@ -50,22 +59,23 @@ class atom_MM:
         self.atom_index = atom_index
 
 class Electrode_Virtual:
-    def __init__(self, topology, chain_indices, electrode_type, voltage, nbondedForce, exclude_element=('H',)):
+    def __init__(self, topology, virtual_chain, electrode_type, voltage, nbondedForce, exclude_element=('H',)):
         self.electrode_type = electrode_type
         self.Voltage = voltage * VOLTAGE_TO_KJMOL
         self.electrode_atoms = []
         self.Q_analytic = 0.0
         self.z_pos = 0.0
         
+        # Only add atoms from the VIRTUAL chain (matching original)
         for chain in topology.chains():
-            if chain.index in chain_indices:
+            if chain.index == virtual_chain:
                 for atom in chain.atoms():
                     if atom.element is not None and atom.element.symbol not in exclude_element:
                         q, sig, eps = nbondedForce.getParticleParameters(atom.index)
                         self.electrode_atoms.append(atom_MM(atom.element.symbol, q._value, atom.index))
         
         self.Natoms = len(self.electrode_atoms)
-        print(f"  {electrode_type}: {self.Natoms} atoms, Voltage = {voltage} V")
+        print(f"  {electrode_type}: {self.Natoms} virtual atoms (chain {virtual_chain}), Voltage = {voltage} V")
     
     def get_total_charge(self):
         return sum([a.charge for a in self.electrode_atoms])
@@ -77,7 +87,7 @@ class Electrode_Virtual:
         sign = 1.0 if self.electrode_type == 'cathode' else -1.0
         flag_small = abs(self.Voltage) < 0.01
         if flag_small:
-            print("adding small value to initial charges in initialize_Charge routine for small Voltage input...")
+            print(f"  Adding small value to initial {self.electrode_type} charges...")
         
         for atom in self.electrode_atoms:
             q_i = sign / (4.0 * np.pi) * area_atom * (self.Voltage / Lgap + self.Voltage / Lcell) * conversion_KjmolNm_Au
@@ -85,6 +95,9 @@ class Electrode_Virtual:
                 q_i = q_i + sign * small_threshold
             atom.charge = q_i
             nbondedForce.setParticleParameters(atom.atom_index, q_i, 1.0, 0.0)
+        
+        # Update context after setting charges
+        # (This will be called again after context creation)
     
     def compute_Electrode_charge_analytic(self, positions, electrolyte_atoms, Lcell, z_opposite, nbondedForce, total_area, Lgap):
         sign = 1.0 if self.electrode_type == 'cathode' else -1.0
@@ -99,7 +112,7 @@ class Electrode_Virtual:
     def Scale_charges_analytic(self, nbondedForce, print_flag=False):
         Q_numeric = self.get_total_charge()
         if print_flag:
-            print(f"Q_numeric , Q_analytic charges on  {self.electrode_type} {Q_numeric} {self.Q_analytic}")
+            print(f"Q_numeric , Q_analytic charges on {self.electrode_type}: {Q_numeric:.6f} {self.Q_analytic:.6f}")
         
         scale_factor = -1
         if abs(Q_numeric) > small_threshold:
@@ -111,41 +124,53 @@ class Electrode_Virtual:
                 nbondedForce.setParticleParameters(atom.atom_index, atom.charge, 1.0, 0.0)
 
 # ============================================================================
-# Electrode Exclusions (CRITICAL - matching original)
+# Exclusion Functions
 # ============================================================================
-def generate_electrode_exclusions(electrode_list, customNonbondedForce, nbondedForce):
-    """
-    Add exclusions for intra-electrode interactions.
-    This prevents electrode atoms from interacting with each other.
-    
-    Matching original: electrode_sapt_exclusions.py::exclusion_Electrode_NonbondedForce
-    """
-    # Track existing exclusions
+def get_chain_atoms(topology, chain_index, exclude_element=('H',)):
+    """Get all non-H atoms from a chain"""
+    atoms = []
+    for chain in topology.chains():
+        if chain.index == chain_index:
+            for atom in chain.atoms():
+                if atom.element is not None and atom.element.symbol not in exclude_element:
+                    atoms.append(atom.index)
+    return atoms
+
+def add_exclusions_between(list1, list2, customNonbondedForce, nbondedForce):
+    """Add exclusions between two atom lists (matching original)"""
     existing = set()
     for i in range(customNonbondedForce.getNumExclusions()):
         p1, p2 = customNonbondedForce.getExclusionParticles(i)
         existing.add((min(p1, p2), max(p1, p2)))
     
-    added_count = 0
-    for i in range(len(electrode_list)):
-        for j in range(i + 1, len(electrode_list)):
-            idx_i = electrode_list[i]
-            idx_j = electrode_list[j]
-            pair = (min(idx_i, idx_j), max(idx_i, idx_j))
-            
-            if pair not in existing:
-                customNonbondedForce.addExclusion(idx_i, idx_j)
-                nbondedForce.addException(idx_i, idx_j, 0, 1, 0, True)
-                existing.add(pair)
-                added_count += 1
-    
-    return added_count
+    added = 0
+    if list1 == list2:
+        # Same list - add exclusions within
+        for i in range(len(list1)):
+            for j in range(i+1, len(list1)):
+                pair = (min(list1[i], list1[j]), max(list1[i], list1[j]))
+                if pair not in existing:
+                    customNonbondedForce.addExclusion(pair[0], pair[1])
+                    nbondedForce.addException(pair[0], pair[1], 0, 1, 0, True)
+                    existing.add(pair)
+                    added += 1
+    else:
+        # Different lists - add exclusions between
+        for i in list1:
+            for j in list2:
+                pair = (min(i, j), max(i, j))
+                if pair not in existing:
+                    customNonbondedForce.addExclusion(pair[0], pair[1])
+                    nbondedForce.addException(pair[0], pair[1], 0, 1, 0, True)
+                    existing.add(pair)
+                    added += 1
+    return added
 
 # ============================================================================
 # System Setup
 # ============================================================================
 print("=" * 70)
-print("Fixed-Voltage MD Simulation (with Electrode Exclusions)")
+print("Fixed-Voltage MD Simulation (Corrected Electrode Structure)")
 print("=" * 70)
 
 residue_xml_list = [ffdir + 'sapt_residues.xml', ffdir + 'graph_residue_c.xml', ffdir + 'graph_residue_n.xml']
@@ -171,22 +196,22 @@ nbondedForce = [f for f in [system.getForce(i) for i in range(system.getNumForce
 nbondedForce.setNonbondedMethod(NonbondedForce.PME)
 
 customNonbondedForce = [f for f in [system.getForce(i) for i in range(system.getNumForces())] if isinstance(f, CustomNonbondedForce)][0]
-customNonbondedForce.setNonbondedMethod(min(nbondedForce.getNonbondedMethod(), NonbondedForce.CutoffPeriodic))
+customNonbondedForce.setNonbondedMethod(NonbondedForce.CutoffPeriodic)
 
 # ============================================================================
-# Initialize Electrodes
+# Initialize Electrodes (only virtual layers)
 # ============================================================================
 print("\nInitializing electrodes...")
-Cathode = Electrode_Virtual(modeller.topology, cathode_chains, "cathode", Voltage, nbondedForce, exclude_elements)
-Anode = Electrode_Virtual(modeller.topology, anode_chains, "anode", Voltage, nbondedForce, exclude_elements)
+Cathode = Electrode_Virtual(modeller.topology, cathode_virtual_chain, "cathode", Voltage, nbondedForce, exclude_elements)
+Anode = Electrode_Virtual(modeller.topology, anode_virtual_chain, "anode", Voltage, nbondedForce, exclude_elements)
 
-# Geometry
+# Geometry (area_atom based on virtual layer atom count)
 positions = modeller.positions
 boxVecs = modeller.topology.getPeriodicBoxVectors()
 crossBox = np.cross([boxVecs[0][0]._value, boxVecs[0][1]._value, boxVecs[0][2]._value],
                     [boxVecs[1][0]._value, boxVecs[1][1]._value, boxVecs[1][2]._value])
 total_area = np.linalg.norm(crossBox)
-area_atom = total_area / Cathode.Natoms
+area_atom = total_area / Cathode.Natoms  # Use virtual layer count (800)
 
 cathode_z = np.mean([positions[a.atom_index][2]._value for a in Cathode.electrode_atoms])
 anode_z = np.mean([positions[a.atom_index][2]._value for a in Anode.electrode_atoms])
@@ -197,30 +222,48 @@ Lcell = abs(anode_z - cathode_z)
 box_z = boxVecs[2][2]._value
 Lgap = box_z - Lcell
 
-print(f"  Lcell: {Lcell:.3f} nm, Lgap: {Lgap:.3f} nm, Area: {total_area:.3f} nm²")
+print(f"  Lcell: {Lcell:.3f} nm, Lgap: {Lgap:.3f} nm")
+print(f"  Total area: {total_area:.3f} nm², area/atom: {area_atom:.5f} nm²")
 
-# Initialize charges
+# Initialize charges on virtual layers
 Cathode.initialize_Charge(Lgap, Lcell, area_atom, nbondedForce)
 Anode.initialize_Charge(Lgap, Lcell, area_atom, nbondedForce)
 
 # ============================================================================
-# CRITICAL: Generate Electrode Exclusions
+# Generate Electrode Exclusions (matching original exactly)
 # ============================================================================
 print("\nGenerating electrode exclusions...")
-cathode_list = Cathode.get_atom_indices()
-anode_list = Anode.get_atom_indices()
 
-n_cathode = generate_electrode_exclusions(cathode_list, customNonbondedForce, nbondedForce)
-n_anode = generate_electrode_exclusions(anode_list, customNonbondedForce, nbondedForce)
-print(f"  Added {n_cathode} cathode exclusions, {n_anode} anode exclusions")
+# Get atom lists for all electrode chains
+cathode_virtual = Cathode.get_atom_indices()
+cathode_real = get_chain_atoms(modeller.topology, cathode_real_chain, exclude_elements)
+anode_virtual = Anode.get_atom_indices()
+anode_real = get_chain_atoms(modeller.topology, anode_real_chain, exclude_elements)
 
-# Identify electrolyte atoms
-all_electrode_atoms = set(cathode_list + anode_list)
+print(f"  Cathode: {len(cathode_virtual)} virtual + {len(cathode_real)} real atoms")
+print(f"  Anode: {len(anode_virtual)} virtual + {len(anode_real)} real atoms")
+
+# Exclusions within primary electrode sheets (virtual-virtual)
+n1 = add_exclusions_between(cathode_virtual, cathode_virtual, customNonbondedForce, nbondedForce)
+n2 = add_exclusions_between(anode_virtual, anode_virtual, customNonbondedForce, nbondedForce)
+
+# Exclusions between virtual and real layers (matching electrode_extra_exclusions)
+n3 = add_exclusions_between(cathode_virtual, cathode_real, customNonbondedForce, nbondedForce)
+n4 = add_exclusions_between(anode_virtual, anode_real, customNonbondedForce, nbondedForce)
+
+# Exclusions within real layers
+n5 = add_exclusions_between(cathode_real, cathode_real, customNonbondedForce, nbondedForce)
+n6 = add_exclusions_between(anode_real, anode_real, customNonbondedForce, nbondedForce)
+
+print(f"  Added exclusions: virtual-virtual={n1+n2}, virtual-real={n3+n4}, real-real={n5+n6}")
+
+# Identify electrolyte atoms (non-electrode)
+all_electrode = set(cathode_virtual + cathode_real + anode_virtual + anode_real)
 electrolyte_atoms = []
 for residue in modeller.topology.residues():
     if len(list(residue.atoms())) < 100:
         for atom in residue.atoms():
-            if atom.index not in all_electrode_atoms:
+            if atom.index not in all_electrode:
                 electrolyte_atoms.append(atom.index)
 print(f"  Electrolyte atoms: {len(electrolyte_atoms)}")
 
@@ -239,7 +282,7 @@ platform = Platform.getPlatformByName('CUDA')
 simulation = Simulation(modeller.topology, system, integrator, platform, {'Precision': 'mixed'})
 simulation.context.setPositions(modeller.positions)
 
-# CRITICAL: Reinitialize context after adding exclusions
+# Reinitialize context with exclusions, then restore charges
 print("Reinitializing context with exclusions...")
 state = simulation.context.getState(getPositions=True)
 positions_snapshot = state.getPositions()
@@ -247,14 +290,15 @@ simulation.context.reinitialize()
 simulation.context.setPositions(positions_snapshot)
 nbondedForce.updateParametersInContext(simulation.context)
 
-state = simulation.context.getState(getEnergy=True, getForces=True, getPositions=True)
-print(f"\n{state.getKineticEnergy()}")
-print(f"{state.getPotentialEnergy()}")
+state = simulation.context.getState(getEnergy=True)
+print(f"\nInitial energies:")
+print(f"  KE: {state.getKineticEnergy()}")
+print(f"  PE: {state.getPotentialEnergy()}")
 for j in range(system.getNumForces()):
     f = system.getForce(j)
-    print(f"{type(f).__name__}: {simulation.context.getState(getEnergy=True, groups=2**j).getPotentialEnergy()}")
+    print(f"  {type(f).__name__}: {simulation.context.getState(getEnergy=True, groups=2**j).getPotentialEnergy()}")
 
-PDBFile.writeFile(simulation.topology, state.getPositions(), open(os.path.join(outPath, 'start_drudes.pdb'), 'w'))
+PDBFile.writeFile(simulation.topology, positions_snapshot, open(os.path.join(outPath, 'start_drudes.pdb'), 'w'))
 simulation.reporters.append(DCDReporter(os.path.join(outPath, 'FV_NVT.dcd'), int(freq_traj_output_ps * 1000)))
 
 # ============================================================================
@@ -271,6 +315,7 @@ def Poisson_solver_fixed_voltage(Niterations=4):
         state = simulation.context.getState(getForces=True)
         forces = state.getForces()
         
+        # Update cathode charges
         for atom in Cathode.electrode_atoms:
             idx = atom.atom_index
             q_old = atom.charge
@@ -281,6 +326,7 @@ def Poisson_solver_fixed_voltage(Niterations=4):
             atom.charge = q_new
             nbondedForce.setParticleParameters(idx, q_new, 1.0, 0.0)
         
+        # Update anode charges
         for atom in Anode.electrode_atoms:
             idx = atom.atom_index
             q_old = atom.charge
@@ -291,6 +337,7 @@ def Poisson_solver_fixed_voltage(Niterations=4):
             atom.charge = q_new
             nbondedForce.setParticleParameters(idx, q_new, 1.0, 0.0)
         
+        # Scale to analytic normalization
         print_flag = (i_iter == Niterations - 1)
         Cathode.Scale_charges_analytic(nbondedForce, print_flag)
         Anode.Scale_charges_analytic(nbondedForce, print_flag)
@@ -299,7 +346,9 @@ def Poisson_solver_fixed_voltage(Niterations=4):
 # ============================================================================
 # Run Simulation
 # ============================================================================
-print("\nStarting simulation...")
+print("\n" + "=" * 70)
+print("Starting simulation...")
+print("=" * 70)
 
 num_iterations = int(simulation_time_ns * 1000 / freq_traj_output_ps)
 steps_per_scf = int(freq_charge_update_fs)
@@ -307,12 +356,7 @@ scf_calls_per_output = int(freq_traj_output_ps * 1000 / freq_charge_update_fs)
 
 for i in range(num_iterations):
     state = simulation.context.getState(getEnergy=True)
-    print(f"{i} iteration")
-    print(f"{state.getKineticEnergy()}")
-    print(f"{state.getPotentialEnergy()}")
-    for j in range(system.getNumForces()):
-        f = system.getForce(j)
-        print(f"{type(f).__name__}: {simulation.context.getState(getEnergy=True, groups=2**j).getPotentialEnergy()}")
+    print(f"\n{i} iteration: KE={state.getKineticEnergy()}, PE={state.getPotentialEnergy()}")
     
     for j in range(scf_calls_per_output):
         Poisson_solver_fixed_voltage(Niterations=4)

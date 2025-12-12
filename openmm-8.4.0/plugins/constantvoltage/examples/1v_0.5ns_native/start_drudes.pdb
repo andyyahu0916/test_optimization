@@ -1,4 +1,4 @@
-REMARK   1 CREATED WITH OPENMM 8.4, 2025-12-11
+REMARK   1 CREATED WITH OPENMM 8.4, 2025-12-12
 CRYST1   49.280   49.280  120.422  90.00  90.00 120.00 P 1           1 
 HETATM    1  C0  grp A   1       0.000   0.000  11.500  1.00  0.00           C  
 HETATM    2  C1  grp A   1       0.000   1.420  11.500  1.00  0.00           C  
