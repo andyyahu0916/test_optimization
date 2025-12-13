@@ -16,7 +16,7 @@
  * -------------------------------------------------------------------------- */
 
 // Conversion constants
-#define CONVERSION_KJMOL_NM_AU 0.00719475f
+#define CONVERSION_KJMOL_NM_AU 0.00719760046f  // 18.8973/2625.5 (precise)
 #define FOUR_PI 12.566370614359172f
 #define SMALL_THRESHOLD 1e-6f
 
@@ -140,7 +140,8 @@ extern "C" __global__ void computeConductorChargeTransfer(
         float q_contact = posq[contactAtomIdx].w;
         float En_external = 0.0f;
         
-        if (fabsf(q_contact) > SMALL_THRESHOLD) {
+        // Match Python: if abs(q_i) > (0.9*self.small_threshold)
+        if (fabsf(q_contact) > 0.9f * SMALL_THRESHOLD) {
             float Ex = Fx / q_contact;
             float Ey = Fy / q_contact;
             float Ez = Fz / q_contact;

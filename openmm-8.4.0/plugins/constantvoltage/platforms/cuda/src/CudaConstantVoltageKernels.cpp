@@ -55,7 +55,7 @@ using namespace std;
 static const double CONVERSION_KJMOL_NM_AU = 18.8973 / 2625.5;  // 0.00719475
 static const double FOUR_PI = 4.0 * 3.14159265358979323846;
 static const double SMALL_THRESHOLD = 1e-6;
-static const double VOLTAGE_TO_KJMOL = 96.485;  // 1V * 1e = 96.485 kJ/mol
+static const double VOLTAGE_TO_KJMOL = 96.487;  // 1V * 1e = 96.487 kJ/mol (matching Python conversion_eV_Kjmol)
 static const double BOLTZMANN_CONSTANTV = 1.380649e-23 * 6.022140857e23 / 1000.0;  // kJ/(mol*K)
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -187,12 +187,21 @@ void CudaCalcConstantVoltageForceKernel::initialize(const System& system, const 
     if (totalConductorAtoms > 0) {
         vector<int> allIdx;
         for (int c = 0; c < numBuckyballs + numNanotubes; c++) {
-            // Download indices from GPU array
-            int size = (c < numBuckyballs) ? 
-                f.getNumBuckyballConductors() : f.getNumNanotubeConductors();
-            // For now, reserve space - actual flattening done per-conductor
+            // Get virtualParticles for this conductor
+            vector<int> virtualParticles, realParticles;
+            string electrodeType;
+            if (c < numBuckyballs) {
+                f.getBuckyballConductorParameters(c, virtualParticles, realParticles, electrodeType);
+            } else {
+                Vec3 axis;
+                f.getNanotubeConductorParameters(c - numBuckyballs, virtualParticles, realParticles, electrodeType, axis);
+            }
+            for (int p : virtualParticles) {
+                allIdx.push_back(p);
+            }
         }
-        allConductorIndices.initialize<int>(cu, max(totalConductorAtoms, 1), "allConductorIndices");
+        allConductorIndices.initialize<int>(cu, max((int)allIdx.size(), 1), "allConductorIndices");
+        allConductorIndices.upload(allIdx);
     }
 
     // Allocate reduction buffers
@@ -223,13 +232,145 @@ void CudaCalcConstantVoltageForceKernel::initialize(const System& system, const 
         computeConductorChargeTransferKernel = cu.getKernel(conductorModule, "computeConductorChargeTransfer");
         scaleElectrodeChargesWithConductorsKernel = cu.getKernel(conductorModule, "scaleElectrodeChargesWithConductors");
         initConductorGeometryKernel = cu.getKernel(conductorModule, "initConductorGeometry");
+        
+        // Initialize vectors for contact information (to be filled during first geometry init)
+        conductorAreas.resize(numBuckyballs + numNanotubes, 0.0f);
+        conductorDrContact.resize(numBuckyballs + numNanotubes, 0.0f);
+        conductorContactAtoms.resize(numBuckyballs + numNanotubes, 0);
+        conductorContactNormals.resize(numBuckyballs + numNanotubes, make_float3(0.0f, 0.0f, 1.0f));
+        conductorIsCloseToElectrode.resize(numBuckyballs + numNanotubes, true);
     }
 }
 
 double CudaCalcConstantVoltageForceKernel::execute(ContextImpl& context, bool includeForces, bool includeEnergy) {
     // ConstantVoltageForce doesn't compute forces directly
     // SCF charge updates are triggered by the Integrator
+    
+    // Initialize conductor geometry on first call (when positions are available)
+    static bool geometryInitialized = false;
+    if (!geometryInitialized && (numBuckyballs + numNanotubes > 0)) {
+        initializeConductorGeometry(context);
+        geometryInitialized = true;
+    }
+    
     return 0.0;
+}
+
+void CudaCalcConstantVoltageForceKernel::initializeConductorGeometry(ContextImpl& context) {
+    /**
+     * Initialize conductor geometry (center, radius, surface normals) and
+     * find contact atom/distance for each conductor.
+     * 
+     * Reference: Fixed_Voltage_routines.py
+     * - Buckyball_Virtual.__init__ (line 424-459)
+     * - Nanotube_Virtual.__init__ (line 517-572)
+     * - find_contact_neighbor_conductor (line 170-210)
+     */
+    
+    ContextSelector selector(cu);
+    
+    // Get positions from context
+    CUdeviceptr posqPtr = cu.getPosq().getDevicePointer();
+    int paddedNumAtoms = cu.getPaddedNumAtoms();
+    
+    // Allocate temporary buffers for geometry output (per-conductor)
+    CudaArray centerBuffer, radiusBuffer;
+    centerBuffer.initialize<float3>(cu, 1, "conductorCenter");
+    radiusBuffer.initialize<float>(cu, 1, "conductorRadius");
+    
+    for (int c = 0; c < numBuckyballs + numNanotubes; c++) {
+        int numAtoms = (int)conductorIndices[c].getSize() / sizeof(int);
+        int conductorType = conductorTypes[c];
+        float length = conductorLengths[c];
+        
+        // Get axis for nanotube (default z for buckyball)
+        float3 axis = make_float3(0.0f, 0.0f, 1.0f);
+        if (conductorType == 1) {  // Nanotube
+            // Get axis from force parameters
+            vector<int> vp, rp;
+            string et;
+            Vec3 axisVec;
+            force->getNanotubeConductorParameters(c - numBuckyballs, vp, rp, et, axisVec);
+            axis = make_float3((float)axisVec[0], (float)axisVec[1], (float)axisVec[2]);
+        }
+        
+        CUdeviceptr conductorIdxPtr = conductorIndices[c].getDevicePointer();
+        CUdeviceptr normalsPtr = conductorNormals[c].getDevicePointer();
+        CUdeviceptr centerPtr = centerBuffer.getDevicePointer();
+        CUdeviceptr radiusPtr = radiusBuffer.getDevicePointer();
+        
+        // Call geometry init kernel
+        void* geoArgs[] = {
+            &numAtoms,
+            &conductorIdxPtr,
+            &conductorType,
+            &axis,
+            &posqPtr,
+            &normalsPtr,
+            &centerPtr,
+            &radiusPtr
+        };
+        cu.executeKernel(initConductorGeometryKernel, geoArgs, numAtoms);
+        
+        // Download center and radius
+        float3 center;
+        float radius;
+        centerBuffer.download(&center);
+        radiusBuffer.download(&radius);
+        
+        // Compute area per atom based on conductor type
+        // Reference: Buckyball: area = 4*pi*r^2/N, Nanotube: area = 2*pi*r*L/N
+        if (conductorType == 0) {  // Buckyball
+            conductorAreas[c] = (float)(4.0 * M_PI * radius * radius / numAtoms);
+        } else {  // Nanotube
+            conductorAreas[c] = (float)(2.0 * M_PI * radius * length / numAtoms);
+        }
+        
+        // ==================================================================
+        // Find contact atom (matching find_contact_neighbor_conductor)
+        // ==================================================================
+        
+        // Download positions to CPU for contact detection
+        vector<float4> positions(cu.getPaddedNumAtoms());
+        cu.getPosq().download(positions);
+        
+        // Find closest cathode atom to conductor center
+        float minDistSq = 1e30f;
+        int closestAtom = 0;
+        
+        // Get cathode atom indices
+        vector<int> cathodeIdx(numCathodes);
+        cathodeIndices.download(cathodeIdx);
+        
+        for (int i = 0; i < numCathodes; i++) {
+            int idx = cathodeIdx[i];
+            float dx = positions[idx].x - center.x;
+            float dy = positions[idx].y - center.y;
+            float dz = positions[idx].z - center.z;
+            float distSq = dx*dx + dy*dy + dz*dz;
+            if (distSq < minDistSq) {
+                minDistSq = distSq;
+                closestAtom = idx;
+            }
+        }
+        
+        // Store contact info
+        conductorContactAtoms[c] = closestAtom;
+        conductorDrContact[c] = sqrtf(minDistSq);
+        conductorIsCloseToElectrode[c] = true;  // Assume close to primary electrode
+        
+        // Compute contact normal (direction from contact atom to conductor center)
+        float3 drVec;
+        drVec.x = center.x - positions[closestAtom].x;
+        drVec.y = center.y - positions[closestAtom].y;
+        drVec.z = center.z - positions[closestAtom].z;
+        float drMag = sqrtf(drVec.x*drVec.x + drVec.y*drVec.y + drVec.z*drVec.z);
+        if (drMag > 1e-8f) {
+            conductorContactNormals[c] = make_float3(drVec.x/drMag, drVec.y/drMag, drVec.z/drMag);
+        } else {
+            conductorContactNormals[c] = make_float3(0.0f, 0.0f, 1.0f);
+        }
+    }
 }
 
 void CudaCalcConstantVoltageForceKernel::updateElectrodeCharges(ContextImpl& context) {
@@ -242,6 +383,11 @@ void CudaCalcConstantVoltageForceKernel::updateElectrodeCharges(ContextImpl& con
     CUdeviceptr forcePtr = cu.getLongForceBuffer().getDevicePointer();
     CUdeviceptr posqPtr = cu.getPosq().getDevicePointer();
     int paddedNumAtoms = cu.getPaddedNumAtoms();
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // STEP 1: Update flat electrode charges (cathode/anode)
+    // Reference: MM_classes.py:321-350
+    // ═══════════════════════════════════════════════════════════════════════
     
     // Update cathode charges
     if (numCathodes > 0) {
@@ -283,7 +429,103 @@ void CudaCalcConstantVoltageForceKernel::updateElectrodeCharges(ContextImpl& con
         cu.executeKernel(updateAnodeChargesKernel, anodeArgs, numAnodes);
     }
     
-    // TODO: Implement analytic charge scaling (Green's reciprocity)
+    // ═══════════════════════════════════════════════════════════════════════
+    // STEP 2: Update conductor charges (Buckyball / Nanotube)
+    // Reference: MM_classes.py:352-381 (Numerical_charge_Conductor)
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    int numTotalConductors = numBuckyballs + numNanotubes;
+    
+    if (numTotalConductors > 0) {
+        float smallThresholdF = (float)smallThreshold;
+        
+        // Step 2a: Image charges on each conductor
+        // Reference: MM_classes.py:396-424 (Step 1 of Numerical_charge_Conductor)
+        for (int c = 0; c < numTotalConductors; c++) {
+            int numAtoms = (int)conductorIndices[c].getSize() / sizeof(int);
+            float areaPerAtom = conductorAreas[c];
+            
+            CUdeviceptr conductorIdxPtr = conductorIndices[c].getDevicePointer();
+            CUdeviceptr normalsPtr = conductorNormals[c].getDevicePointer();
+            
+            void* imageArgs[] = {
+                &numAtoms,
+                &conductorIdxPtr,
+                &normalsPtr,
+                &areaPerAtom,
+                &posqPtr,
+                &forcePtr,
+                &paddedNumAtoms,
+                &smallThresholdF
+            };
+            cu.executeKernel(computeConductorImageChargesKernel, imageArgs, numAtoms);
+        }
+        
+        // Step 2b: CRITICAL - Recompute forces after image charges
+        // Reference: MM_classes.py:424-426
+        // The image charges affect the field at the contact atom, so we must
+        // update the context and recalculate forces before charge transfer.
+        cu.getPosq().copyTo(cu.getPosqCorrection());
+        context.calcForcesAndEnergy(true, false);
+        forcePtr = cu.getLongForceBuffer().getDevicePointer();  // Refresh pointer
+        
+        // Step 2c: Charge transfer for each conductor
+        // Reference: MM_classes.py:429-495 (Step 2 of Numerical_charge_Conductor)
+        for (int c = 0; c < numTotalConductors; c++) {
+            int numAtoms = (int)conductorIndices[c].getSize() / sizeof(int);
+            int conductorType = conductorTypes[c];
+            float drContact = conductorDrContact[c];
+            float length = conductorLengths[c];
+            int contactAtomIdx = conductorContactAtoms[c];
+            float3 contactNormal = conductorContactNormals[c];
+            int isCloseToElectrode = conductorIsCloseToElectrode[c] ? 1 : 0;
+            float v_kjmol = (float)voltage_kjmol;
+            float lgap = (float)Lgap;
+            
+            CUdeviceptr conductorIdxPtr = conductorIndices[c].getDevicePointer();
+            
+            void* transferArgs[] = {
+                &numAtoms,
+                &conductorIdxPtr,
+                &contactAtomIdx,
+                &contactNormal,
+                &conductorType,
+                &drContact,
+                &length,
+                &isCloseToElectrode,
+                &v_kjmol,
+                &lgap,
+                &posqPtr,
+                &forcePtr,
+                &paddedNumAtoms
+            };
+            cu.executeKernel(computeConductorChargeTransferKernel, transferArgs, numAtoms);
+        }
+        
+        // Step 2d: Scale cathode + all conductors to analytic normalization
+        // Reference: MM_classes.py:500-545 (Scale_charges_analytic_general)
+        // When conductors present, cathode and conductors are scaled together
+        // using Q_analytic = -Anode.Q_analytic (charge neutrality)
+        
+        // Compute Q_analytic for anode (it's scaled independently)
+        // Reference: Fixed_Voltage_routines.py:325 - uses (V/Lgap + V/Lcell) term
+        float qAnalyticAnode = (float)(-(voltage_kjmol / Lgap + voltage_kjmol / Lcell) * totalArea * CONVERSION_KJMOL_NM_AU / FOUR_PI);
+        
+        // Flatten conductor indices for combined scaling
+        CUdeviceptr cathodeIdxPtr = cathodeIndices.getDevicePointer();
+        CUdeviceptr allCondIdxPtr = allConductorIndices.getDevicePointer();
+        
+        void* scaleArgs[] = {
+            &numCathodes,
+            &cathodeIdxPtr,
+            &totalConductorAtoms,
+            &allCondIdxPtr,
+            &qAnalyticAnode,
+            &posqPtr,
+            &smallThresholdF
+        };
+        cu.executeKernel(scaleElectrodeChargesWithConductorsKernel, scaleArgs, 256);
+    }
 }
 
 double CudaCalcConstantVoltageForceKernel::getTotalCathodeCharge(ContextImpl& context) {

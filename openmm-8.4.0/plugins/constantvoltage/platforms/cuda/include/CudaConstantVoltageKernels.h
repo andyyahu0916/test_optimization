@@ -113,6 +113,9 @@ private:
     CUfunction computeConductorChargeTransferKernel;
     CUfunction scaleElectrodeChargesWithConductorsKernel;
     CUfunction initConductorGeometryKernel;
+    
+    // Helper methods
+    void initializeConductorGeometry(ContextImpl& context);
 };
 
 /**

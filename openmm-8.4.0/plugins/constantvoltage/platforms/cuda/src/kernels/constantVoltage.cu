@@ -12,7 +12,7 @@
 
 // Physical constants (from Fixed_Voltage_routines.py)
 #ifndef CONVERSION_KJMOL_NM_AU
-#define CONVERSION_KJMOL_NM_AU 0.00719475f  // 18.8973/2625.5
+#define CONVERSION_KJMOL_NM_AU 0.00719760046f  // 18.8973/2625.5 (precise)
 #endif
 
 #ifndef FOUR_PI
