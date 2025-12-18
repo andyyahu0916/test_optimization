@@ -52,7 +52,7 @@ using namespace OpenMM;
 using namespace std;
 
 // Physical constants (matching Professor's Python code)
-static const double CONVERSION_KJMOL_NM_AU = 18.8973 / 2625.5;  // 0.00719475
+static const double CONVERSION_KJMOL_NM_AU = 18.8973 / 2625.5;  // 0.00719760046
 static const double FOUR_PI = 4.0 * 3.14159265358979323846;
 static const double SMALL_THRESHOLD = 1e-6;
 static const double VOLTAGE_TO_KJMOL = 96.487;  // 1V * 1e = 96.487 kJ/mol (matching Python conversion_eV_Kjmol)
@@ -207,6 +207,7 @@ void CudaCalcConstantVoltageForceKernel::initialize(const System& system, const 
     // Allocate reduction buffers
     totalCathodeCharge.initialize<float>(cu, 1, "totalCathodeCharge");
     totalAnodeCharge.initialize<float>(cu, 1, "totalAnodeCharge");
+    analyticChargeBuffer.initialize<float>(cu, 1, "analyticChargeBuffer");
 
     // Compile CUDA kernels from JIT source
     map<string, string> defines;
@@ -359,16 +360,29 @@ void CudaCalcConstantVoltageForceKernel::initializeConductorGeometry(ContextImpl
         conductorDrContact[c] = sqrtf(minDistSq);
         conductorIsCloseToElectrode[c] = true;  // Assume close to primary electrode
         
-        // Compute contact normal (direction from contact atom to conductor center)
-        float3 drVec;
-        drVec.x = center.x - positions[closestAtom].x;
-        drVec.y = center.y - positions[closestAtom].y;
-        drVec.z = center.z - positions[closestAtom].z;
-        float drMag = sqrtf(drVec.x*drVec.x + drVec.y*drVec.y + drVec.z*drVec.z);
-        if (drMag > 1e-8f) {
-            conductorContactNormals[c] = make_float3(drVec.x/drMag, drVec.y/drMag, drVec.z/drMag);
-        } else {
+        // FIX 3: Contact normal for flat electrode should be (0, 0, ±1)
+        // Reference: Fixed_Voltage_routines.py:265-266
+        // The electrode atoms have nx=0, ny=0, nz=1 (for cathode) or nz=-1 (for anode)
+        // When contacting a flat electrode, use the electrode's surface normal, not geometric direction
+        if (conductorIsCloseToElectrode[c]) {
+            // Contact with flat electrode: use electrode surface normal
+            // Cathode is typically at lower z, anode at higher z
+            // Conductor on cathode: normal points +z
+            // TODO: Need to track which electrode (cathode/anode) the conductor is attached to
+            // For now, assume cathode contact (can be generalized later)
             conductorContactNormals[c] = make_float3(0.0f, 0.0f, 1.0f);
+        } else {
+            // Contact with another conductor: use geometric direction
+            float3 drVec;
+            drVec.x = center.x - positions[closestAtom].x;
+            drVec.y = center.y - positions[closestAtom].y;
+            drVec.z = center.z - positions[closestAtom].z;
+            float drMag = sqrtf(drVec.x*drVec.x + drVec.y*drVec.y + drVec.z*drVec.z);
+            if (drMag > 1e-8f) {
+                conductorContactNormals[c] = make_float3(drVec.x/drMag, drVec.y/drMag, drVec.z/drMag);
+            } else {
+                conductorContactNormals[c] = make_float3(0.0f, 0.0f, 1.0f);
+            }
         }
     }
 }
@@ -435,10 +449,9 @@ void CudaCalcConstantVoltageForceKernel::updateElectrodeCharges(ContextImpl& con
     // ═══════════════════════════════════════════════════════════════════════
     
     int numTotalConductors = numBuckyballs + numNanotubes;
+    float smallThresholdF = (float)smallThreshold;
     
     if (numTotalConductors > 0) {
-        float smallThresholdF = (float)smallThreshold;
-        
         // Step 2a: Image charges on each conductor
         // Reference: MM_classes.py:396-424 (Step 1 of Numerical_charge_Conductor)
         for (int c = 0; c < numTotalConductors; c++) {
@@ -502,29 +515,138 @@ void CudaCalcConstantVoltageForceKernel::updateElectrodeCharges(ContextImpl& con
             cu.executeKernel(computeConductorChargeTransferKernel, transferArgs, numAtoms);
         }
         
-        // Step 2d: Scale cathode + all conductors to analytic normalization
-        // Reference: MM_classes.py:500-545 (Scale_charges_analytic_general)
-        // When conductors present, cathode and conductors are scaled together
-        // using Q_analytic = -Anode.Q_analytic (charge neutrality)
+        // ═══════════════════════════════════════════════════════════════════
+        // FIX 2 & 5: Scale with proper analytic charge calculation
+        // Reference: MM_classes.py:509-545 (Scale_charges_analytic_general)
+        // ═══════════════════════════════════════════════════════════════════
         
-        // Compute Q_analytic for anode (it's scaled independently)
-        // Reference: Fixed_Voltage_routines.py:325 - uses (V/Lgap + V/Lcell) term
-        float qAnalyticAnode = (float)(-(voltage_kjmol / Lgap + voltage_kjmol / Lcell) * totalArea * CONVERSION_KJMOL_NM_AU / FOUR_PI);
+        // Step 2d: First, scale anode INDEPENDENTLY
+        // Reference: MM_classes.py:514-515
+        // "assume anode is scaled normally..."
+        double qAnalyticAnode = computeAnalyticChargeWithElectrolytePlusConductors(context, zCathode, false);
+        double qNumericAnode = getTotalAnodeCharge(context);
         
-        // Flatten conductor indices for combined scaling
-        CUdeviceptr cathodeIdxPtr = cathodeIndices.getDevicePointer();
-        CUdeviceptr allCondIdxPtr = allConductorIndices.getDevicePointer();
+        if (fabs(qNumericAnode) > smallThreshold) {
+            double scaleAnode = qAnalyticAnode / qNumericAnode;
+            if (scaleAnode > 0.0) {
+                float scaleAnodeF = (float)scaleAnode;
+                CUdeviceptr anodeIdxPtr = anodeIndices.getDevicePointer();
+                
+                void* scaleAnodeArgs[] = {
+                    &posqPtr,
+                    &anodeIdxPtr,
+                    &numAnodes,
+                    &scaleAnodeF
+                };
+                cu.executeKernel(scaleElectrodeChargesKernel, scaleAnodeArgs, numAnodes);
+            }
+        }
         
-        void* scaleArgs[] = {
-            &numCathodes,
-            &cathodeIdxPtr,
-            &totalConductorAtoms,
-            &allCondIdxPtr,
-            &qAnalyticAnode,
-            &posqPtr,
-            &smallThresholdF
-        };
-        cu.executeKernel(scaleElectrodeChargesWithConductorsKernel, scaleArgs, 256);
+        // Step 2e: THEN scale cathode + all conductors using -qAnalyticAnode
+        // Reference: MM_classes.py:517 "Q_analytic = -1.0 * self.Anode.Q_analytic"
+        // Re-read anode analytic charge after scaling (should be same value)
+        double qAnalyticCathodePlusConductors = -qAnalyticAnode;
+        
+        // Get numeric total of cathode + conductors
+        double qNumericCathode = getTotalCathodeCharge(context);
+        double qNumericConductors = 0.0;
+        
+        // Sum conductor charges
+        for (int c = 0; c < numTotalConductors; c++) {
+            int numAtoms = (int)conductorIndices[c].getSize() / sizeof(int);
+            vector<int> condIdx(numAtoms);
+            conductorIndices[c].download(condIdx);
+            
+            vector<float4> positions(cu.getPaddedNumAtoms());
+            cu.getPosq().download(positions);
+            
+            for (int i = 0; i < numAtoms; i++) {
+                qNumericConductors += positions[condIdx[i]].w;
+            }
+        }
+        
+        double qNumericTotal = qNumericCathode + qNumericConductors;
+        
+        if (fabs(qNumericTotal) > smallThreshold) {
+            double scaleCathodeConductors = qAnalyticCathodePlusConductors / qNumericTotal;
+            if (scaleCathodeConductors > 0.0) {
+                float scaleF = (float)scaleCathodeConductors;
+                
+                // Scale cathode
+                CUdeviceptr cathodeIdxPtr = cathodeIndices.getDevicePointer();
+                void* scaleCathodeArgs[] = {
+                    &posqPtr,
+                    &cathodeIdxPtr,
+                    &numCathodes,
+                    &scaleF
+                };
+                cu.executeKernel(scaleElectrodeChargesKernel, scaleCathodeArgs, numCathodes);
+                
+                // Scale all conductors
+                for (int c = 0; c < numTotalConductors; c++) {
+                    int numAtoms = (int)conductorIndices[c].getSize() / sizeof(int);
+                    CUdeviceptr conductorIdxPtr = conductorIndices[c].getDevicePointer();
+                    
+                    void* scaleConductorArgs[] = {
+                        &posqPtr,
+                        &conductorIdxPtr,
+                        &numAtoms,
+                        &scaleF
+                    };
+                    cu.executeKernel(scaleElectrodeChargesKernel, scaleConductorArgs, numAtoms);
+                }
+            }
+        }
+    } else {
+        // ═══════════════════════════════════════════════════════════════════
+        // FIX 1: No conductors - scale cathode and anode independently
+        // Reference: MM_classes.py:547-550
+        // "no extra conductors, scale each electrode to individual Analytic normalization"
+        // ═══════════════════════════════════════════════════════════════════
+        
+        // Scale cathode
+        if (numCathodes > 0) {
+            double qAnalyticCathode = computeAnalyticChargeWithElectrolyte(context, zAnode, true);
+            double qNumericCathode = getTotalCathodeCharge(context);
+            
+            if (fabs(qNumericCathode) > smallThreshold) {
+                double scaleCathode = qAnalyticCathode / qNumericCathode;
+                if (scaleCathode > 0.0) {
+                    float scaleCathodeF = (float)scaleCathode;
+                    CUdeviceptr cathodeIdxPtr = cathodeIndices.getDevicePointer();
+                    
+                    void* scaleCathodeArgs[] = {
+                        &posqPtr,
+                        &cathodeIdxPtr,
+                        &numCathodes,
+                        &scaleCathodeF
+                    };
+                    cu.executeKernel(scaleElectrodeChargesKernel, scaleCathodeArgs, numCathodes);
+                }
+            }
+        }
+        
+        // Scale anode
+        if (numAnodes > 0) {
+            double qAnalyticAnode = computeAnalyticChargeWithElectrolyte(context, zCathode, false);
+            double qNumericAnode = getTotalAnodeCharge(context);
+            
+            if (fabs(qNumericAnode) > smallThreshold) {
+                double scaleAnode = qAnalyticAnode / qNumericAnode;
+                if (scaleAnode > 0.0) {
+                    float scaleAnodeF = (float)scaleAnode;
+                    CUdeviceptr anodeIdxPtr = anodeIndices.getDevicePointer();
+                    
+                    void* scaleAnodeArgs[] = {
+                        &posqPtr,
+                        &anodeIdxPtr,
+                        &numAnodes,
+                        &scaleAnodeF
+                    };
+                    cu.executeKernel(scaleElectrodeChargesKernel, scaleAnodeArgs, numAnodes);
+                }
+            }
+        }
     }
 }
 
@@ -584,6 +706,101 @@ double CudaCalcConstantVoltageForceKernel::getTotalAnodeCharge(ContextImpl& cont
     float result;
     totalAnodeCharge.download(&result);
     return (double)result;
+}
+
+double CudaCalcConstantVoltageForceKernel::computeAnalyticChargeWithElectrolyte(
+    ContextImpl& context, double z_opposite, bool isCathode)
+{
+    /**
+     * Compute analytic charge including electrolyte image charge contribution.
+     * Reference: Fixed_Voltage_routines.py:318-344
+     * 
+     * Q_analytic = sign / (4π) * area * (V/Lgap + V/Lcell) * K
+     *            + Σ_electrolyte (|z - z_opposite| / Lcell) * (-q_i)
+     */
+    
+    double sign = isCathode ? 1.0 : -1.0;
+    
+    // Geometric contribution
+    double qGeometric = sign * totalArea * (voltage_kjmol / Lgap + voltage_kjmol / Lcell) 
+                        * CONVERSION_KJMOL_NM_AU / FOUR_PI;
+    
+    // Electrolyte image charge contribution
+    if (numElectrolytes > 0) {
+        ContextSelector selector(cu);
+        
+        // Reset accumulator
+        float zero = 0.0f;
+        analyticChargeBuffer.upload(&zero);
+        
+        // Call computeAnalyticCharge kernel
+        CUdeviceptr posqPtr = cu.getPosq().getDevicePointer();
+        CUdeviceptr electrolyteIdxPtr = electrolyteIndices.getDevicePointer();
+        CUdeviceptr contribPtr = analyticChargeBuffer.getDevicePointer();
+        float z_opp = (float)z_opposite;
+        float lcell = (float)Lcell;
+        
+        void* args[] = {
+            &posqPtr,
+            &electrolyteIdxPtr,
+            &numElectrolytes,
+            &z_opp,
+            &lcell,
+            &contribPtr
+        };
+        cu.executeKernel(computeAnalyticChargeKernel, args, numElectrolytes);
+        
+        float imageContrib;
+        analyticChargeBuffer.download(&imageContrib);
+        qGeometric += (double)imageContrib;
+    }
+    
+    return qGeometric;
+}
+
+double CudaCalcConstantVoltageForceKernel::computeAnalyticChargeWithElectrolytePlusConductors(
+    ContextImpl& context, double z_opposite, bool isCathode)
+{
+    /**
+     * Compute analytic charge including both electrolyte and conductor contributions.
+     * Reference: Fixed_Voltage_routines.py:336-344
+     * 
+     * Conductors are effectively part of the electrolyte as far as the analytic
+     * charge formula is concerned, so we add their image charge contribution.
+     */
+    
+    double result = computeAnalyticChargeWithElectrolyte(context, z_opposite, isCathode);
+    
+    // Add conductor atoms contribution
+    if (totalConductorAtoms > 0) {
+        ContextSelector selector(cu);
+        
+        // Reset accumulator
+        float zero = 0.0f;
+        analyticChargeBuffer.upload(&zero);
+        
+        CUdeviceptr posqPtr = cu.getPosq().getDevicePointer();
+        CUdeviceptr condIdxPtr = allConductorIndices.getDevicePointer();
+        CUdeviceptr contribPtr = analyticChargeBuffer.getDevicePointer();
+        float z_opp = (float)z_opposite;
+        float lcell = (float)Lcell;
+        
+        void* args[] = {
+            &posqPtr,
+            &condIdxPtr,
+            &totalConductorAtoms,
+            &z_opp,
+            &lcell,
+            &contribPtr
+        };
+        cu.executeKernel(computeAnalyticChargeKernel, args, totalConductorAtoms);
+        
+        float condContrib;
+        analyticChargeBuffer.download(&condContrib);
+        result += (double)condContrib;
+    }
+    
+    return result;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

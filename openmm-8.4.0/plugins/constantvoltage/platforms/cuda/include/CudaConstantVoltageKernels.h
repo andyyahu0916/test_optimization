@@ -116,6 +116,31 @@ private:
     
     // Helper methods
     void initializeConductorGeometry(ContextImpl& context);
+    
+    /**
+     * Compute analytic charge including electrolyte image charge contribution.
+     * Reference: Fixed_Voltage_routines.py:318-344
+     * 
+     * @param context The context to get positions from
+     * @param z_opposite Z position of the opposite electrode
+     * @param isCathode True for cathode, false for anode
+     * @return The analytic charge value
+     */
+    double computeAnalyticChargeWithElectrolyte(ContextImpl& context, double z_opposite, bool isCathode);
+    
+    /**
+     * Compute analytic charge including both electrolyte and conductor contributions.
+     * Reference: Fixed_Voltage_routines.py:336-344
+     * 
+     * @param context The context to get positions from
+     * @param z_opposite Z position of the opposite electrode
+     * @param isCathode True for cathode, false for anode
+     * @return The analytic charge value
+     */
+    double computeAnalyticChargeWithElectrolytePlusConductors(ContextImpl& context, double z_opposite, bool isCathode);
+    
+    // Reduction buffer for analytic charge calculation
+    CudaArray analyticChargeBuffer;
 };
 
 /**
