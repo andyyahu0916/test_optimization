@@ -15,10 +15,18 @@
  * - Nanotube dQ:    dQ = -dE * dr_center_contact * length / 2
  * -------------------------------------------------------------------------- */
 
-// Conversion constants
+// FIX B: Conversion constants - use #ifndef to accept JIT-injected values
+#ifndef CONVERSION_KJMOL_NM_AU
 #define CONVERSION_KJMOL_NM_AU 0.00719760046f  // 18.8973/2625.5 (precise)
+#endif
+
+#ifndef FOUR_PI
 #define FOUR_PI 12.566370614359172f
+#endif
+
+#ifndef SMALL_THRESHOLD
 #define SMALL_THRESHOLD 1e-6f
+#endif
 
 // Conductor types
 #define CONDUCTOR_BUCKYBALL 0
@@ -112,9 +120,15 @@ extern "C" __global__ void computeConductorImageCharges(
  * @param forceBuffer         Force buffer
  * @param paddedNumAtoms      Padded atom count
  */
-extern "C" __global__ void computeConductorChargeTransfer(
+/**
+ * FIX A: Compute dq_per_atom for conductor charge transfer.
+ * 
+ * This kernel is called first (single thread) to compute the per-atom charge
+ * transfer value and store it in global memory. Then applyChargeTransfer
+ * is called to apply it to all atoms.
+ */
+extern "C" __global__ void computeConductorDqPerAtom(
     int numAtoms,
-    const int* __restrict__ conductorIndices,
     int contactAtomIdx,
     float3 contactNormal,
     int conductorType,
@@ -123,65 +137,75 @@ extern "C" __global__ void computeConductorChargeTransfer(
     int isCloseToElectrode,
     float voltage,
     float Lgap,
-    float4* __restrict__ posq,
+    const float4* __restrict__ posq,
     const long long* __restrict__ forceBuffer,
-    int paddedNumAtoms
+    int paddedNumAtoms,
+    float* __restrict__ dqPerAtomGlobal
 ) {
-    // Only thread 0 computes the charge transfer, then broadcasts
-    __shared__ float dq_per_atom;
+    // Only need one thread
+    if (threadIdx.x != 0 || blockIdx.x != 0) return;
     
-    if (threadIdx.x == 0 && blockIdx.x == 0) {
-        // Read force on contact atom
-        const float forceScale = 1.0f / 0x100000000;
-        float Fx = forceBuffer[contactAtomIdx] * forceScale;
-        float Fy = forceBuffer[contactAtomIdx + paddedNumAtoms] * forceScale;
-        float Fz = forceBuffer[contactAtomIdx + 2 * paddedNumAtoms] * forceScale;
-        
-        float q_contact = posq[contactAtomIdx].w;
-        float En_external = 0.0f;
-        
-        // Match Python: if abs(q_i) > (0.9*self.small_threshold)
-        if (fabsf(q_contact) > 0.9f * SMALL_THRESHOLD) {
-            float Ex = Fx / q_contact;
-            float Ey = Fy / q_contact;
-            float Ez = Fz / q_contact;
-            En_external = Ex * contactNormal.x + Ey * contactNormal.y + Ez * contactNormal.z;
-        }
-        
-        // Compute dE based on contact type
-        float dE_conductor;
-        if (isCloseToElectrode) {
-            // Contact with primary electrode
-            // dE = -(En + V/Lgap/2) * K
-            dE_conductor = -(En_external + voltage / Lgap / 2.0f) * CONVERSION_KJMOL_NM_AU;
-        } else {
-            // Contact with another conductor
-            // dE = -En * K
-            dE_conductor = -En_external * CONVERSION_KJMOL_NM_AU;
-        }
-        
-        // Geometry-dependent charge transfer
-        float dQ_conductor;
-        float sign = -1.0f;  // positive z displacement from cathode → negative field for positive charge
-        
-        if (conductorType == CONDUCTOR_BUCKYBALL) {
-            // Spherical: Q = E * A / 4π,  A = 4π * r²  →  Q = E * r²
-            dQ_conductor = sign * dE_conductor * drCenterContact * drCenterContact;
-        } else {  // CONDUCTOR_NANOTUBE
-            // Cylindrical: Q = E * A / 4π,  A = 2π * r * L  →  Q = E * r * L / 2
-            dQ_conductor = sign * dE_conductor * drCenterContact * conductorLength / 2.0f;
-        }
-        
-        // Per-atom charge
-        dq_per_atom = dQ_conductor / (float)numAtoms;
+    // Read force on contact atom
+    const float forceScale = 1.0f / 0x100000000;
+    float Fx = forceBuffer[contactAtomIdx] * forceScale;
+    float Fy = forceBuffer[contactAtomIdx + paddedNumAtoms] * forceScale;
+    float Fz = forceBuffer[contactAtomIdx + 2 * paddedNumAtoms] * forceScale;
+    
+    float q_contact = posq[contactAtomIdx].w;
+    float En_external = 0.0f;
+    
+    // Match Python: if abs(q_i) > (0.9*self.small_threshold)
+    if (fabsf(q_contact) > 0.9f * SMALL_THRESHOLD) {
+        float Ex = Fx / q_contact;
+        float Ey = Fy / q_contact;
+        float Ez = Fz / q_contact;
+        En_external = Ex * contactNormal.x + Ey * contactNormal.y + Ez * contactNormal.z;
     }
     
-    __syncthreads();
+    // Compute dE based on contact type
+    float dE_conductor;
+    if (isCloseToElectrode) {
+        // Contact with primary electrode
+        // dE = -(En + V/Lgap/2) * K
+        dE_conductor = -(En_external + voltage / Lgap / 2.0f) * CONVERSION_KJMOL_NM_AU;
+    } else {
+        // Contact with another conductor
+        // dE = -En * K
+        dE_conductor = -En_external * CONVERSION_KJMOL_NM_AU;
+    }
     
-    // All threads add the charge to their atoms
+    // Geometry-dependent charge transfer
+    float dQ_conductor;
+    float sign = -1.0f;  // positive z displacement from cathode → negative field for positive charge
+    
+    if (conductorType == CONDUCTOR_BUCKYBALL) {
+        // Spherical: Q = E * A / 4π,  A = 4π * r²  →  Q = E * r²
+        dQ_conductor = sign * dE_conductor * drCenterContact * drCenterContact;
+    } else {  // CONDUCTOR_NANOTUBE
+        // Cylindrical: Q = E * A / 4π,  A = 2π * r * L  →  Q = E * r * L / 2
+        dQ_conductor = sign * dE_conductor * drCenterContact * conductorLength / 2.0f;
+    }
+    
+    // Per-atom charge - write to global memory
+    *dqPerAtomGlobal = dQ_conductor / (float)numAtoms;
+}
+
+/**
+ * FIX A: Apply charge transfer to conductor atoms.
+ * 
+ * Called after computeConductorDqPerAtom to apply the computed charge
+ * to all conductor atoms. Safe for multi-block execution.
+ */
+extern "C" __global__ void applyConductorChargeTransfer(
+    int numAtoms,
+    const int* __restrict__ conductorIndices,
+    float4* __restrict__ posq,
+    const float* __restrict__ dqPerAtomGlobal
+) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx >= numAtoms) return;
     
+    float dq_per_atom = *dqPerAtomGlobal;
     int particleIdx = conductorIndices[idx];
     posq[particleIdx].w += dq_per_atom;
 }

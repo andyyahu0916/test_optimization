@@ -42,7 +42,8 @@ extern "C" __global__ void updateCathodeCharges(
     int numCathodes,
     int paddedNumAtoms,
     float voltage_kjmol,
-    float Lgap)
+    float Lgap,
+    float smallThreshold)  // FIX C: Runtime parameter instead of compile-time constant
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx >= numCathodes) return;
@@ -60,7 +61,7 @@ extern "C" __global__ void updateCathodeCharges(
     
     // Compute external field: Ez = Fz / q
     float Ez_external = 0.0f;
-    if (fabsf(q_old) > 0.9f * SMALL_THRESHOLD) {
+    if (fabsf(q_old) > 0.9f * smallThreshold) {
         Ez_external = fz / q_old;
     }
     
@@ -69,8 +70,8 @@ extern "C" __global__ void updateCathodeCharges(
     float q_new = (2.0f / FOUR_PI) * area * (voltage_kjmol / Lgap + Ez_external) * CONVERSION_KJMOL_NM_AU;
     
     // Prevent charge from getting too small (numerical stability)
-    if (fabsf(q_new) < SMALL_THRESHOLD) {
-        q_new = SMALL_THRESHOLD;  // Cathode: positive
+    if (fabsf(q_new) < smallThreshold) {
+        q_new = smallThreshold;  // Cathode: positive
     }
     
     // Update charge in posq
@@ -93,7 +94,8 @@ extern "C" __global__ void updateAnodeCharges(
     int numAnodes,
     int paddedNumAtoms,
     float voltage_kjmol,
-    float Lgap)
+    float Lgap,
+    float smallThreshold)  // FIX C: Runtime parameter instead of compile-time constant
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx >= numAnodes) return;
@@ -110,7 +112,7 @@ extern "C" __global__ void updateAnodeCharges(
     
     // Compute external field
     float Ez_external = 0.0f;
-    if (fabsf(q_old) > 0.9f * SMALL_THRESHOLD) {
+    if (fabsf(q_old) > 0.9f * smallThreshold) {
         Ez_external = fz / q_old;
     }
     
@@ -118,8 +120,8 @@ extern "C" __global__ void updateAnodeCharges(
     float q_new = -(2.0f / FOUR_PI) * area * (voltage_kjmol / Lgap + Ez_external) * CONVERSION_KJMOL_NM_AU;
     
     // Prevent charge from getting too small (numerical stability)
-    if (fabsf(q_new) < SMALL_THRESHOLD) {
-        q_new = -SMALL_THRESHOLD;  // Anode: negative
+    if (fabsf(q_new) < smallThreshold) {
+        q_new = -smallThreshold;  // Anode: negative
     }
     
     // Update charge in posq

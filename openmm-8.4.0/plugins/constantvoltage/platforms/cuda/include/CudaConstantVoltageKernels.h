@@ -108,9 +108,13 @@ private:
     CudaArray allConductorIndices;
     int totalConductorAtoms;
     
+    // FIX A: Global buffer for charge transfer broadcast (multi-block safe)
+    CudaArray dqPerAtomBuffer;
+    
     // Conductor kernels
     CUfunction computeConductorImageChargesKernel;
-    CUfunction computeConductorChargeTransferKernel;
+    CUfunction computeConductorDqPerAtomKernel;     // FIX A: Compute dq_per_atom (single thread)
+    CUfunction applyConductorChargeTransferKernel;  // FIX A: Apply to all atoms
     CUfunction scaleElectrodeChargesWithConductorsKernel;
     CUfunction initConductorGeometryKernel;
     
