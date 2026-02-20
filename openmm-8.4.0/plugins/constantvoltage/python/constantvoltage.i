@@ -30,6 +30,21 @@ namespace std {
 using namespace OpenMM;
 %}
 
+// Add type casting functions to help with inheritance
+%extend OpenMM::ConstantVoltageForce {
+    // Cast to Force* for System.addForce()
+    OpenMM::Force* asForce() {
+        return (OpenMM::Force*) $self;
+    }
+}
+
+%extend OpenMM::ConstantVDrudeLangevinIntegrator {
+    // Cast to Integrator* if needed
+    OpenMM::Integrator* asIntegrator() {
+        return (OpenMM::Integrator*) $self;
+    }
+}
+
 %feature("autodoc", "0");
 %nodefaultctor;
 

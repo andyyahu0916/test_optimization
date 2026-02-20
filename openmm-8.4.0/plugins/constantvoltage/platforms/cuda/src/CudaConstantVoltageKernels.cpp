@@ -372,18 +372,18 @@ void CudaCalcConstantVoltageForceKernel::initializeConductorGeometry(ContextImpl
         // Step 1: Search primary electrode based on electrode_type
         if (electrodeType == "cathode" && numCathodes > 0) {
             // Search cathode
-            vector<int> cathodeIdx(numCathodes);
-            cathodeIndices.download(cathodeIdx);
-            
-            for (int i = 0; i < numCathodes; i++) {
-                int idx = cathodeIdx[i];
-                float dx = positions[idx].x - center.x;
-                float dy = positions[idx].y - center.y;
-                float dz = positions[idx].z - center.z;
+        vector<int> cathodeIdx(numCathodes);
+        cathodeIndices.download(cathodeIdx);
+        
+        for (int i = 0; i < numCathodes; i++) {
+            int idx = cathodeIdx[i];
+            float dx = positions[idx].x - center.x;
+            float dy = positions[idx].y - center.y;
+            float dz = positions[idx].z - center.z;
                 float dist = sqrtf(dx*dx + dy*dy + dz*dz);
                 if (dist < minDist) {
                     minDist = dist;
-                    closestAtom = idx;
+                closestAtom = idx;
                     isCathodeContact = true;
                 }
             }
@@ -458,8 +458,8 @@ void CudaCalcConstantVoltageForceKernel::initializeConductorGeometry(ContextImpl
             // Contact with flat electrode: use electrode surface normal
             // Cathode: normal points +z, Anode: normal points -z
             if (isCathodeContact) {
-                conductorContactNormals[c] = make_float3(0.0f, 0.0f, 1.0f);
-            } else {
+            conductorContactNormals[c] = make_float3(0.0f, 0.0f, 1.0f);
+        } else {
                 conductorContactNormals[c] = make_float3(0.0f, 0.0f, -1.0f);
             }
         } else {
@@ -773,6 +773,11 @@ void CudaCalcConstantVoltageForceKernel::updateElectrodeCharges(ContextImpl& con
             }
         }
     }
+    
+    // CRITICAL: Synchronize charge changes after all updates
+    // This ensures PME and other force calculations use the updated charges
+    // Reference: Original algorithm calls updateParametersInContext() after each SCF iteration
+    cu.invalidateMolecules();
 }
 
 double CudaCalcConstantVoltageForceKernel::getTotalCathodeCharge(ContextImpl& context) {
@@ -1027,10 +1032,17 @@ void CudaIntegrateConstantVDrudeLangevinStepKernel::execute(
     // Check if SCF update is needed
     if (stepCount % scfFrequency == 0 && forceKernel != nullptr) {
         for (int i = 0; i < numSCFIterations; i++) {
-            // Recalculate forces
+            // CRITICAL: Ensure charges are up-to-date before recalculating forces
+            // This matches the original algorithm where getState(getForces=True) 
+            // triggers a full force recalculation with current charges
+            cu.invalidateMolecules();
+            // Recalculate forces (with current charge distribution)
             context.calcForcesAndEnergy(true, false, context.getIntegrator().getIntegrationForceGroups());
             // Update electrode charges
             forceKernel->updateElectrodeCharges(context);
+            // CRITICAL: Synchronize charge changes for next iteration
+            // This ensures PME and other force calculations use the updated charges
+            cu.invalidateMolecules();
         }
     }
 

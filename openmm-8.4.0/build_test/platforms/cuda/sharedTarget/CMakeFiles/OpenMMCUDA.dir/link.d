@@ -43,16 +43,16 @@
   /usr/lib/x86_64-linux-gnu/libdl.a \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libdl.a \
   /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/librt.a \
-  /home/andy/miniforge3/envs/cuda/lib/../lib/libstdc++.so \
+  /usr/lib/gcc/x86_64-linux-gnu/13/libstdc++.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so \
   /lib/x86_64-linux-gnu/libm.so.6 \
   /lib/x86_64-linux-gnu/libmvec.so.1 \
-  /home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so \
-  /home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so \
-  /home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so \
-  /home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so.1 \
+  /usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so \
+  /usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so \
+  /usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so \
+  /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgcc_s.so.1 \
   /usr/lib/gcc/x86_64-linux-gnu/13/libgcc.a \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libpthread.a \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libc.so \
@@ -61,10 +61,10 @@
   /lib/x86_64-linux-gnu/libc.so.6 \
   /usr/lib/x86_64-linux-gnu/libc_nonshared.a \
   /lib64/ld-linux-x86-64.so.2 \
-  /home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so \
-  /home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so \
-  /home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so \
-  /home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so.1 \
+  /usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so \
+  /usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so \
+  /usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so \
+  /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgcc_s.so.1 \
   /usr/lib/gcc/x86_64-linux-gnu/13/libgcc.a \
   /usr/lib/gcc/x86_64-linux-gnu/13/crtendS.o \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/crtn.o
@@ -157,7 +157,7 @@ CMakeFiles/OpenMMCUDA.dir/__/__/common/src/CommonKernelSources.cpp.o:
 
 /home/andy/miniforge3/envs/cuda/x86_64-conda-linux-gnu/sysroot/usr/lib/librt.a:
 
-/home/andy/miniforge3/envs/cuda/lib/../lib/libstdc++.so:
+/usr/lib/gcc/x86_64-linux-gnu/13/libstdc++.so:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so:
 
@@ -169,13 +169,13 @@ CMakeFiles/OpenMMCUDA.dir/__/__/common/src/CommonKernelSources.cpp.o:
 
 /lib/x86_64-linux-gnu/libmvec.so.1:
 
-/home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so:
+/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so:
 
-/home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so:
+/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so:
 
-/home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so:
+/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so:
 
-/home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so.1:
+/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgcc_s.so.1:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/libgcc.a:
 
@@ -193,13 +193,13 @@ CMakeFiles/OpenMMCUDA.dir/__/__/common/src/CommonKernelSources.cpp.o:
 
 /lib64/ld-linux-x86-64.so.2:
 
-/home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so:
+/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so:
 
-/home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so:
+/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so:
 
-/home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so:
+/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so:
 
-/home/andy/miniforge3/envs/cuda/lib/../lib/libgcc_s.so.1:
+/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgcc_s.so.1:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/libgcc.a:
 
