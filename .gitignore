@@ -1,0 +1,6 @@
+__pycache__
+.git
+.pixi
+pixi.lock
+.vscode
+openmm-8.4.0
